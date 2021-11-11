@@ -1,2 +1,0 @@
-\echo schema
-create or replace schema homicidehotel;
