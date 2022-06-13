@@ -26,12 +26,22 @@ def main():
 
     bbsengine.title("homicide hotel")
     ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
-    ch = ttyio.inputchar("prompt: ", "QE", "")
+    ttyio.echo("[E]xplain")
+    ttyio.echo("[C]redits")
+    ttyio.echo("{f6}[Q]uit")
+    ch = ttyio.inputchar("prompt: ", "QCE", "")
     if ch == "E":
         ttyio.echo("Explain #1")
         fp = open("s.m.explain-1")
         content = fp.read()
         content.replace("\r\n", "CR")
+        fp.close()
+        ttyio.echo(content)
+    if ch == "C":
+        ttyio.echo("Credits")
+        fp = open("s.m.credits")
+        content = fp.read()
+        fp.close()
         ttyio.echo(content)
 
 if __name__ == "__main__":
