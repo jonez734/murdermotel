@@ -1,0 +1,50 @@
+
+
+;s.word file \c8axe handle\cl
+\c8pistol\cl
+\c8chlorine gas\cl
+\c8flame thrower\cl
+\c8industrial acid\cl
+\c8axe blade\cl
+\c8bullets\cl
+\c8gas sprayer\cl
+\c8lighter fluid\cl
+\c8acid sprayer\cl
+\c3riot shield\cl
+\c3flak jacket\cl
+\c3gas mask\cl
+\c3fire extinguisher\cl
+\c3lye\cl
+{f6}You butcher 
+{f6}You take aim & shoot 
+{f6}You gas 
+{f6}You pull out your fueled flame thrower{f6}and fry 
+{f6}You pump the acid sprayer furiously{f6}and dissolve 
+{f6}You swing the axe with all your might{f6}and slaughter 
+{f6}You take aim.. Pull the trigger.. {f6}And waste 
+{f6}The noxious fumes spread from the{f6}sprayer and poison 
+{f6}Heat and light burst from the flame gun{f6}as you cook 
+{f6}The acid hisses from the nossle of your{f6}sprayer. It liquifies 
+{f6}THUCK! WHACK! THUCK! You hack away{f6}and finish 
+{f6}BANG\b1 BANG\b1!!! You gun down the vermin{f6}called 
+{f6}The chlorine spews out ans asphyxiates{f6}your mortal enemy 
+{f6} You barbecue 
+{f6}You boil away 
+{f6}{f6}{f6}\p1\c8       MAGIC FOAM BBS PRESENTS
+{f6}{f6}\p0\c5            Sean D Wagle's\c7{f6}{f6}       M U R D E R   M O T E L{f6}{f6}{f6}
+\clType 'I' to find out who your{f6}target is. If you need help- type 'H'.{f6}
+{f6}HELP-North/East/West/South/Up/Down{f6}Information/Take/Leave/Kill/Quit
+\c1Updating files. Returning you to LOBBY
+{f6}Take which object (give #){f6}>
+{f6}GAME INFORMATION{f6}You are carrying with you...{f6}
+{f6}\b1 That weapon is incomplete!
+TAKEN.
+{f6}OH NO!{f6}Your opponent has a 
+.{f6}You flee to a random location in panic!
+{f6}No weapons or defenses.
+{f6}\b1Sorry- but you have used up all your    moves for this call.{f6}
+{f6}{f6}\c7You are now the only player left..{f6}You've won the game!{f6}{f6}
+{f6}\b1You can carry up to 5 items.{f6}And only 2 of them may be defenses.
+{f6}Kill with which?{f6}1)axe 2)pistol 3)chlorine 4)fire 5)acid{f6}>
+.
+

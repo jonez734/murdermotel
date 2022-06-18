@@ -1,0 +1,86 @@
+
+
+;s.m.explain 2 \c1    MURDER MOTEL COMMAND SUMMARY
+\c7    {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+\cm  When you are playing MURDER MOTEL
+the followin commands are available to
+you\cn NORTH SOUTH EAST WEST UP DOWN
+
+The directional commands will move
+your player towards whatever exits
+are available. You can only go
+through THESE exits; there are no
+secret doors in the game.
+
+\coTAKE\cm - This command allows you
+to take any item (weapon or defense)
+that you find in the motel. You can
+carry a maximum of five things
+including up to two defenses.
+
+\coLEAVE\cm - When you want to drop
+an object that you are carrying (to
+make more room for something you
+need) use this command. A prompt
+will appear for each object you are 
+carrying asking in (Y-N) format
+which you will leave behind.
+
+\coKILL\cm - Use this to kill the 
+player you are after. This command
+is useless unless you are in the
+same room as your opponent.
+
+\coQUIT\cm - To quit the game and
+return to the MAIN area. You may
+go back to the game on the same
+call if you had any moves left when
+you quit.
+
+\coINFORMATION\cm - This will tell
+you what you are carrying who you
+must kill what room you are in and
+what objects or people are in the 
+room with you. You should always
+check INFORMATION when you begin the
+game just in case your target has
+been changed from the last time you
+called.
+
+\coMAP\cm - This takes one movement
+point and will display any of the
+five levels.
+
+\coREPORT\cm - This will allow you
+to add a one line message of 76
+characters to the Motel Newspaper.
+This will take one movement point
+and is great for leading people
+around in circles.
+
+\coHIGH KILLS\cm - This will show
+the list of players in order of
+the most kills.
+
+\coHIGH POINTS\cm - This will show
+the list of players in order of
+the most points.
+
+\coREAD PAPER\cm - This will allow you
+to read the Motel Newspaper.  This
+will contain all information about
+what has happened in the game,
+including reports by other players.
+
+\coGET INSTRUCTIONS\cm - This will
+give you this instruction file you
+are currently viewing.
+
+Pres the '?' to view the appropriate
+SINGLE letter command entries for the
+above command discriptions.
+
+Thanks and enjoy this version.
+Mark Dickenson
+Mark AD I (Quantum Link)
+
