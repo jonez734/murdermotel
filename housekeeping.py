@@ -4,6 +4,8 @@ import argparse
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
+def init(args=None):
+  pass
 #def init(args=None):
 #  ttyio.setvariable("menuoption", "{white}{bggray}")
 #  ttyio.setvariable("menudesc", "{/bgcolor}{white}")
@@ -43,21 +45,12 @@ def main(args):
       bbsengine.title("homicide hotel housekeeping")
       ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
       setarea(args, "homicide hotel housekeeping")
-      ttyio.echo("{var:menuoption}[A]{var:menudesc}dd address")
       ttyio.echo("{f6}{var:menuoption}[Q]{var:menudesc}uit{f6}")
-      ch = ttyio.inputchar("{var:promptcolor}hotel maint [AQ]: {var:inputcolor}", "AQ", "")
-      if ch == "A":
-        ttyio.echo("A - add address")
-        t = ttyio.inputchar("{var:promptcolor}Type {var:menuoption}[V]{var:menudesc}irtual or {var:menuoption}[M]{var:menudesc}ailbox: {var:inputcolor}", "VM", "")
-        if t == "M":
-          ttyio.echo("Mailbox")
-          addmailbox(args)
-        elif t == "V":
-          ttyio.echo("Virtual")
-          # addvirtual()
-      elif ch == "Q":
+      ch = ttyio.inputchar("{var:promptcolor}hotel housekeeping [AQ]: {var:inputcolor}", "AQ", "")
+      if ch == "Q":
         ttyio.echo("Q - Quit")
         done = True
+    return True
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")
