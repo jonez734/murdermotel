@@ -1,4 +1,6 @@
 import argparse
+import random
+
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
@@ -23,10 +25,17 @@ def setarea(args, left, dirty=False):
     return rightbuf
   bbsengine.setarea(left, right)
 
+def weapons(args):
+  kk = 140
+  for t in range(0, 90+1):
+    ttyio.echo("t=%r" % (t))
+    ttyio.echo("randint=%r" % (random.randint(10, kk-10)))
+
 def main(args):
     if args is not None and "debug" in args and args.debug is True:
         ttyio.echo("hotelsetup.main.100: args=%r" % (args))
 
-    ch = ttyio.inputboolean("create playground? [Yn]: ", "Y")
-    ch = ttyio.inputboolean("create players? [Yn]: ", "Y")
-    ch = ttyio.inputboolean("create weapons? [Yn]: ", "Y")
+#    ch = ttyio.inputboolean("create playground? [Yn]: ", "Y")
+#    ch = ttyio.inputboolean("create players? [Yn]: ", "Y")
+    if ttyio.inputboolean("create weapons? [Yn]: ", "Y") is True:
+      weapons(args)
