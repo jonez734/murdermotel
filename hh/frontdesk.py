@@ -17,6 +17,8 @@ def main(args):
 
     done = False
     while not done:
+        height = ttyio.getterminalheight()
+
         lib.setarea(args, player, "front desk")
         options = ""
         ttyio.echo("{var:optioncolor}[G]{var:menudesc}ame instructions")
@@ -32,7 +34,7 @@ def main(args):
         if ch == "G":
             ttyio.echo("Game Instructions")
             bbsengine.filedisplay(args, "s.explain-1.txt", more=True)
-            if ttyio.inputboolean("{var:promptcolor}continue? [{var:optioncolor}Yn{var:promptcolor}]: {var:inputcolor}", "Yn") is True:
+            if ttyio.inputboolean("{curpos:%d,1}{el}{var:promptcolor}end of part 1. continue? [{var:optioncolor}Yn{var:promptcolor}]: {var:inputcolor}" % (height-1), "Yn") is True:
                 bbsengine.filedisplay(args, "s.explain-2.txt")
         elif ch == "C":
             ttyio.echo("Credits")
