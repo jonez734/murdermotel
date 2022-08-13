@@ -5,38 +5,8 @@ import argparse
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
-import hh.lib
-
-class WeaponComponent(object):
-    def __init__(self, args, name, location, description):
-        self.args = args
-        self.name = name
-        self.description = description
-        self.location = location
-
-class Safety(object):
-    def __init__(self, args, name, location, description):
-        self.args = args
-        self.name = name
-        self.location = location
-        self.description = description
-
-class Room(object):
-    def __init__(self, args, name, location, description):
-        self.args = args
-        self.name = name
-        self.location = location
-        self.description = description
-        self.contents = []
-        self.exits = {}
-
-class Player(object):
-    def __init__(self, args, name, location):
-        self.args = args
-        self.name = name
-        self.location = location
-        self.isdirty = False
-        self.turn = 3
+from . import lib
+from . import version
 
 def init(args=None):
     hh.lib.init(args)
@@ -66,8 +36,6 @@ def main(args):
     hh.lib.setcurrentplayer(player)
 
     bbsengine.runsubmodule(args, "hh.lobby")
-#    bbsengine.runcallback(args, "hh.lobby.init")
-#    bbsengine.runcallback(args, "hh.lobby.main")
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")

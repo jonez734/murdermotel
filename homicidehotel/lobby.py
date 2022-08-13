@@ -33,9 +33,7 @@ def main(args):
         ch = ttyio.inputchar("{var:promptcolor}:hotel: front desk [%s]: {var:inputcolor}" % (options), options, "")
         if ch == "G":
             ttyio.echo("Game Instructions")
-            bbsengine.filedisplay(args, "s.explain-1.txt", more=True)
-            if ttyio.inputboolean("{curpos:%d,1}{el}{var:promptcolor}end of part 1. continue? [{var:optioncolor}Yn{var:promptcolor}]: {var:inputcolor}" % (height-1), "Yn") is True:
-                bbsengine.filedisplay(args, "s.explain-2.txt")
+            bbsengine.filedisplay(args, "s.explain.txt", more=True)
         elif ch == "C":
             ttyio.echo("Credits")
             bbsengine.filedisplay(args, "s.credits.txt", more=False)
@@ -46,7 +44,7 @@ def main(args):
         elif ch == "H":
             ttyio.echo("Housekeeping")
             res = bbsengine.runsubmodule(args, "hh.housekeeping")
-            if res is None:
+            if res is False:
                 ttyio.echo("!! error running submodule", level="error")
         elif ch == "?":
             ttyio.echo("menu")

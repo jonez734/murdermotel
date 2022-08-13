@@ -1,6 +1,37 @@
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
+class WeaponComponent(object):
+    def __init__(self, args, name, location, description):
+        self.args = args
+        self.name = name
+        self.description = description
+        self.location = location
+
+class Safety(object):
+    def __init__(self, args, name, location, description):
+        self.args = args
+        self.name = name
+        self.location = location
+        self.description = description
+
+class Room(object):
+    def __init__(self, args, name, location, description):
+        self.args = args
+        self.name = name
+        self.location = location
+        self.description = description
+        self.contents = []
+        self.exits = {}
+
+class Player(object):
+    def __init__(self, args, name, location):
+        self.args = args
+        self.name = name
+        self.location = location
+        self.isdirty = False
+        self.turn = 3
+
 currentplayer = None
 def setcurrentplayer(player):
   global currentplayer
