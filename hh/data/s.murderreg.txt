@@ -1,0 +1,24 @@
+{clr}{$0a}{gry3}{CTRL-O}{swuc}{rvon}{lblu}                                       {rvof}
+{rvon}     {CBM-D}{yel} please sign in at the desk {lblu}     {rvof}
+{rvon}     {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}     {rvof}
+{rvon}                                       {rvof}
+{rvon}   {brn}{CBM-K}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{lblu}                   {rvof}
+{rvon}   {brn}{CBM-K}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{lblu}                   {rvof}
+{rvon}   {brn}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{lblu}                   {rvof}
+{rvon}   {brn}{CBM-K}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{CBM-I}{CBM-F}{lblu}         {CBM-I}{CBM-F}        {rvof}
+{rvon}   {brn}{CBM-K}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{rvof}{CBM-I}{rvon}{CBM-V}{lblu}        {CBM-D}{wht}{CBM-K}{lblu}{CBM-K}        {rvof}
+{rvon}   {brn}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{rvof} {rvon}{CBM-K}{lblu}        {rvof}{CBM-K}{wht}{CBM-K}{rvon}{lblu}{CBM-V}        {rvof}
+{rvon}   {rvof}{brn}{CBM-C}{rvon}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{lblu}        {rvof}{wht}{CBM-D}{CBM-V}{rvon}{lblu}         {rvof}
+{rvon}                            {wht}{CBM-K}{lblu}{CBM-K}         {rvof}
+{rvon}                          {rvof}{lgrn}{CBM-D}{CBM-I}{CBM-I}{CBM-I}{CBM-F}{rvon}{lblu}        {rvof}
+{rvon}                {rvof}{grn}{SHIFT--}{rvon}{lblu} {rvof}{grn}{SHIFT--}{rvon}{lblu}    {rvof}{lgrn}{CBM-D}{CBM-I}{CBM-I}{rvon} {rvof}{brn}{CBM-D}{rvon} {rvof}{CBM-F}{rvon}{lgrn} {rvof}{CBM-I} {rvon}{lblu}      {rvof}
+{rvon}   {brn}{CBM-O}{CBM-O}{CBM-O}{CBM-O}  {CBM-O}{CBM-O}{CBM-O}{CBM-O}{lblu}  {rvof}{grn}{CBM-A}{CBM-E}{SHIFT-*}{CBM-E}{CBM-S}{rvon}{lblu}  {rvof}{lgrn}{CBM-D}{rvon}    {rvof}{brn}{CBM-C}{rvon} {rvof}{CBM-V}{rvon}{lgrn}  {rvof}{CBM-K}{CBM-I}{CBM-I}{CBM-K}{rvon}{lblu}   {rvof}
+{rvon}{gry2} {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P} {rvof}
+{rvon}{CBM-M}{gry1}M                                   {gry2}N{CBM-G}{rvof}
+{rvon}{CBM-M}{gry1} {gry2}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{gry3} {gry2}{CBM-G}{rvof}
+{rvon}{CBM-M}{gry1} {gry2}{CBM-H}                                 {CBM-N}{gry3} {gry2}{CBM-G}{rvof}
+{rvon}{CBM-M}{gry1} {gry2}{CBM-H} {CBM-D}{wht}   murder motel front desk   {gry2}  {CBM-N}{gry3} {gry2}{CBM-G}{rvof}
+{rvon}{CBM-M}{gry1} {gry2}{CBM-H} {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}  {CBM-N}{gry3}{$a0}{gry2}{CBM-G}{rvof}
+{rvon}{CBM-M}{gry1} {gry2}L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}{gry3} {gry2}{CBM-G}{rvof}
+{rvon}{CBM-M}N{gry3}                                   M{gry2}{CBM-G}{rvof}
+{rvon} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y} {rvof}
