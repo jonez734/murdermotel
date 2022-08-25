@@ -9,8 +9,7 @@ from . import lib
 from . import version
 
 def init(args=None):
-    hh.lib.init(args)
-    return
+    return lib.init(args)
 
 def buildargs(args=None):
     parser = argparse.ArgumentParser("homicidehotel")
@@ -31,11 +30,11 @@ def main(args):
 
     ttyio.echo("{f6:3}{cursorup:3}") #  curpos:%d,0}" % (ttyio.getterminalheight()-5))
     bbsengine.initscreen(bottommargin=1)
-    player = Player(args, "testplayer-1", (0,0,0))
-    hh.lib.setarea(args, player, "homicide hotel")
-    hh.lib.setcurrentplayer(player)
+    player = lib.Player(args, "testplayer-1", (0,0,0))
+    lib.setarea(args, player, "homicide hotel")
+    lib.setcurrentplayer(player)
 
-    bbsengine.runsubmodule(args, "hh.lobby")
+    lib.runsubmodule(args, player, "lobby")
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")

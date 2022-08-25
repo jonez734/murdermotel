@@ -1,14 +1,15 @@
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
-import hh.lib as lib
+from . import lib
+from . import data
 
-def init(args=None):
+def init(args=None, **kw):
 #    ttyio.echo("hh.frontdesk.init called", level="debug")
     lib.init(args)
     return True
 
-def main(args):        
+def main(args, **kw):
     bbsengine.title("homicide hotel front desk")
     ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
 
@@ -28,26 +29,31 @@ def main(args):
         if bbsengine.checksysop(args) is True:
             ttyio.echo("{var:optioncolor}[H]{var:menudesc}ousekeeping")
             options += "H"
+        ttyio.echo("{var:optioncolor}[P]{var:menudesc}lay")
+        options += "P"
         ttyio.echo("{f6}{var:optioncolor}[Q]{var:menudesc}uit")
         options += "Q?"
         ch = ttyio.inputchar("{var:promptcolor}:hotel: front desk [%s]: {var:inputcolor}" % (options), options, "")
         if ch == "G":
             ttyio.echo("Game Instructions")
-            bbsengine.filedisplay(args, "s.explain.txt", more=True)
+            lib.setarea(args, player, "reading: 'game instructions'")
+            bbsengine.filedisplay(args, data.get("s.explain.txt"), more=True)
         elif ch == "C":
             ttyio.echo("Credits")
-            bbsengine.filedisplay(args, "s.credits.txt", more=False)
+            lib.setarea(args, player, "reading: 'credits'")
+            bbsengine.filedisplay(args, data.get("s.credits.txt"), more=False)
         elif ch == "Q":
             ttyio.echo(":door: Quit")
             if ttyio.inputboolean("{var:promptcolor}are you sure? [{var:optioncolor}yN{var:promptcolor}]: {var:inputcolor}", "N") is True:
                 done = True
         elif ch == "H":
             ttyio.echo("Housekeeping")
-            res = bbsengine.runsubmodule(args, "hh.housekeeping")
-            if res is False:
-                ttyio.echo("!! error running submodule", level="error")
+            res = lib.runsubmodule(args, player, "housekeeping")
+        elif ch == "P":
+            ttyio.echo("Play")
+            res = lib.runsubmodule(args, player, "play")
         elif ch == "?":
             ttyio.echo("menu")
-            bbsengine.filedisplay(args, "s.menu.txt")
+            bbsengine.filedisplay(args, data.get("s.menu.txt"))
         else:
             ttyio.echo()

@@ -1,6 +1,9 @@
 import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
+# @since 20220813
+PACKAGENAME = "homicidehotel"
+
 class WeaponComponent(object):
     def __init__(self, args, name, location, description):
         self.args = args
@@ -69,3 +72,10 @@ def init(args=None):
   ttyio.setvariable("valuecolor", "{/bgcolor}{green}")
   ttyio.setvariable("promptcolor", "{/bgcolor}{lightgray}")
   ttyio.setvariable("inputcolor", "{/bgcolor}{green}")
+
+# @since 20220813
+def runsubmodule(args, player, submodule, **kw):
+    x = "%s.%s" % (PACKAGENAME, submodule)
+    if args.debug is True:
+        ttyio.echo("lib.runsubmodule.100: x=%r" % (x), level="debug")
+    return bbsengine.runsubmodule(args, x, player=player, **kw)
