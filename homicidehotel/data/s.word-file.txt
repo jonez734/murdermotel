@@ -1,0 +1,47 @@
+\c8axe handle\cl
+\c8pistol\cl
+\c8chlorine gas\cl
+\c8flame thrower\cl
+\c8industrial acid\cl
+\c8axe blade\cl
+\c8bullets\cl
+\c8gas sprayer\cl
+\c8lighter fluid\cl
+\c8acid sprayer\cl
+\c3riot shield\cl
+\c3flak jacket\cl
+\c3gas mask\cl
+\c3fire extinguisher\cl
+\c3lye\cl
+You butcher 
+You take aim & shoot 
+You gas 
+You pull out your fueled flame throwerand fry 
+You pump the acid sprayer furiouslyand dissolve 
+You swing the axe with all your mightand slaughter 
+You take aim.. Pull the trigger.. And waste 
+The noxious fumes spread from thesprayer and poison 
+Heat and light burst from the flame gunas you cook 
+The acid hisses from the nossle of yoursprayer. It liquifies 
+THUCK! WHACK! THUCK! You hack awayand finish 
+BANG\b1 BANG\b1!!! You gun down the vermincalled 
+The chlorine spews out ans asphyxiatesyour mortal enemy 
+ You barbecue 
+You boil away 
+\p1\c8       MAGIC FOAM BBS PRESENTS
+\p0\c5            Sean D Wagle's\c7       M U R D E R   M O T E L
+\clType 'I' to find out who yourtarget is. If you need help- type 'H'.
+HELP-North/East/West/South/Up/DownInformation/Take/Leave/Kill/Quit
+\c1Updating files. Returning you to LOBBY
+Take which object (give #)>
+GAME INFORMATIONYou are carrying with you...
+\b1 That weapon is incomplete!
+TAKEN.
+OH NO!Your opponent has a 
+.You flee to a random location in panic!
+No weapons or defenses.
+\b1Sorry- but you have used up all your    moves for this call.
+\c7You are now the only player left..You've won the game!
+\b1You can carry up to 5 items.And only 2 of them may be defenses.
+Kill with which?1)axe 2)pistol 3)chlorine 4)fire 5)acid>
+.

@@ -1,0 +1,21 @@
+{acs:ulcorner}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:urcorner}
+{acs:vline}  Super Murder Motel PLUS Menu   {acs:vline}
+{acs:ltee}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:rtee}
+{acs:vline}  U - Up         D - Down        {acs:vline}
+{acs:vline}  N - North      S - South       {acs:vline}
+{acs:vline}  E - East       W - West        {acs:vline}
+{acs:vline}  I - Information on YOU         {acs:vline}
+{acs:vline}  K - Kill your target           {acs:vline}
+{acs:vline}  L - Leave an Item behind       {acs:vline}
+{acs:vline}  T - Take an Item from the room {acs:vline}
+{acs:vline}  R - Send a Report to the Paper {acs:vline}
+{acs:vline}  M - Motel Level Maps 1-5       {acs:vline}
+{acs:vline}  P - Read the Motel Newspaper   {acs:vline}
+{acs:vline}  # - Read High Point List       {acs:vline}
+{acs:vline}  H - Read High Kill List        {acs:vline}
+{acs:vline}  G - Read Game Instructions     {acs:vline}
+{acs:vline}  ? - This Help Screen           {acs:vline}
+{acs:vline}  Q - Quit the Game              {acs:vline}
+{acs:ltee}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:rtee}
+{acs:vline}  Select an ITEM from the list:  {acs:vline}
+{acs:llcorner}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:lrcorner}
