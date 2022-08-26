@@ -10,7 +10,7 @@ def init(args=None, **kw):
     return True
 
 def main(args, **kw):
-    bbsengine.title("homicide hotel front desk")
+    bbsengine.title("murder motel lobby")
     ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
 
     player = lib.getcurrentplayer()

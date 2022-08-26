@@ -2,7 +2,7 @@ import ttyio5 as ttyio
 import bbsengine5 as bbsengine
 
 # @since 20220813
-PACKAGENAME = "homicidehotel"
+PACKAGENAME = "murdermotel"
 
 class WeaponComponent(object):
     def __init__(self, args, name, location, description):
@@ -57,7 +57,7 @@ def setarea(args, player, left):
 
             turn = " | %s" % (bbsengine.pluralize(4-player.turn, "turn remains", "turns remain"))
 
-            return "homicide hotel | %s%s%s%s" % (isdirty, player.name, turn, debug)
+            return "murder motel | %s%s%s%s" % (isdirty, player.name, turn, debug)
         else:
             if debug is True:
                 return "debug"

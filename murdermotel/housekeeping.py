@@ -21,7 +21,7 @@ def main(args, **kw):
 
     done = False
     while not done:
-      bbsengine.title("homicide hotel housekeeping")
+      bbsengine.title("murder motel housekeeping")
       ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
       lib.setarea(args, player, "housekeeping")
       ttyio.echo("{var:menuoption}[S]{var:menudesc}etup")
