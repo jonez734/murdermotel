@@ -1,2 +1,2 @@
 \i schema.sql
-\i map.sql
+\i playground.sql
