@@ -7,7 +7,7 @@ from setuptools import setup
 r = 1
 v = time.strftime("%Y%m%d%H%M")
 
-projectname = "empyre"
+projectname = "murdermotel"
 
 os.system("./updateversion.sh")
 
@@ -18,10 +18,10 @@ setup(
   author="zoid technologies",
   author_email="%s@projects.zoidtechnologies.com" % (projectname),
   requires=["ttyio5", "bbsengine5"],
-  scripts=["bin/empyre"],
+  scripts=["bin/murdermotel"],
   license="GPLv2",
   provides=[projectname],
-  packages=["empyre", "empyre.island", "empyre.quests", "empyre.data"],
-  long_description = """empyre -- turn-based strategy game based on empire6 and built upon bbsengine5""",
+  packages=["murdermotel", "murdermotel.data"],
+  long_description = """murder motel -- turn based game involving assassination of other players""",
   include_package_data = True,
 )
