@@ -1,0 +1,24 @@
+{clr}{$00}{gry3}{$00}{swuc}{rvon}M{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{gry2}N{rvof}
+{rvon}{gry3}{CBM-M}{gry2}                                     {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}M{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}N{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}                               {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {CBM-D}{yel}                        {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}       {CBM-D}{gry3} super {yel}         {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}       {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}         {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}   {CBM-D}{gry3} murder  motel {yel}     {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}   {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}     {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}       {CBM-D}{gry3} plus! {yel}         {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}       {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}         {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {rvof}{CBM-K}{rvon}{yel}                        {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}                               {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {CBM-D}{wht} 1989 by mark dickenson {grn}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}{CBM-M}{grn}   {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}   {gry3}{CBM-G}{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}  {gry1}N{gry3}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}M{gry2}  {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}                                     {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}   {gry3}M{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}N{gry2}   {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}   {gry3}{CBM-M}{gry2}                             {gry1}{CBM-G}{gry2}   {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}   {gry3}{CBM-M}{gry2} {CBM-D}{wht}image release 24 may 1989{gry2}  {gry1}{CBM-G}{gry2}   {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}   {gry3}{CBM-M}{gry2} {CBM-C}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-V}  {gry1}{CBM-G}{gry2}   {gry1}{CBM-G}{rvof}
+{rvon}{gry3}{CBM-M}{gry2}   {gry1}N{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}M{gry2}   {gry1}{CBM-G}{rvof}
+{rvon}{gry2}N{gry1}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}M{rvof}
