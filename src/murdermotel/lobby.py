@@ -27,8 +27,8 @@ def main(args, **kw):
         ttyio.echo("{var:optioncolor}[C]{var:menudesc}redits")
         options += "C"
         if bbsengine.checksysop(args) is True:
-            ttyio.echo("{var:optioncolor}[H]{var:menudesc}ousekeeping")
-            options += "H"
+            ttyio.echo("{var:optioncolor}[M]{var:menudesc}aintenance")
+            options += "M"
         ttyio.echo("{var:optioncolor}[P]{var:menudesc}lay")
         options += "P"
         ttyio.echo("{f6}{var:optioncolor}[Q]{var:menudesc}uit")
@@ -46,9 +46,9 @@ def main(args, **kw):
             ttyio.echo(":door: Quit")
             if ttyio.inputboolean("{var:promptcolor}are you sure? [{var:optioncolor}yN{var:promptcolor}]: {var:inputcolor}", "N") is True:
                 done = True
-        elif ch == "H":
-            ttyio.echo("Housekeeping")
-            res = lib.runsubmodule(args, player, "housekeeping")
+        elif ch == "M":
+            ttyio.echo("Maintenance")
+            res = lib.runsubmodule(args, player, "maintenance")
         elif ch == "P":
             ttyio.echo("Play")
             res = lib.runsubmodule(args, player, "play")
