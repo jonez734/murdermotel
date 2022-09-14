@@ -1,0 +1,64 @@
+Map of the FIRST FLOOR
+CONTROL-S or CLR-HOME will Pause
+
+         Up      North Wing
+       Elevator  End          Basement
+         (2)-----(15)          Stairs
+          !       !             (120)
+          !      North           !
+       Library   Wing    Janitor !
+         (23)----(14)----(21)    !
+          !       !              !
+          !      North           !
+       West      Main    East    !
+       Hallway   Hall    Wing   Pantry
+         (24)----(13)----(20)---(19)
+          !       !       !      !
+       Women's    !    Kitchen  Freezer
+       Restroom   !      (16)---(17)
+         (25)     !       !      !
+                Central   !      !
+\n1-<Press ANY Key>-\g1
+       Men's     Main     !     Bootleg
+       Restroom  Hall    Cafe   Bar
+         (26)----(12)----(51)---(18)
+          !       !       !
+          !       !      Trash
+          !       !      Compactor
+          !       !      (50)
+          !       !
+          !      South
+File     TV      Main    Storage
+Room     Room    Hall    Closet
+(28)     (27)----(11)----(49)
+ !                !
+Manager  Sec's   Main    Normal
+Office   Office  Lobby   Elevator
+(30)-----(29)----(10)----(5)
+ !        !       !
+ !        !       !  Phone  Vacancy
+ !        !       !  Booth  Sign
+ !        !       !  (36)---(35)
+ !        !       !          !
+ !       Supply  Front    Parking
+\n1-<Press ANY Key>-\g1
+ !       Room    Porch      Lot    I-80
+ !       (22)    (33)-------(34)---(37)
+ !                !                 !
+Court    Under    !                Pot
+Yard     Porch   Garden            Hole
+(31)-----(32)    (39)              (38)
+                  !
+Dog              Shrub   LARCH
+Cage     Kennel  Maze    Tree
+(48)-----(47)----(40)----(41)
+                  !       !
+                 River   Gardener's
+                 Bank    Shed
+                 (46)----(45)
+
+In the LARCH Tree
+                Tree
+Trunk  Foliage  Top   Falling
+(42)---(43)-----(44)--(1)
+ 

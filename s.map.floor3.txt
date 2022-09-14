@@ -1,0 +1,32 @@
+Map on the THIRD FLOOR
+CONTROL-S or CLR-HOME will Pause
+
+Up
+Elevator
+(4)
+ !
+Vinegar      Hill of
+Bean Room    Beans Room
+(81)---------(82)
+ !            !
+Avacado      Syslob's      Cabbage
+Room         Room          Corner
+(70)---------(71)----------(72)
+ !                          !
+Booger       Squash        Radish
+Diner        Suite         Room
+(75)         (74)----------(73)
+ !                          !
+Spiral       Crud           !
+Staircase    Cafe           !
+(76)         (80)           !
+\n1-<Press ANY Key.>-\g1
+ !            !            Alter
+Torture      Loosing       Little
+Chamber #1   Sanity        John
+(77)---------(79)----------(78)
+                            !
+                           Normal
+                           Elevator
+                           (7)
+ 

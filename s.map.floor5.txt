@@ -1,0 +1,66 @@
+Map of the BASEMENT LEVEL
+CONTROL-S or CLR-HOME will Pause
+
+      Crawl  Air       River
+      Space Shaft      Bank
+      (100) (101)      (46)
+        !     !         !
+      Cave  Breezy    Still in
+       in   Tunnel    Tunnel
+      (102)-(103)     (140)
+              !         !
+              !       Small
+              !       Tunnel
+              !       (139)
+              !         !
+      Cubby Windy     Stone
+      Hole  Inter     Stair
+      (104) (105)-----(106)
+\n1-<Press ANY Key>-\g1
+        !     !         !
+Dim   Small Floor Fur-  !   Frozen
+Cornr Hole  Grill nace  !   Meat
+(107)-(108)-(109)-(110) !   (111)
+  !           !         !     !
+Sump  Maint  in       Frost Cold  Froze
+Room  Corrd Archv     Door  Store Contn
+(112)-(113) (114)     (115)-(116)-(117)
+  !     !     !         !     !
+  !     !   Man's       !   Frozen
+  !     !   Room        !   Boxes
+  !     !   (119)       !   (122)
+  !     !     !         !
+  !   Gener Basement   Old
+  !   Room  Stair    Furnature
+  !   (118)-(120)-----(121)
+  !           !
+  !           !       In         Rock
+  !           !       Crevas     Wall
+  !           !       (126)------(127)
+\n1-<Press ANY Key>-\g1
+  !           !         !          !
+ #2         Food      Look  Glow   !
+Laundry     Locker    Crevs Sphere !
+(123)-------(124)-----(125) (128)  !
+                              !    !
+Natural                     Dry    !
+Drain                       Ledge  !
+(129)-----------------------(130)  !
+  !                                !
+  !         Carved               Steap
+  !         Stairs               Wall
+  !         (131)----------------(132)
+  !           !
+  !           !       Butcher
+  !           !       Room
+  !           !       (133)
+  !           !         !
+Smelly      Rough     Death      Sleep
+Water       Stairs     All       Area
+(134)-------(135)-----(136)------(137)
+\n1-<Press ANY Key>-\g1
+                        !
+                   Bottomless
+                       Pit
+                      (138)
+
