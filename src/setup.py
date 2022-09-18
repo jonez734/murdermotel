@@ -18,7 +18,7 @@ setup(
   author="zoid technologies",
   author_email="%s@projects.zoidtechnologies.com" % (projectname),
   requires=["ttyio5", "bbsengine5"],
-  scripts=["bin/murdermotel"],
+  scripts=["../bin/murdermotel"],
   license="GPLv2",
   provides=[projectname],
   packages=["murdermotel", "murdermotel.data"],
