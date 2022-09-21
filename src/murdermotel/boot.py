@@ -5,10 +5,10 @@ import ttyio5 as ttyio
 
 from . import lib
 
-def init(args=None):
+def init(args=None, **kw):
     return lib.init(args)
 
-def buildargs(args=None):
+def buildargs(args=None, **kw):
     parser = argparse.ArgumentParser("murdermotel")
     
     parser.add_argument("--verbose", action="store_true", dest="verbose")
@@ -21,17 +21,15 @@ def buildargs(args=None):
     bbsengine.buildargdatabasegroup(parser, defaults)
     return parser
 
-def access(args):
+def access(args, op="run", **kw) -> bool:
     return True
 
-def main(args):
+def main(args, **kw):
     if args is not None and "debug" in args and args.debug is True:
         ttyio.echo("mm.main.100: args=%r" % (args), level="debug")
 
     ttyio.echo("{f6:3}{cursorup:3}") #  curpos:%d,0}" % (ttyio.getterminalheight()-5))
     bbsengine.initscreen(bottommargin=1)
-    player = lib.Player(args, "testplayer-1", (0,0,0))
+    player = None
     lib.setarea(args, player, "murder motel")
-    lib.setcurrentplayer(player)
-
     lib.runsubmodule(args, player, "lobby")
