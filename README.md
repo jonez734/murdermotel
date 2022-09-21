@@ -11,7 +11,7 @@
 - "glowing sphere"
   data"inside a glowing sphere",150,150,150,150,150,150
 - [x] use 'with' to display credits file @since 20220613 @see https://stackoverflow.com/a/48124263
-- (https://www.mobileread.com/forums/showthread.php?t=56489)[Text Analysis & Paragraph Detection]
+- [Text Analysis & Paragraph Detection](https://www.mobileread.com/forums/showthread.php?t=56489)
 - 3 weapons (2 pieces each), 2 defenses
 - 64list.exe has been very helpful @since 20220915 @see https://www.c64-wiki.com/wiki/C64list @ty ryan
 - [x] load and save player data @done 20220921
