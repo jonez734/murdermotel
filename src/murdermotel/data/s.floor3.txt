@@ -6,28 +6,27 @@ CONTROL-S or CLR-HOME will Pause
 Up
 Elevator
 (4)
- !
+ {acs:vline}
 Vinegar      Hill of
 Bean Room    Beans Room
-(81)---------(82)
- !            !
+(81){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(82)
+ {acs:vline}            {acs:vline}
 Avacado      Syslob's      Cabbage
 Room         Room          Corner
-(70)---------(71)----------(72)
- !                          !
+(70){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(71){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(72)
+ {acs:vline}                          {acs:vline}
 Booger       Squash        Radish
 Diner        Suite         Room
-(75)         (74)----------(73)
- !                          !
-Spiral       Crud           !
-Staircase    Cafe           !
-(76)         (80)           !
-\n1-<Press ANY Key.>-\g1
- !            !            Alter
+(75)         (74){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(73)
+ {acs:vline}                          {acs:vline}
+Spiral       Crud           {acs:vline}
+Staircase    Cafe           {acs:vline}
+(76)         (80)           {acs:vline}
+ {acs:vline}            {acs:vline}            Alter
 Torture      Loosing       Little
 Chamber #1   Sanity        John
-(77)---------(79)----------(78)
-                            !
+(77){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(79){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(78)
+                            {acs:vline}
                            Normal
                            Elevator
                            (7)

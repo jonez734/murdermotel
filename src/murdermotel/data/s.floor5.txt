@@ -6,62 +6,61 @@ CONTROL-S or CLR-HOME will Pause
       Crawl  Air       River
       Space Shaft      Bank
       (100) (101)      (46)
-        !     !         !
+        {acs:vline}     {acs:vline}         {acs:vline}
       Cave  Breezy    Still in
        in   Tunnel    Tunnel
-      (102)-(103)     (140)
-              !         !
-              !       Small
-              !       Tunnel
-              !       (139)
-              !         !
+      (102){acs:hline}(103)     (140)
+              {acs:vline}         {acs:vline}
+              {acs:vline}       Small
+              {acs:vline}       Tunnel
+              {acs:vline}       (139)
+              {acs:vline}         {acs:vline}
       Cubby Windy     Stone
       Hole  Inter     Stair
-      (104) (105)-----(106)
-\n1-<Press ANY Key>-\g1
-        !     !         !
-Dim   Small Floor Fur-  !   Frozen
-Cornr Hole  Grill nace  !   Meat
-(107)-(108)-(109)-(110) !   (111)
-  !           !         !     !
+      (104) (105){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(106)
+\n1{acs:hline}<Press ANY Key>{acs:hline}\g1
+        {acs:vline}     {acs:vline}         {acs:vline}
+Dim   Small Floor Fur{acs:hline}  {acs:vline}   Frozen
+Cornr Hole  Grill nace  {acs:vline}   Meat
+(107){acs:hline}(108){acs:hline}(109){acs:hline}(110) {acs:vline}   (111)
+  {acs:vline}           {acs:vline}         {acs:vline}     {acs:vline}
 Sump  Maint  in       Frost Cold  Froze
 Room  Corrd Archv     Door  Store Contn
-(112)-(113) (114)     (115)-(116)-(117)
-  !     !     !         !     !
-  !     !   Man's       !   Frozen
-  !     !   Room        !   Boxes
-  !     !   (119)       !   (122)
-  !     !     !         !
-  !   Gener Basement   Old
-  !   Room  Stair    Furnature
-  !   (118)-(120)-----(121)
-  !           !
-  !           !       In         Rock
-  !           !       Crevas     Wall
-  !           !       (126)------(127)
-\n1-<Press ANY Key>-\g1
-  !           !         !          !
- #2         Food      Look  Glow   !
-Laundry     Locker    Crevs Sphere !
-(123)-------(124)-----(125) (128)  !
-                              !    !
-Natural                     Dry    !
-Drain                       Ledge  !
-(129)-----------------------(130)  !
-  !                                !
-  !         Carved               Steap
-  !         Stairs               Wall
-  !         (131)----------------(132)
-  !           !
-  !           !       Butcher
-  !           !       Room
-  !           !       (133)
-  !           !         !
+(112){acs:hline}(113) (114)     (115){acs:hline}(116){acs:hline}(117)
+  {acs:vline}     {acs:vline}     {acs:vline}         {acs:vline}     {acs:vline}
+  {acs:vline}     {acs:vline}   Man's       {acs:vline}   Frozen
+  {acs:vline}     {acs:vline}   Room        {acs:vline}   Boxes
+  {acs:vline}     {acs:vline}   (119)       {acs:vline}   (122)
+  {acs:vline}     {acs:vline}     {acs:vline}         {acs:vline}
+  {acs:vline}   Gener Basement   Old
+  {acs:vline}   Room  Stair    Furnature
+  {acs:vline}   (118){acs:hline}(120){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(121)
+  {acs:vline}           {acs:vline}
+  {acs:vline}           {acs:vline}       In         Rock
+  {acs:vline}           {acs:vline}       Crevas     Wall
+  {acs:vline}           {acs:vline}       (126){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(127)
+\n1{acs:hline}<Press ANY Key>{acs:hline}\g1
+  {acs:vline}           {acs:vline}         {acs:vline}          {acs:vline}
+ #2         Food      Look  Glow   {acs:vline}
+Laundry     Locker    Crevs Sphere {acs:vline}
+(123){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(124){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(125) (128)  {acs:vline}
+                              {acs:vline}    {acs:vline}
+Natural                     Dry    {acs:vline}
+Drain                       Ledge  {acs:vline}
+(129){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(130)  {acs:vline}
+  {acs:vline}                                {acs:vline}
+  {acs:vline}         Carved               Steap
+  {acs:vline}         Stairs               Wall
+  {acs:vline}         (131){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(132)
+  {acs:vline}           {acs:vline}
+  {acs:vline}           {acs:vline}       Butcher
+  {acs:vline}           {acs:vline}       Room
+  {acs:vline}           {acs:vline}       (133)
+  {acs:vline}           {acs:vline}         {acs:vline}
 Smelly      Rough     Death      Sleep
 Water       Stairs     All       Area
-(134)-------(135)-----(136)------(137)
-\n1-<Press ANY Key>-\g1
-                        !
+(134){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(135){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(136){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(137)
+                        {acs:vline}
                    Bottomless
                        Pit
                       (138)
