@@ -1,10 +1,10 @@
 {cyan}Based on the original code from {red}Murder {lightred}Motel {yellow}by SEAN D. WAGLE  (C) 1987
-{white}Super {lightred}Murder Motel {yellow}PLUS {lightgreen}Version {white}4 (C) copyright 1989 {lightgreen}By Mark A. Dickenson
-{white}image release 24 may 1989
-{white}re-moded by little john for 12.0 on 1/11/88
-{white}murder motel image v1.0 9/1 pc
-{white}now player files created on etc disk, not system disk 20jan1988 little john
-{white}murder motel super and plus additions by mark dickenson 28 feb 89
-{white}murder hotel file maker v12.0 by little john
-{white}port to Image BBS 3.0 by Rug Rat - The Rats Den BBS - bbs.catracing.org port 6400 09jun2021
-{white}port to {darkgreen}bbsengine{white} started on 2022-07-27 by {lightgray}zoidtechnologies.com{white} (C) copyright 2022
+Super {lightred}Murder Motel {yellow}PLUS {lightgreen}Version {white}4 (C) copyright 1989 {lightgreen}By Mark A. Dickenson
+{var:normalcolor}re-moded by little john for 12.0 on 1/11/88
+now player files created on etc disk, not system disk 20jan1988 little john
+image release 24 may 1989
+murder motel image v1.0 9/1 pc
+murder motel super and plus additions by mark dickenson 28 feb 89
+murder hotel file maker v12.0 by little john
+port to Image BBS 3.0 by Rug Rat - The Rats Den BBS - bbs.catracing.org port 6400 09jun2021
+port to {darkgreen}bbsengine{var:normalcolor} started on 2022-07-27 by {lightgray}zoidtechnologies.com{white} (C) copyright 2022
