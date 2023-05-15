@@ -53,7 +53,7 @@ Murder Motel Update 5/20/89
 
 There is now a Rabid Wolf roaming the corridors of the Motel.  If you run into the wolf you had better have a COMPLETE weapon.  If you don't then the wolf will attack you and remove a number of moves from you.  You can also attack the wolf if you have a COMPLETE weapon.  You can remove strength from the wolf with each attack until you kill him.  You will get points for each attack and a large bonus if you kill the wolf.  After each attack by you or the wolf he will run to a random room that is connected to the one you are in.  You can also IGNORE the wolf and hope he doesn't attack you before he leaves (unlikely).  Or flee from the room in a random direction.  If you flee the wolf will run also and MAY follow you!
 
-{var:normalcolor}When you are playing MURDER MOTEL the followin commands are available to you\cn NORTH SOUTH EAST WEST UP DOWN The directional commands will move your player towards whatever exits are available. You can only go through THESE exits; there are no secret doors in the game. 
+{var:normalcolor}When you are playing MURDER MOTEL the followin commands are available to you NORTH SOUTH EAST WEST UP DOWN The directional commands will move your player towards whatever exits are available. You can only go through THESE exits; there are no secret doors in the game. 
 
 {var:optioncolor}TAKE (T){var:normalcolor} - This command allows you to take any item (weapon or defense) that you find in the motel. You can carry a maximum of five things including up to two defenses. 
 
