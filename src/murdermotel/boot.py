@@ -16,6 +16,8 @@ def buildargs(args=None, **kw):
     parser.add_argument("--debug", action="store_true", dest="debug")
     
     parser.add_argument("--terminalwidth", action="store", dest="terminalwidth", default=ttyio.getterminalwidth())
+    
+    parser.add_argument("--node", action="store", dest="node", default="cyclops")
 
     defaults = {"databasename": "zoidweb5", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
     bbsengine.buildargdatabasegroup(parser, defaults)

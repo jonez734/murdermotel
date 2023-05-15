@@ -19,6 +19,8 @@ if __name__ == "__main__":
 
     init(args)
 
+    bbsengine.init(args)
+
     try:
         main(args)
     except KeyboardInterrupt:

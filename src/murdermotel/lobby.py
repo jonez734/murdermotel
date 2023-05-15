@@ -15,13 +15,12 @@ def lobbyhelp(**kw):
     ttyio.echo("{var:optioncolor}[G]{var:menudesc}ame instructions")
     ttyio.echo("{var:optioncolor}[C]{var:menudesc}redits")
     if bbsengine.checksysop(args) is True:
-        ttyio.echo("{var:optioncolor}[M]{var:menudesc}aintenance")
-    ttyio.echo("{var:optioncolor}[P]{var:menudesc}lay")
+        ttyio.echo("{var:optioncolor}[M]{var:labelcolor}aintenance")
+        ttyio.echo("{var:optioncolor}[H]{var:labelcolor}ousekeeping")
+    ttyio.echo("{var:optioncolor}[P]{var:labelcolor}lay")
     ttyio.echo("{f6}{var:optioncolor}[Q]{var:menudesc}uit")
     
 def main(args, **kw):
-    bbsengine.title("murder motel lobby")
-    ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
 
     name = bbsengine.getmembername(args)
     if args.debug is True:
@@ -30,20 +29,23 @@ def main(args, **kw):
     player = None
     done = False
     while not done:
-        height = ttyio.getterminalheight()
-
         lib.setarea(args, player, "lobby", help=True)
+
+        bbsengine.title("murder motel lobby")
+        ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
+        ttyio.echo()
 
         options = ""
         options += "G"
         options += "C"
         if bbsengine.checksysop(args) is True:
-            options += "M"
+            options += "MH"
+            
         options += "P"
         options = "".join(sorted(options, key=str.upper))
         options += "Q"
         
-        ch = ttyio.inputchar("{var:promptcolor}:hotel: lobby [%s]: {var:inputcolor}" % (options), options, "", help=lobbyhelp, args=args)
+        ch = ttyio.inputchar(f"{{var:promptcolor}}:hotel: lobby [{options}]: {{var:inputcolor}}", options, "", help=lobbyhelp, args=args)
         if ch == "G":
             ttyio.echo("Game Instructions")
             lib.setarea(args, player, "reading: 'game instructions'")
@@ -59,6 +61,9 @@ def main(args, **kw):
         elif ch == "M":
             ttyio.echo("Maintenance")
             res = lib.runsubmodule(args, player, "maintenance")
+        elif ch == "H":
+            ttyio.echo("Housekeeping")
+            res = lib.runsubmodule(args, player, "housekeeping")
         elif ch == "P":
             ttyio.echo("Play")
             res = lib.runsubmodule(args, player, "play")

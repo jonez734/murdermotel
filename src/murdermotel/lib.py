@@ -215,7 +215,7 @@ class Player(Living):
       components = [
         ["axe",      "axeblade",       "axehandle"],
         ["pistol",   "pistol",         "bullets"],
-        ["chlorine", "chlorine",       "gassprayer"],
+        ["chlorine", "chlorinegas",    "gassprayer"],
         ["fire",     "lighterfluid",   "flamethrower"],
         ["acid",     "industrialacid", "acidsprayer"],
       ]
@@ -378,6 +378,15 @@ class Player(Living):
       ttyio.echo(f"weapons={w!r}", level="debug")
       return w + items
 
+currentplayer = None
+def setcurrentplayer(player):
+  global currentplayer
+  currentplayer = player
+
+def getcurrentplayer():
+  global currentplayer
+  return currentplayer
+
 class completeItemName(object):
     def __init__(self, args, **kw):
       self.roomid = kw["roomid"] if "roomid" in kw else None
@@ -457,7 +466,7 @@ class BoobyTrap(Item):
     self.roomid = random.randint(10, getroomcount(args)-10+1)
 
 def setarea(args, player, left, **kw):
-    ttyio.echo(f"kw={kw!r}")
+    # ttyio.echo(f"kw={kw!r}")
     def right():
         help = " | F1: Help" if "help" in kw and kw["help"] is True else ""
         debug = " | debug" if args.debug is True else ""
@@ -495,11 +504,12 @@ def setarea(args, player, left, **kw):
     return
 
 def init(args=None):
-  ttyio.setvariable("optioncolor", "{white}{bggray}")
-  ttyio.setvariable("menudesc", "{/bgcolor}{white}")
-  ttyio.setvariable("valuecolor", "{/bgcolor}{green}")
-  ttyio.setvariable("promptcolor", "{/bgcolor}{lightgray}")
-  ttyio.setvariable("inputcolor", "{/bgcolor}{green}")
+#  ttyio.setvariable("optioncolor", "{white}{bggray}")
+#  ttyio.setvariable("menudesc", "{/bgcolor}{white}")
+#  ttyio.setvariable("valuecolor", "{/bgcolor}{green}")
+#  ttyio.setvariable("promptcolor", "{/bgcolor}{lightgray}")
+#  ttyio.setvariable("inputcolor", "{/bgcolor}{green}")
+  return True
 
 # @since 20220813
 def runsubmodule(args, player, submodule, **kw):
