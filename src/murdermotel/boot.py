@@ -23,7 +23,7 @@ def buildargs(args=None, **kw):
     bbsengine.buildargdatabasegroup(parser, defaults)
     return parser
 
-def access(args, op="run", **kw) -> bool:
+def access(args, op, **kw) -> bool:
     return True
 
 def main(args, **kw):
