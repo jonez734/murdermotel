@@ -1,81 +1,169 @@
-{var:highlightcolor}MURDER MOTEL{var:normalcolor} is an on-line C-net game that was converted to Image V1.0 format and further modified by Mark Dickenson.  It allows people on the board to play against each other rather than against the computer.  The game concept has elements of the movies PSYCHO and THUNDERDOME based on the game format of the ASSASSINATION game.  If you've seen these movies & have played ASSASSINATION I'm sure you'll find {var:highlightcolor}MURDER MOTEL{var:normalcolor} a blast!
-
-When you enter the motel you will be automatically registered.  If you are already registered and have been killed you will be revived and told who it was that killed you.  You will be told who your current target is.  This is the only person you can kill.  When you have killed them you will be assigned a new person to eliminate.  If you kill everyone you win the game. (Unlikely because the other players can revive themselves so it will be rare for only one person to be left.)
-
-In order to kill anyone you must build weapons from the parts strewn all over the motel.  It takes two pieces to make a weapon.  For example an axe handle & an axe blade.
-
-There are also defenses you can pick up.  They come complete but you can't carry more than two at once.  If you attack a player that has the defense for the weapon you use on him, you will be thrown into a random room as a penalty.  Oh and by the way someone in the game is looking for YOU!  So be careful who you trust! 
-
+{var:highlightcolor}MURDER MOTEL{var:normalcolor} is an on-line C-net game
+that was converted to Image V1.0 format, further modified by Mark Dickenson,
+ported to Image v3.0 by NISSA, and {var:highlightcolor}ported to bbsengine by
+zoidtechhnologies.com{var:normalcolor}.  It allows people on the board to
+play against each other rather than against the computer.  The game concept
+has elements of the movies PSYCHO and THUNDERDOME based on the game format
+of the ASSASSINATION game.  If you've seen these movies and have played
+ASSASSINATION I'm sure you'll find {var:highlightcolor}MURDER
+MOTEL{var:normalcolor} a blast!
+{f6}
+When you enter the motel you will be automatically registered.  If you are
+already registered and have been killed you will be revived and told who it
+was that killed you.  You will be told who your current target is.  This is
+the only person you can kill.  When you have killed them you will be
+assigned a new person to eliminate.  If you kill everyone you win the game. 
+(Unlikely because the other players can revive themselves so it will be rare
+for only one person to be left.)
+{f6}
+In order to kill anyone you must build weapons from the parts strewn all
+over the motel.  It takes two pieces to make a weapon.  For example an axe
+handle and an axe blade.
+{f6}
+There are also defenses you can pick up.  They come complete but you can't
+carry more than two at once.  If you attack a player that has the defense
+for the weapon you use on him, you will be thrown into a random room as a
+penalty.  Oh and by the way someone in the game is looking for YOU!  So be
+careful who you trust!
+{f6}
 Odds and ends about the game----
-
-At the time of this writing the motel has 140 rooms (i.e.  places) that you can go.  You will be allowed 60 moves and there can be up to 30 people playing at once.  (These figures are subject to change.)
-
-There are five weapon types and each weapon has a safety that will protect a player from the use of that weapon.  It works out as follows
-
-{var:highlightcolor}WEAPON COMPONENTS        SAFETY
-{white}-----------------        ------
-{var:normalcolor}Axe blade & axe handle   Riot shield
-Pistol and bullets       Flak jacket
-Chlorine & gas sprayer   Gas mask
-Flame thrower & fuel     Extinguisher
-Acid & acid sprayer      Lye
-
-Each weapon can be used indefinitely when it is complete.  You can leave weapons anywhere even illogical places.  It is possible for one room to contain all the items, there is no limit to the space available.  There are six of each weapon that can be assembled as well as six of each defense. 
-
+{f6}
+At the time of this writing the motel has 140 rooms (i.e.  places) that you
+can go.  You will be allowed 60 moves and there can be up to 30 people
+playing at once.  (These figures are subject to change.)
+{f6}
+There are five weapon types and each weapon has a safety that will protect a
+player from the use of that weapon.  It works out as follows
+{f6}
+{var:highlightcolor}WEAPON COMPONENTS        SAFETY{f6}
+{white}-----------------        ------{f6}
+{var:normalcolor}Axe blade and axe handle   Riot shield{f6}
+Pistol and bullets       Flak jacket{f6}
+Chlorine and gas sprayer   Gas mask{f6}
+Flame thrower and fuel     Extinguisher{f6}
+Acid and acid sprayer      Lye{f6}
+{f6}
+Each weapon can be used indefinitely when it is complete.  You can leave
+weapons anywhere even illogical places.  It is possible for one room to
+contain all the items, there is no limit to the space available.  There are
+six of each weapon that can be assembled as well as six of each defense.
+{f6}
 Total items 90.
-
+{f6}
 {strike}From time to time the program will pause for about 1-30 seconds.  This should only happen once or twice during the game.  This is because the computer needs to do a garbage collection and is not the fault of the game.  Don't get frustrated at these stops you WILL get a chance to move if you are patient!{/all}
+{f6}
 
-If you choose option 'M' at the menu you can look at maps of the motel layout.  These come in very handy.  Be sure to buffer them and print them out so you'll have them for quick reference later.  There are 4 floors to the motel plus an extensive underground basement. 
+If you choose option 'M' at the menu you can look at maps of the motel
+layout.  These come in very handy.  Be sure to buffer them and print them
+out so you'll have them for quick reference later.  There are 4 floors to
+the motel plus an extensive underground basement.  {f6}
 
-The software enforces virtually everything.  The software will not allow you to call several times consecutively & stack all your allowable moves together.  You may play ONLY if the previous caller was someone else.  Even if you didn't play you must let someone else log on before the game will accept you.  You are also, allowed to play only TWO times during any day.  While online you can enter the motel as many times as you would like until you use all of your moves.  But you may only enter the game with a FULL 60 moves twice in any one day.  This is to prevent any one person from hogging the game. 
+The software enforces virtually everything.  The software will not allow you
+to call several times consecutively and stack all your allowable moves
+together.  You may play ONLY if the previous caller was someone else.  Even
+if you didn't play you must let someone else log on before the game will
+accept you.  You are also, allowed to play only TWO times during any day. 
+While online you can enter the motel as many times as you would like until
+you use all of your moves.  But you may only enter the game with a FULL 60
+moves twice in any one day.  This is to prevent any one person from hogging
+the game.  {f6}
 
-The MOTEL NEWS (option P) will allow you to track the progress of all the players in the game.  It will give a running commentary of who was killed and by whom, who defended themselves, who registered or was revived, who was hit by the {var:highlightcolor}THIEF{var:normalcolor} and who found the TREASURE ROOM. 
+The MOTEL NEWS (option P) will allow you to track the progress of all the
+players in the game.  It will give a running commentary of who was killed
+and by whom, who defended themselves, who registered or was revived, who was
+hit by the {var:highlightcolor}THIEF{var:normalcolor} and who found the
+TREASURE ROOM.  {f6}
 
-Thief?  What {var:highlightcolor}THIEF{var:normalcolor}? :grin:  There is also a {var:highlightcolor}THIEF{var:normalcolor} in the game.  If you enter his room he will steal some of the items you are carrying.  You will then have to find new ones.  There is even a chance you will be able to fight him off and not lose anything.
+Thief?  What {var:highlightcolor}THIEF{var:normalcolor}?  :grin:  There is
+also a {var:highlightcolor}THIEF{var:normalcolor} in the game.  If you enter
+his room he will steal some of the items you are carrying.  You will then
+have to find new ones.  There is even a chance you will be able to fight him
+off and not lose anything.  {f6}
 
-Also new to the game is the {var:highlightcolor}TREASURE ROOM{var:normalcolor}.  If you find this room you will receive a bonus number of moves.  This can help greatly when trying to find a cleaverly hidden person.  Considering the size of the motel there are TWO Treasure Rooms.
+Also new to the game is the {var:highlightcolor}TREASURE
+ROOM{var:normalcolor}.  If you find this room you will receive a bonus
+number of moves.  This can help greatly when trying to find a cleaverly
+hidden person.  Considering the size of the motel there are TWO Treasure
+Rooms.  {f6}
 
-The Treasure Rooms and the Thief are randomly placed everytime you enter the motel.
+The Treasure Rooms and the Thief are randomly placed everytime you enter the
+motel.  {f6}
 
-Also you will notice the inclusion of a {var:highlightcolor}BOOBY-TRAP{var:normalcolor}.  If you find this item you can drag it along with you.  This is the ONLY time you can carry SIX items.  If you leave the TRAP in a room with someone in it, then there is a 90% chance it will go off when they re-enter the motel.  If it does go off then 15 to 30 moves will be removed for that logon and the trap will move to a random room location.  BEWARE, if you are carrying the trap when you leave the motel, it will SPRING ON YOU when you re-enter, unless someone moves it from the room.  So drop it in another room before you leave.
+Also you will notice the inclusion of a
+{var:highlightcolor}BOOBY-TRAP{var:normalcolor}.  If you find this item you
+can drag it along with you.  This is the ONLY time you can carry SIX items. 
+If you leave the TRAP in a room with someone in it, then there is a 90%
+chance it will go off when they re-enter the motel.  If it does go off then
+15 to 30 moves will be removed for that logon and the trap will move to a
+random room location.  BEWARE, if you are carrying the trap when you leave
+the motel, it will SPRING ON YOU when you re-enter, unless someone moves it
+from the room.  So drop it in another room before you leave.  {f6}
 
-Last but not least, when you kill your target you will also get a SMALL bonus number of moves.  This is to aid you in finding a new place to hide when you kill your target and are down to 5 moves.
+Last but not least, when you kill your target you will also get a SMALL
+bonus number of moves.  This is to aid you in finding a new place to hide
+when you kill your target and are down to 5 moves.  {f6}
 
-Murder Motel Update 3/16/89
+Murder Motel Update 3/16/89{f6:1}
 ---------------------------
-If you accidentally press the Q key you are no longer immediately returned to the Motel Main Menu.  You will be queried as to whether or not you really wish to leave.
+{f6}
+If you accidentally press the Q key you are no longer immediately returned
+to the Motel Main Menu.  You will be queried as to whether or not you really
+wish to leave.  {f6}
+{strike}You can now use the command stacking feature of the BBS on ALL
+commands while playing Murder Motel.  For moves: N^E^E^N (executes a move
+NORTH, EAST, EAST and then NORTH) For Dropping things: L^Y^N^N (selects
+LEAVE and drops the FIRST item while keeping the second and third).  Or
+getting a group of items: T^3^T^55 (picks up item 3 and 55).  These commands
+can be stacked in ANY order.  But BEWARE you cannot stop the sequence after
+you press RETURN.{/strike}
+{f6}
+Murder Motel Update 5/20/89{f6}
+---------------------------{f6}
+{f6}
 
-{strike}You can now use the command stacking feature of the BBS on ALL commands while playing Murder Motel.  For moves: N^E^E^N (executes a move NORTH, EAST, EAST and then NORTH) For Dropping things: L^Y^N^N (selects LEAVE and drops the FIRST item while keeping the second and third).  Or getting a group of items: T^3^T^55 (picks up item 3 and 55).  These commands can be stacked in ANY order.  But BEWARE you cannot stop the sequence after you press RETURN.{/strike}
-
-Murder Motel Update 5/20/89
----------------------------
-
-There is now a Rabid Wolf roaming the corridors of the Motel.  If you run into the wolf you had better have a COMPLETE weapon.  If you don't then the wolf will attack you and remove a number of moves from you.  You can also attack the wolf if you have a COMPLETE weapon.  You can remove strength from the wolf with each attack until you kill him.  You will get points for each attack and a large bonus if you kill the wolf.  After each attack by you or the wolf he will run to a random room that is connected to the one you are in.  You can also IGNORE the wolf and hope he doesn't attack you before he leaves (unlikely).  Or flee from the room in a random direction.  If you flee the wolf will run also and MAY follow you!
-
-{var:normalcolor}When you are playing MURDER MOTEL the followin commands are available to you NORTH SOUTH EAST WEST UP DOWN The directional commands will move your player towards whatever exits are available. You can only go through THESE exits; there are no secret doors in the game. 
-
-{var:optioncolor}TAKE (T){var:normalcolor} - This command allows you to take any item (weapon or defense) that you find in the motel. You can carry a maximum of five things including up to two defenses. 
-
-{var:optioncolor}LEAVE (L){var:normalcolor} - When you want to drop an object that you are carrying (to make more room for something you need) use this command. A prompt will appear for each object you are  carrying asking in (Y-N) format which you will leave behind.
-
-{var:optioncolor}KILL (K){var:normalcolor} - Use this to kill the player you are after. This command is useless unless you are in the same room as your opponent. 
-
-{var:optioncolor}QUIT (Q){var:normalcolor} - To quit the game and return to the MAIN area. You may go back to the game on the same call if you had any moves left when you quit.
-
+There is now a Rabid Wolf roaming the corridors of the Motel.  If you run
+into the wolf you had better have a COMPLETE weapon.  If you don't then the
+wolf will attack you and remove a number of moves from you.  You can also
+attack the wolf if you have a COMPLETE weapon.  You can remove strength from
+the wolf with each attack until you kill him.  You will get points for each
+attack and a large bonus if you kill the wolf.  After each attack by you or
+the wolf he will run to a random room that is connected to the one you are
+in.  You can also IGNORE the wolf and hope he doesn't attack you before he
+leaves (unlikely).  Or flee from the room in a random direction.  If you
+flee the wolf will run also and MAY follow you!
+{f6}
+{var:normalcolor}When you are playing MURDER MOTEL the following commands
+are available to you {var:highlightcolor}NORTH{var:normalcolor},
+{var:highlightcolor}SOUTH{var:normalcolor},
+{var:highlightcolor}EAST{var:normalcolor},
+{var:highlightcolor}WEST{var:normalcolor},
+{var:highlightcolor}UP{var:normalcolor}, and
+{var:highlightcolor}DOWN{var:normalcolor} The directional commands will move
+your player towards whatever exits are available.  You can only go through
+THESE exits; there are no secret doors in the game.
+{f6}
+{var:optioncolor}TAKE        (T){var:normalcolor} - This command allows you to take any item (weapon or defense) that you find in the motel. You can carry a maximum of five things including up to two defenses.
+{f6}
+{var:optioncolor}LEAVE       (L){var:normalcolor} - When you want to drop an object that you are carrying (to make more room for something you need) use this command. A prompt will appear for each object you are  carrying asking in (Y-N) format which you will leave behind.
+{f6}
+{var:optioncolor}KILL        (K){var:normalcolor} - Use this to kill the player you are after. This command is useless unless you are in the same room as your opponent.
+{f6}
+{var:optioncolor}QUIT        (Q){var:normalcolor} - To quit the game and return to the MAIN area. You may go back to the game on the same call if you had any moves left when you quit.
+{f6}
 {var:optioncolor}INFORMATION (I){var:normalcolor} - This will tell you what you are carrying who you must kill what room you are in and what objects or people are in the room with you. You should always check INFORMATION when you begin the game just in case your target has been changed from the last time you called.
-
-{var:optioncolor}MAP (M){var:normalcolor} - This takes one movement point and will display any of the five levels.
-
-{var:optioncolor}REPORT (R){var:normalcolor} - This will allow you to add a one line message of 76 characters to the Motel Newspaper. This will take one movement point and is great for leading people around in circles.
-
-{var:optioncolor}HIGH KILLS{var:normalcolor} - This will show the list of players in order of the most kills. 
-
-{var:optioncolor}HIGH POINTS{var:normalcolor} - This will show the list of players in order of the most points. 
-
+{f6}
+{var:optioncolor}MAP         (M){var:normalcolor} - This takes one movement point and will display any of the five levels.
+{f6}
+{var:optioncolor}REPORT      (R){var:normalcolor} - This will allow you to add a one line message of 76 characters to the Motel Newspaper. This will take one movement point and is great for leading people around in circles.
+{f6}
+{var:optioncolor}HIGH KILLS{var:normalcolor} - This will show the list of players in order of the most kills.
+{f6}
+{var:optioncolor}HIGH POINTS{var:normalcolor} - This will show the list of players in order of the most points.
+{f6}
 {var:optioncolor}READ PAPER (P){var:normalcolor} - This will allow you to read the Motel Newspaper.  This will contain all information about what has happened in the game, including reports by other players.
+{f6}
+Thanks and enjoy this version.{f6}
+Mark Dickenson{f6}
+Mark AD I (Quantum Link){f6}
 
-Thanks and enjoy this version.
-Mark Dickenson
-Mark AD I (Quantum Link)
 
