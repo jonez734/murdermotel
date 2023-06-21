@@ -1,8 +1,8 @@
 import copy
 import random
 
-import ttyio5 as ttyio
-import bbsengine5 as bbsengine
+import ttyio6 as ttyio
+import bbsengine6 as bbsengine
 
 # @since 20220813
 PACKAGENAME = "murdermotel"
@@ -19,10 +19,10 @@ class Obj(object):
     self.classname = self.__class__.__name__
 
   def load(self, name) -> bool:
-    ttyio.echo("%s.load({self.classname})", level="debug")
+    ttyio.echo(f"{name}.load({self.classname})", level="debug")
     sql = "select * from %s where name=%%s" % (self.table)
     dat = (name,)
-    dbh = bbsengine.databaseconnect(self.args)
+    dbh = bbsengine.database.connect(self.args)
     cur = dbh.cursor()
 #    ttyio.echo("%s.load.100: %r" % (self.classname, cur.mogrify(sql, dat)), level="debug")
     cur.execute(sql, dat)
@@ -43,16 +43,16 @@ class Obj(object):
 
     ttyio.echo(f"{self.classname}.save.100: p={p!r}", level="debug")
 
-    dbh = bbsengine.databaseconnect(self.args)
+    dbh = bbsengine.database.connect(self.args)
     if self.args.debug is True:
       ttyio.echo(f"{classname}.save.140: trying update", level="debug")
-    res = bbsengine.update(dbh, self.table, self.name, p, primarykey="name", mogrify=True)
+    res = bbsengine.database.update(dbh, self.table, self.name, p, primarykey="name", mogrify=True)
     if self.args.debug is True:
       ttyio.echo("{classname}.save.120: res={res!r}", level="debug")
     if res == 0:
       if self.args.debug is True:
         ttyio.echo("%s.save.160: update failed, trying insert. p=%r" % (p), level="debug")
-      bbsengine.insert(dbh, self.table, p, primarykey="name", returnid=False, mogrify=True)
+      bbsengine.database.insert(dbh, self.table, p, primarykey="name", returnid=False, mogrify=True)
     self.isdirty = False
     dbh.commit()
     return True
@@ -81,7 +81,7 @@ class Room(object):
         ttyio.echo(f"Room.load({roomid})", level="debug")
       sql = "select * from murdermotel.playground where roomid=%s"
       dat = (roomid,)
-      dbh = bbsengine.databaseconnect(self.args)
+      dbh = bbsengine.database.connect(self.args)
       cur = dbh.cursor()
       if self.args.debug is True:
         ttyio.echo("room.load.100: %r" % (cur.mogrify(sql, dat)), level="debug")
@@ -112,16 +112,16 @@ class Room(object):
       if self.args.debug is True:
         ttyio.echo(f"Room.save.100: r={r!r}", level="debug")
 
-      dbh = bbsengine.databaseconnect(self.args)
+      dbh = bbsengine.database.connect(self.args)
       if self.args.debug is True:
         ttyio.echo("Room.save.140: trying update", level="debug")
-      res = bbsengine.update(dbh, "murdermotel.playground", self.roomid, r, primarykey="roomid", mogrify=mogrify)
+      res = bbsengine.database.update(dbh, "murdermotel.playground", self.roomid, r, primarykey="roomid", mogrify=mogrify)
       if self.args.debug is True:
         ttyio.echo("Room.save.120: res=%r" % (res), level="debug")
       if res == 0:
         if self.args.debug is True:
           ttyio.echo("Room.save.160: update failed, trying insert r=%r" % (r), level="debug")
-        bbsengine.insert(dbh, "murdermotel.playground", r, primarykey="roomid", returnid=False, mogrify=mogrify)
+        bbsengine.database.insert(dbh, "murdermotel.playground", r, primarykey="roomid", returnid=False, mogrify=mogrify)
       self.isdirty = False
 
       cur = dbh.cursor()
@@ -136,7 +136,7 @@ class Room(object):
         m = {}
         m["itemname"] = i.name
         m["roomid"] = self.roomid
-        bbsengine.insert(dbh, "murdermotel.map_item_room", m, returnid=False, mogrify=mogrify)
+        bbsengine.database.insert(dbh, "murdermotel.map_item_room", m, returnid=False, mogrify=mogrify)
 
       dbh.commit()
       return True
@@ -181,11 +181,11 @@ class Player(Living):
       super().__init__(args)
       self.fields = ("name", "roomid", "turn", "moves", "memberid", "datelastplayed", "points", "bodycount")
       self.args = args
-      self.name = bbsengine.getmembername(args)
+      self.name = bbsengine.member.getname(args) # getmembername(args)
       self.turn = 1
       self.moves = MOVESPERTURN
       self.datelastplayed = "now()"
-      self.memberid = bbsengine.getcurrentmemberid(args)
+      self.memberid = bbsengine.member.getcurrentid(args) # getcurrentmemberid(args)
       self.items = []
       self.isdirty = False
       self.points = 0
@@ -252,7 +252,7 @@ class Player(Living):
         ttyio.echo(f"Player.load({name!r})", level="debug")
       sql = "select * from murdermotel.player where name=%s"
       dat = (name,)
-      dbh = bbsengine.databaseconnect(self.args)
+      dbh = bbsengine.database.connect(self.args)
       cur = dbh.cursor()
       if self.args.debug is True:
         ttyio.echo(f"player.load.100: {cur.mogrify(sql, dat)!r}", level="debug")
@@ -280,17 +280,17 @@ class Player(Living):
       if self.args.debug is True:
         ttyio.echo(f"Player.save.100: p={p}", level="debug")
 
-      dbh = bbsengine.databaseconnect(self.args)
+      dbh = bbsengine.database.connect(self.args)
       
       if self.args.debug is True:
         ttyio.echo("Player.save.140: trying update", level="debug")
-      res = bbsengine.update(dbh, "murdermotel.player", self.name, p, primarykey="name", mogrify=mogrify)
+      res = bbsengine.database.update(dbh, "murdermotel.player", self.name, p, primarykey="name", mogrify=mogrify)
       if self.args.debug is True:
         ttyio.echo("Player.save.120: res=%r" % (res), level="debug")
       if res == 0:
         if self.args.debug is True:
           ttyio.echo("Player.save.160: update failed, trying insert p=%r" % (p), level="debug")
-        bbsengine.insert(dbh, "murdermotel.player", p, primarykey="name", returnid=False, mogrify=mogrify)
+        bbsengine.databse.insert(dbh, "murdermotel.player", p, primarykey="name", returnid=False, mogrify=mogrify)
 
       cur = dbh.cursor()
       sql = "delete from murdermotel.map_item_player where playername=%s"
@@ -304,7 +304,7 @@ class Player(Living):
         m = {}
         m["itemname"] = i.name
         m["playername"] = self.name
-        bbsengine.insert(dbh, "murdermotel.map_item_player", m, returnid=False, mogrify=True)
+        bbsengine.datbase.insert(dbh, "murdermotel.map_item_player", m, returnid=False, mogrify=True)
         
       dbh.commit()
       return True
@@ -313,11 +313,11 @@ class Player(Living):
       ttyio.echo(f"{{var:labelcolor}}Moves: {{var:valuecolor}}{self.moves}")
       ttyio.echo(f"{{var:labelcolor}}Turns: {{var:valuecolor}}{self.turn}")
       ttyio.echo(f"{{var:labelcolor}}Name:  {{var:valuecolor}}{self.name}")
-      date = bbsengine.datestamp(self.datelastplayed)
+      date = bbsengine.util.datestamp(self.datelastplayed)
       ttyio.echo(f"{{var:labelcolor}}Date:  {{var:valuecolor}}{date}")
       items = copy.deepcopy(self.items)
       items = self.weapons(items)+items
-      bbsengine.oxfordcomma(items)
+      bbsengine.util.oxfordcomma(items)
       ttyio.echo(f"{{var:labelcolor}}Items: {{var:valuecolor}}{items}")
     
     def getitems(self):
@@ -401,7 +401,7 @@ class completeItemName(object):
       if self.args.debug is True:
         ttyio.echo("completeItemName.140: complete called", level="debug")
 
-      dbh = bbsengine.databaseconnect(self.args)
+      dbh = bbsengine.database.connect(self.args)
 
       if self.args.debug is True:
         ttyio.echo(f"completeItemName.160: building vocab. self.roomid={self.roomid!r}, self.playername={self.playername!r}", level="debug")
@@ -421,7 +421,7 @@ class completeItemName(object):
         ttyio.echo(f"completeItemName.120: mogrify={cur.mogrify(sql, dat)}")
       cur.execute(sql, dat)
 
-      for rec in bbsengine.resultiter(cur):
+      for rec in bbsengine.util.resultiter(cur):
         vocab.append(rec["name"])
 
       results = [x for x in vocab if x.startswith(text)] + [None]
@@ -447,15 +447,15 @@ class Item(object):
     if self.args.debug is True:
       ttyio.echo(f"Item.save.100: p={p!r}", level="debug")
 
-    dbh = bbsengine.databaseconnect(self.args)
+    dbh = bbsengine.database.connect(self.args)
     if self.args.debug is True:
       ttyio.echo("Item.save.140: trying update", level="debug")
-    res = bbsengine.update(dbh, "murdermotel.item", self.name, p, primarykey="name", mogrify=True)
+    res = bbsengine.database.update(dbh, "murdermotel.item", self.name, p, primarykey="name", mogrify=True)
     ttyio.echo(f"Item.save.120: res={res!r}", level="debug")
     if res == 0:
       if self.args.debug is True:
         ttyio.echo(f"Item.save.160: update failed, trying insert p={p!r}", level="debug")
-      bbsengine.insert(dbh, "murdermotel.item", p, primarykey="name", returnid=False, mogrify=True)
+      bbsengine.database.insert(dbh, "murdermotel.item", p, primarykey="name", returnid=False, mogrify=True)
     dbh.commit()
     return True
 
@@ -482,7 +482,7 @@ def setarea(args, player, left, **kw):
           else:
               isdirty = ""
 
-          turn = " | %s" % (bbsengine.pluralize(4-player.turn, "turn", "turns"))
+          turn = " | %s" % (bbsengine.util.pluralize(4-player.turn, "turn", "turns"))
 
           if player.roomid is not None:
             room = f" | room #{player.roomid}"
@@ -492,7 +492,7 @@ def setarea(args, player, left, **kw):
           else:
             room = ""
 
-          moves = " | %s" % (bbsengine.pluralize(player.moves, "move", "moves"))
+          moves = " | %s" % (bbsengine.util.pluralize(player.moves, "move", "moves"))
           
           playername = f" | {isdirty}{player.name}"
 
@@ -500,7 +500,7 @@ def setarea(args, player, left, **kw):
 
         return buf
 
-    bbsengine.setarea(left, right)
+    bbsengine.screen.setarea(left, right)
     return
 
 def init(args=None):
@@ -513,10 +513,11 @@ def init(args=None):
 
 # @since 20220813
 def runsubmodule(args, player, submodule, **kw):
+  ttyio.echo("mudermotel.lib.runsubmodule.120: trace") # , level="debug", end="\n")
   x = f"{PACKAGENAME}.{submodule}"
   if args.debug is True:
     ttyio.echo("lib.runsubmodule.100: x=%r" % (x), level="debug")
-  return bbsengine.runsubmodule(args, x, player=player, **kw)
+  return bbsengine.module.runsubmodule(args, x, player=player, **kw)
 
 def buildroomdict(res):
   room = {}
@@ -531,7 +532,7 @@ def buildroomob(args, res):
   return room
 
 def getroom(args, roomid):
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   sql = "select * from murdermotel.playground where roomid=%s"
   dat = (roomid,)
   cur = dbh.cursor()
@@ -544,7 +545,7 @@ def getroom(args, roomid):
   return buildroomob(args, res)
 
 def getroomcount(args):
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   sql = "select count(roomid) from murdermotel.playground"
   dat = ()
   cur = dbh.cursor()
@@ -558,7 +559,7 @@ def getroomcount(args):
 def getroomitems(args, roomid, mogrify=True):
   sql = "select * from murdermotel.item as i, murdermotel.map_item_room as m where m.roomid = %s and m.itemname = i.name"
   dat = (roomid,)
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   cur = dbh.cursor()
   cur.execute(sql, dat)
   if mogrify is True and args.debug is True:
@@ -568,7 +569,7 @@ def getroomitems(args, roomid, mogrify=True):
     return []
 
   items = []
-  for rec in bbsengine.resultiter(cur):
+  for rec in bbsengine.util.resultiter(cur):
     i = Item(args)
     i.name = rec["name"]
     i.title = rec["title"]
@@ -582,7 +583,7 @@ def getplayeritems(args, playername, mogrify=True):
     ttyio.echo("getplayeritems.100: foo", level="debug")
   sql = "select * from murdermotel.item as i, murdermotel.map_item_player as m where m.playername = %s and m.itemname = i.name"
   dat = (playername,)
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   cur = dbh.cursor()
   cur.execute(sql, dat)
   if mogrify is True and args.debug is True:
@@ -592,7 +593,7 @@ def getplayeritems(args, playername, mogrify=True):
     return []
 
   items = []
-  for rec in bbsengine.resultiter(cur):
+  for rec in bbsengine.util.resultiter(cur):
     i = Item(args)
     i.type = rec["type"]
     i.name = rec["name"]
@@ -604,7 +605,7 @@ def getplayeritems(args, playername, mogrify=True):
 def getitem(args, name):
   sql = "select * from murdermotel.item as i where name=%s"
   dat = (name,)
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   cur = dbh.cursor()
   cur.execute(sql, dat)
   if cur.rowcount == 0:
@@ -619,14 +620,14 @@ def getroomplayers(args, roomid, mogrify=True):
   sql = "select name from murdermotel.player as p where p.roomid=%s"
   dat = (roomid,)
 
-  dbh = bbsengine.databaseconnect(args)
+  dbh = bbsengine.database.connect(args)
   cur = dbh.cursor()
   if mogrify is True:
     ttyio.echo("mm.lib.getroomplayers.100: %s" % (cur.mogrify(sql, dat)), level="debug")
   cur.execute(sql, dat)
   players = []
   if cur.rowcount > 0:
-    for rec in bbsengine.resultiter(cur):
+    for rec in bbsengine.util.resultiter(cur):
       p = Player(args)
       p.load(rec["name"])
       players.append(p)

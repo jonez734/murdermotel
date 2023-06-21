@@ -2,8 +2,8 @@ import time
 import locale
 import argparse
 
-import ttyio5 as ttyio
-import bbsengine5 as bbsengine
+import ttyio6 as ttyio
+import bbsengine6 as bbsengine
 
 from . import lib
 from . import version
@@ -19,7 +19,9 @@ if __name__ == "__main__":
 
     init(args)
 
-    bbsengine.init(args)
+    print("prior to screen.init()")
+    bbsengine.screen.init(args)
+    print("after")
 
     try:
         main(args)

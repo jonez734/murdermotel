@@ -1,8 +1,8 @@
 import copy
 import random
 
-import ttyio5 as ttyio
-import bbsengine5 as bbsengine
+import ttyio6 as ttyio
+import bbsengine6 as bbsengine
 
 from . import lib
 from . import data
@@ -34,7 +34,7 @@ def maintmode(args, **kw):
         
         sql = "select roomid from murdermotel.playground where shortname=%s"
         dat = (dest,)
-        dbh = bbsengine.databaseconnect(args)
+        dbh = bbsengine.database.connect(args)
         cur = dbh.cursor()
         cur.execute(sql, dat)
         if cur.rowcount == 0:
@@ -103,10 +103,11 @@ def playgroundhelp(**kw):
         ttyio.setvar("T", "{green}")
     if len(player.items) > 0:
         ttyio.setvar("L", "{green}")
-    bbsengine.filedisplay(data.get("s.menu.txt"), **kw)
+    bbsengine.util.filedisplay(data.get("s.menu.txt"), **kw)
 
 def main(args, **kw):
-    name = bbsengine.getmembername(args)
+    ttyio.echo("murdermotel.play.100: running!", level="debug")
+    name = bbsengine.member.getcurrentmoniker(args)
     if lib.getroomcount(args) == 0:
         ttyio.echo("{f6}the playground is not set up properly.{f6}")
         return False
@@ -115,7 +116,7 @@ def main(args, **kw):
         player.roomid = random.randint(10, lib.getroomcount(args)-10+1)
         player.save()
 
-    bbsengine.title("playground")
+    bbsengine.screen.heading("playground")
 
     boobytrap = lib.BoobyTrap(args)
     thief = lib.Thief(args)
@@ -158,15 +159,15 @@ def main(args, **kw):
             ttyio.echo("roomitems={room.items!r}", level="debug")
 
         if len(room.items) > 0:
-            label = bbsengine.pluralize(len(room.items), "item", "items", quantity=False)
-            value = bbsengine.oxfordcomma(room.items)
+            label = bbsengine.util.pluralize(len(room.items), "item", "items", quantity=False)
+            value = bbsengine.util.oxfordcomma(room.items)
             ttyio.echo(f"{{var:labelcolor}}room {label}: {{var:valuecolor}}{value}")
 
         if len(player.items) > 0:
-            label = bbsengine.pluralize(len(player.items), "item", "items", quantity=False)
+            label = bbsengine.util.pluralize(len(player.items), "item", "items", quantity=False)
             items = copy.deepcopy(player.items)
             items = player.weapons(items)+items
-            value = bbsengine.oxfordcomma(items)
+            value = bbsengine.util.oxfordcomma(items)
             ttyio.echo(f"{{var:labelcolor}}player {label}: {{var:valuecolor}}{value}")
 
         if wolf.roomid == player.roomid:
@@ -211,13 +212,13 @@ def main(args, **kw):
         options += "I"
         
         players = lib.getroomplayers(args, room.roomid)
-        ttyio.echo(":person: {var:labelcolor}%s: {var:valuecolor}%s" % (bbsengine.pluralize(len(players), "player", "players", quantity=False), bbsengine.oxfordcomma(players)))
+        ttyio.echo(":person: {var:labelcolor}%s: {var:valuecolor}%s" % (bbsengine.util.pluralize(len(players), "player", "players", quantity=False), bbsengine.util.oxfordcomma(players)))
         
-        ttyio.echo(":door: {var:labelcolor}%s: {var:valuecolor}%s" % (bbsengine.pluralize(len(exitdir), "exit", "exits", quantity=False), bbsengine.oxfordcomma(exitdir)))
+        ttyio.echo(":door: {var:labelcolor}%s: {var:valuecolor}%s" % (bbsengine.util.pluralize(len(exitdir), "exit", "exits", quantity=False), bbsengine.util.oxfordcomma(exitdir)))
         
         ttyio.echo(f"{wolf.short()} roomid={wolf.roomid}")
         
-        ttyio.echo(f"your items: {bbsengine.oxfordcomma(player.getitems())}")
+        ttyio.echo(f"your items: {bbsengine.util.oxfordcomma(player.getitems())}")
         
         options = "".join(sorted(options))
         ch = ttyio.inputchar(f"{{var:promptcolor}}playground: [{options}]: {{var:inputcolor}}", options+"ZG", "Q", help=playgroundhelp, player=player, args=args, room=room)
@@ -249,9 +250,9 @@ def main(args, **kw):
                 # if an invalid floor is entered, do not deduct a move
                 ttyio.echo("invalid floor")
                 continue
-            bbsengine.filedisplay(data.get(f"s.map.floor{floor}.txt"))
+            bbsengine.util.filedisplay(data.get(f"s.map.floor{floor}.txt"))
         elif ch == "G":
-            bbsengine.filedisplay(data.get("s.explain.txt"))
+            bbsengine.util.filedisplay(data.get("s.explain.txt"))
         elif ch == "Z":
             res = maintmode(args, player=player, room=room)
             if res is False:
@@ -266,7 +267,7 @@ def main(args, **kw):
             room.save()
         elif ch == "?" or ch == "KEY_HELP":
             ttyio.echo("menu")
-            bbsengine.filedisplay(data.get("s.menu.txt"))
+            bbsengine.util.filedisplay(data.get("s.menu.txt"))
         elif ch == "T":
             itemname = ttyio.inputstring("Take - {var:promptcolor}item name: {var:inputcolor}", noneok=True, completer=lib.completeItemName(args, roomid=player.roomid))
             if itemname == "":

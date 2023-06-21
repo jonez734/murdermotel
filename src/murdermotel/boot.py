@@ -1,7 +1,7 @@
 import argparse
 
-import bbsengine5 as bbsengine
-import ttyio5 as ttyio
+import bbsengine6 as bbsengine
+import ttyio6 as ttyio
 
 from . import lib
 
@@ -19,8 +19,8 @@ def buildargs(args=None, **kw):
     
     parser.add_argument("--node", action="store", dest="node", default="cyclops")
 
-    defaults = {"databasename": "zoidweb5", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
-    bbsengine.buildargdatabasegroup(parser, defaults)
+    defaults = {"databasename": "zoid6", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
+    bbsengine.database.buildargdatabasegroup(parser, defaults)
     return parser
 
 def access(args, op, **kw) -> bool:
@@ -31,7 +31,8 @@ def main(args, **kw):
         ttyio.echo("mm.main.100: args=%r" % (args), level="debug")
 
     ttyio.echo("{f6:3}{cursorup:3}") #  curpos:%d,0}" % (ttyio.getterminalheight()-5))
-    bbsengine.initscreen(bottommargin=1)
+    bbsengine.screen.init()
     player = None
     lib.setarea(args, player, "murder motel")
     lib.runsubmodule(args, player, "lobby")
+    return True
