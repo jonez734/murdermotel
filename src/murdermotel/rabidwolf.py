@@ -102,8 +102,14 @@ def main(args, **kw):
     if wolf is None:
         ttyio.echo("The wolf does not exist!")
         return False
-    loop = True
-    while loop:
+
+    room = kw["room"] if "room" in kw else None
+    if room is None:
+        ttyio.echo("The room you are in does not exist!")
+        return False
+
+    done = False
+    while not done:
         lib.setarea(args, player, "playground: rabid wolf")
 
         ttyio.echo(f"{{var:labelcolor}}There is a {wolf.short()} snarling at you.{{f6}}")
