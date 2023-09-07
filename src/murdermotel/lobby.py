@@ -33,6 +33,14 @@ def main(args, **kw):
         ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
         ttyio.echo()
 
+        ttyio.echo(f"check={bbsengine.database.classexists(args, 'murdermotel.playground')!r}")
+        if bbsengine.database.classexists(args, "murdermotel") is True:
+            if bbsengine.member.checkflag(args, "SYSOP") == True:
+                ttyio.echo("SysOP, please use 'maint mode' to create playground.")
+            ttyio.echo("murdermotel schema does not exist. ")
+        else:
+            ttyio.echo("murdermotel schema exists")
+
         options = ""
         options += "G"
         options += "C"
