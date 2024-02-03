@@ -1,7 +1,4 @@
-import random
-
-import ttyio6 as ttyio
-import bbsengine6 as bbsengine
+from bbsengine6 import io, util
 
 from . import lib
 
@@ -14,17 +11,17 @@ def access(args, op, **kw):
 def main(args, **kw):
     player = kw["player"] if "player" in kw else None
     if player is None:
-        ttyio.echo("You do not exist! Go Away!")
-        bbsengine.util.logentry("murdermotel.thief.main.100: player does not exist")
+        io.echo("You do not exist! Go Away!")
+        util.logentry("murdermotel.thief.main.100: player does not exist")
         return False
     thief = kw["thief"] if "thief" in kw else None
     if thief is None:
-        ttyio.echo("The thief does not exist!")
-        bbsengine.util.logentry("murdermotel.thief.main.120: thief does not exist")
+        io.echo("The thief does not exist!")
+        util.logentry("murdermotel.thief.main.120: thief does not exist")
         return False
-    ttyio.echo("THIEF! THIEF!  You were ATTACKED!")
+    io.echo("THIEF! THIEF!  You were ATTACKED!")
     player.moves -= 5
-    if bbsengine.diceroll(10) < 4:
+    if util.diceroll(10) < 4:
         # pick item at random
         # set 'thiefroomid' (uq) to 0
         pass
