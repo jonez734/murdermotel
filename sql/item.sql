@@ -9,10 +9,10 @@ create table if not exists murdermotel.item (
 \echo map_item_player
 create table if not exists murdermotel.map_item_player (
     itemname text,
-    playername text constraint fk_map_item_player references murdermotel.player(name) on update cascade on delete cascade
+    playermoniker text constraint fk_map_item_player references murdermotel.player(moniker) on update cascade on delete cascade
 );
 
-create unique index idx_map_item_player on murdermotel.map_item_player(itemname, playername);
+create unique index idx_map_item_player on murdermotel.map_item_player(itemname, playermoniker);
 
 \echo map_item_room
 create table if not exists murdermotel.map_item_room (
@@ -20,4 +20,4 @@ create table if not exists murdermotel.map_item_room (
     roomid bigint constraint fk_map_item_player references murdermotel.playground(roomid) on update cascade on delete cascade
 );
 
-create unique index idx_map_item_room on murdermotel.map_item_player(itemname, playername);
+create unique index idx_map_item_room on murdermotel.map_item_player(itemname, playermoniker);
