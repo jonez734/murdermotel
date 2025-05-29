@@ -178,7 +178,7 @@ def main(args, **kw):
 
         if wolf.roomid == player.roomid:
             currentroomid = player.roomid
-            if lib.runsubmodule(args, player, "rabidwolf", room=room, wolf=wolf) is False:
+            if lib.runmodule(args, "rabidwolf", room=room, wolf=wolf, **kw) is False:
                 io.echo("trouble running 'rabidwolf' prg")
                 return False
             if player.roomid != currentroomid:
@@ -266,7 +266,7 @@ def main(args, **kw):
                 # if an invalid floor is entered, do not deduct a move
                 io.echo("invalid floor")
                 continue
-            util.filedisplay(data.get(f"s.map.floor{floor}.txt"))
+            util.filedisplay(data.get(f"s.map.floor{floor}.txt"), wordwrap=False)
         elif ch == "G":
             util.filedisplay(data.get("s.explain.txt"))
         elif ch == "Z":
