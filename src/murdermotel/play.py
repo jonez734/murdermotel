@@ -8,16 +8,16 @@ from bbsengine6 import io, util, database, member
 from . import lib
 from . import data
 
-def init(args, **kw):
+def init(args, **kwargs):
     return True
 
-def access(args, op, **kw):
+def access(args, op, **kwargs):
     return True
 
-def buildargs(args, **kw):
+def buildargs(args, **kwargs):
     return None
 
-def maintmode(args, **kw):
+def maintmode(args, **kwargs):
     def editroom():
         io.echo("edit room")
         shortname = io.inputstring("{var:promptcolor}room short name: {var:inputcolor}", room.shortname, noneok=True)
@@ -71,7 +71,7 @@ def maintmode(args, **kw):
     
     return True
 
-def playgroundhelp(**kw):
+def playgroundhelp(**kwargs):
     io.echo(f"kw={kw!r}")
     room = kw["room"] if "room" in kw else None
     if room is None:
@@ -107,9 +107,9 @@ def playgroundhelp(**kw):
         io.setvar("T", "{green}")
     if len(player.items) > 0:
         io.setvar("L", "{green}")
-    util.filedisplay(data.get("s.menu.txt"), **kw)
+    util.filedisplay(data.get("s.menu.txt"), **kwargs)
 
-def main(args, **kw):
+def main(args, **kwargs):
     io.echo("murdermotel.play.100: running!", level="debug")
     name = member.getcurrentmoniker(args)
     if lib.getroomcount(args) == 0:
@@ -178,7 +178,7 @@ def main(args, **kw):
 
         if wolf.roomid == player.roomid:
             currentroomid = player.roomid
-            if lib.runmodule(args, "rabidwolf", room=room, wolf=wolf, **kw) is False:
+            if lib.runmodule(args, "rabidwolf", room=room, wolf=wolf, **kwargs) is False:
                 io.echo("trouble running 'rabidwolf' prg")
                 return False
             if player.roomid != currentroomid:
