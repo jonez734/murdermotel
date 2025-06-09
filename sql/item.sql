@@ -1,4 +1,4 @@
-\echo item
+--\echo item
 create table if not exists murdermotel.item (
     "type" text not null,
     "name" text unique not null primary key,
