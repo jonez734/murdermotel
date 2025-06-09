@@ -2,32 +2,35 @@ import time
 import locale
 import argparse
 
-import ttyio6 as ttyio
-import bbsengine6 as bbsengine
+from bbsengine6 import io, screen
 
-from . import lib
-from . import version
+from . import lib, version
 
-from .boot import *
+def init(args, **kw:dict) -> bool:
+    screen.init(args)
+    return True
+
+def access(args, op:str, **kw:dict) -> bool:
+    return True
+
+def buildargs(args=None, **kw:dict):
+    parser = argparse.ArgumentParser("murder motel")
+    return parser
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")
     time.tzset()
 
-    parser = buildargs()
+    parser = lib.buildargs()
     args = parser.parse_args()
 
     init(args)
 
-    print("prior to screen.init()")
-    bbsengine.screen.init(args)
-    print("after")
-
     try:
-        main(args)
+        lib.runmodule(args, "lobby")
     except KeyboardInterrupt:
-        ttyio.echo("{/all}{bold}INTR{bold}")
+        io.echo("{/all}{bold}INTR{bold}")
     except EOFError:
-        ttyio.echo("{/all}{bold}EOF{/bold}")
+        io.echo("{/all}{bold}EOF{/bold}")
     finally:
-        ttyio.echo("{decsc}{curpos:%d,0}{el}{decrc}{reset}{/all}" % (ttyio.getterminalheight()))
+        io.echo("{decsc}{curpos:%d,0}{el}{decrc}{reset}{/all}" % (io.getterminalheight()))

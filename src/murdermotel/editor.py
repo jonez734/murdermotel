@@ -1,5 +1,4 @@
-import ttyio5 as ttyio
-import bbsengine5 as bbsengine
+from bbsengine6 import io
 
 def main(args):
-    ttyio.echo("pass")
+    io.echo("pass")

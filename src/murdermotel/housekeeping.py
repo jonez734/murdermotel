@@ -1,8 +1,7 @@
 import time
 import locale
 
-import ttyio5 as ttyio
-import bbsengine5 as bbsengine
+from bbsengine6 import io
 
 from . import lib
 
@@ -25,7 +24,7 @@ def main(args, **kw):
 
     done = False
     while not done:
-      bbsengine.title("murder motel housekeeping")
+      util.heading("murder motel housekeeping")
       ttyio.echo("database: %s host: %s:%s" % (args.databasename, args.databasehost, args.databaseport), level="debug")
       ttyio.echo()
       lib.setarea(args, player, "housekeeping")

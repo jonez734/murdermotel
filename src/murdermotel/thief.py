@@ -12,12 +12,12 @@ def main(args, **kw):
     player = kw["player"] if "player" in kw else None
     if player is None:
         io.echo("You do not exist! Go Away!")
-        util.logentry("murdermotel.thief.main.100: player does not exist")
+        util.logentry("murdermotel.thief.main.100: player does not exist", prg="murdermotel")
         return False
     thief = kw["thief"] if "thief" in kw else None
     if thief is None:
         io.echo("The thief does not exist!")
-        util.logentry("murdermotel.thief.main.120: thief does not exist")
+        util.logentry("murdermotel.thief.main.120: thief does not exist", prg="murdermotel")
         return False
     io.echo("THIEF! THIEF!  You were ATTACKED!")
     player.moves -= 5

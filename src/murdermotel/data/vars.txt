@@ -29,3 +29,4 @@
 - dt$(): directions 0: east 1: north 2: west 3: south 4: up 5: down
 - jm
 - tq
+- ff% - current player inventory
