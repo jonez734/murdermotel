@@ -2,18 +2,18 @@ import time
 import locale
 import argparse
 
-from bbsengine6 import io, screen
+from bbsengine6 import io, screen, database
 
-from . import lib, version
+from . import lib as libmm
 
-def init(args, **kw:dict) -> bool:
+def init(args, **kwargs:dict) -> bool:
     screen.init(args)
     return True
 
-def access(args, op:str, **kw:dict) -> bool:
+def access(args, op:str, **kwargs:dict) -> bool:
     return True
 
-def buildargs(args=None, **kw:dict):
+def buildargs(args=None, **kwargs:dict):
     parser = argparse.ArgumentParser("murder motel")
     return parser
 
@@ -21,16 +21,17 @@ if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")
     time.tzset()
 
-    parser = lib.buildargs()
+    parser = libmm.buildargs()
     args = parser.parse_args()
 
     init(args)
 
-    try:
-        lib.runmodule(args, "lobby")
-    except KeyboardInterrupt:
-        io.echo("{/all}{bold}INTR{bold}")
-    except EOFError:
-        io.echo("{/all}{bold}EOF{/bold}")
-    finally:
-        io.echo("{decsc}{curpos:%d,0}{el}{decrc}{reset}{/all}" % (io.getterminalheight()))
+    with database.getpool(args) as pool:
+        try:
+            libmm.runmodule(args, "lobby", pool=pool)
+        except KeyboardInterrupt:
+            io.echo("{/all}**INTR**")
+        except EOFError:
+            io.echo("{/all}**EOF**")
+        finally:
+            io.echo(f"{{decsc}}{{curpos:{io.getterminalheight()},0}}{{el}}{{decrc}}{{reset}}{{/all}}")
