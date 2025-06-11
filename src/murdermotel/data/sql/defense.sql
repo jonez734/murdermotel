@@ -1,7 +1,9 @@
 --\echo defense
-create table if not exists (
+create table if not exists murdermotel.defense (
     defenseid bigint unique not null,
-    name text,
+    module text,
+    state jsonb,
+    name citext,
     description text
 );
 

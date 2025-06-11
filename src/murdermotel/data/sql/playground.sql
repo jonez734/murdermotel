@@ -1,6 +1,7 @@
 --\echo playground
 create table if not exists murdermotel.playground (
     roomid bigint unique not null primary key,
+    module text,
     shortname text unique,
     title text unique not null,
     description text,
