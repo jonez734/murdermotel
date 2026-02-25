@@ -1,0 +1,8 @@
+- uq = roomid of thief
+- bn = roomid of current player
+- w(91) = booby trap (hard coded)
+- n = playerid
+- u(n,3) = sa
+- sa = ???
+- u(n,9) = player moves
+- bt = booby-trap playerid
