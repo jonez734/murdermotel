@@ -1,0 +1,459 @@
+	mp=.:gosub{:3700}
+	&"{uppercase}":dr=1:a$="s.murderttl,s,r":gosub4:&,3,2:close2:&"{pound}Q0{lowercase}{f6}":p$="":goto{:3448}
+{:3002}
+	gosub{:3116}:m$=na$
+	gosub{:3628}
+	gosub[35]:&"{lt. green}The Manager, {lt. blue}":&bs$:&"{lt. green},{f6}Welcomes you.{f6}":goto{:3094}
+{:3008}
+	dr=1:gosub2:close5:open5,dv%,5,dr$+"s.m.menu,s,r"
+	&,3,5:close5:return
+{:3012}
+	hs=0:goto{:3022}
+{:3014}
+	hs=128:goto{:3022}
+{:3016}
+	&"{f6}{lt. green}Clearing Variables{white}..":gosub{:3704}:goto300
+{:3018}
+	fort=1to2:&"{f6}":dr=1:gosub2:close5
+	open5,dv%,5,dr$+"s.m.explain"+str$(t):&,3,5:close5
+	&"{f6}{lt. green}(RETURN) or 'A':{lt. blue} {pound}g1{pound}v7{f6}":t=t-4*(an$="A"):next:goto{:3158}
+{:3022}
+	&"{f6}{white}Sorting data...":qe=.:rs=.:fork=1to30
+	ifu(k,.)=.then{:3030}
+	qe=qe+1:a%(qe)=u(k,.):tt$(qe)=u$(k,.):c%(qe)=u(k,6):e%(qe)=u(k,9)
+	d%(qe)=u(k,1):rs=qe:ifrs=1then:&".":next:goto{:3046}
+{:3030}
+	ifrs<2then{:3044}
+	ifhs=.thenifd%(rs)<=d%(rs-1)then{:3044}
+	ifhs=128thenife%(rs)<=e%(rs-1)then{:3044}
+	a=d%(rs):d%(rs)=d%(rs-1):d%(rs-1)=a:a=e%(rs):e%(rs)=e%(rs-1):e%(rs-1)=a
+	a=a%(rs):a%(rs)=a%(rs-1):a%(rs-1)=a
+	a$=tt$(rs):tt$(rs)=tt$(rs-1):tt$(rs-1)=a$
+	a=c%(rs):c%(rs)=c%(rs-1):c%(rs-1)=a:rs=rs-1:goto{:3030}
+{:3044}
+	&".":next
+{:3046}
+	rs=.:&"{f6:3}{orange}{pound}{back arrow}11HIGH SCORES ":a$=" KILLS{f6}{pound}vz":ifhs=128thena$=" POINTS{f6}{pound}vz"
+	&:fort=1toqe:&"{f6}{lt. green}Number {white}":&right$(str$(t),2)
+	&" {lt. red}Assassin: {yellow}":&tt$(t):&"{f6}{white}":tt$(t)=""
+	&"   Status: ":a$="Alive":ifa%(t)=1thena$="Dead"
+	&:&" - Points: ":&str$(e%(t)):&"{f6}"
+	&"   Kills: ":&right$("  "+str$(d%(t)),3)
+	&" - Died: ":&right$("  "+str$(c%(t)),3):a%(t)=.:e%(t)=.:d%(t)=.:c%(t)=.
+	t=t-100*(rs<>.):next
+{:3062}
+	&"{f6:2}{gray3}(hit RETURN)":gosub6:ontr%+1goto{:3016}:goto{:3158}
+	forz=.to2:t$=tt$(t+1+z*31):tt$(t+1+z*31)=tt$(a+z*31):tt$(a+z*31)=t$:next:return
+{:3066}
+	&"{f6}{yellow}Which floor (1-5)?{lt. green}":gosub6:iftr%<1thenreturn
+	ifval(an$)>5orval(an$)<1thenreturn
+	dr=1:gosub2:close5:open5,dv%,5,dr$+"s.floor"+an$:&,3,5:close5
+	&"{f6}(RETURN) {pound}i1":return
+{:3072}
+	dr=3:a$="e.weapons file,s,r":gosub4:&"{f6}"
+	fork=1to90:&,2,2:w(k)=val(a$):input#2,w$(k):next
+	&,2,2:w(k)=val(a$):&"{f6}":close2:return
+{:3078}
+	ifbt=.andbn=w(91)thenbt=128:sa=sa-1:&nn$(39):goto{:3160}
+	t=.:goto{:3194}
+{:3082}
+	&"{f6}Leave BOOBY-TRAP (Y/N) ":gosub6
+	ontr%+1goto{:3164}:b=-(an$="Y")
+	ifbthenw(91)=bn:bt=.
+	goto{:3160}
+{:3090}
+	ifbt=.thenreturn
+	&"You are dragging a large BOOBY-TRAP.{f6}":return
+{:3094}
+	ifd3$=na$andac%<9then:&"{f6}No back to back calls!":goto{:3016}
+	m=60:&"{f6}":gosub{:3460}:fork=1to30:gosub{:3294}:&,2,2:ifa$<>na$thennext:k=.
+	ifk=.then:&"{f6}Ah, a new BODY!  Building and{f6}":gosub{:3116}:goto{:3108}
+	gosub{:3282}:if(ca<>u(k,4)andu(k,4)>1)ori%=1thenu(k,3)=m
+	gosub{:3468}:gosub{:3116}
+	ifu(k,.)=1then:&"{f6}":&u$(k,1):&" killed you!!!{f6}":goto{:3108}
+	goto{:3118}
+{:3108}
+	&" REVIVING your Character...":close2:close1:f1=60:tr=139:bz=.:td=.:tq=128
+	jm=.:e9=0:ifk=.then{:3302}
+	goto{:3306}
+	return
+{:3116}
+	close2:close15:close5:return
+{:3118}
+	&"{f6}{white}Please Wait..Finding Motel Key..."
+	gosub{:3300}:gosub{:3460}
+	n=.:fork=1to31:&".":gosub{:3282}:ifna$=u$(k,.)thenn=k
+	u(k,5)=.:next:gosub{:3116}:&"{f6}":u(31,.)=1:ifu(31,.)>.then{:3128}
+	&"{f6}{pound}b1MOTEL CLOSED TODAY":x=.:goto{:3016}
+{:3128}
+	k=n:x=.:goto{:3534}
+{:3130}
+	dr=1:a$="s.word file,s,r":gosub4:fort=1to46
+	input#2,nn$(t):next:close2
+	b=u(n,4)=ca:x=u(n,3):ifband(x<1)then:&nn$(43):x=.:goto{:3246}
+	sa=x:bz=u(n,1):an$=d1$:&,15:b$=na$+" leaves their room at "+an$+"."
+	gosub{:3504}:m$=u$(n,.):gosub{:3072}:bt=.:&"{f6}":dt$(.)="East"
+	dt$(1)="North":dt$(2)="West":dt$(3)="South":dt$(4)="Up"
+	dt$(5)="Down":nr=.:bn=u(n,2):ifbn<1thenbn=10
+	nn$(31)="":nn$(32)="":nn$(33)="":nn$(34)="":gosub{:3008}
+	&"{f6:2}Hang on, opening"
+	&" up the Murder Motel...":gosub{:3462}:gosub{:3484}:nr=.:u(n,4)=ca
+{:3150}
+	ug=.:u$(n,1)="no-one":fort=1to90:ifw$(t)=m$thenug=ug+1:f%(int((t-1)/6+1))=t
+	&".":ifw$(t)=u$(n,2)thenso%(int((t-1)/6+1))=t
+	next:&"{f6}":u(n,5)=-1:fort=1to30:&"-":ifu$(t,.)<>u$(n,2)thennext
+	&"{f6}":e=t:u(31,5)=-1:&nn$(34):&"{f6}":&nn$(37):fort=1to2:goto{:3212}
+{:3158}
+	gosub{:3248}:gosub{:3550}
+{:3160}
+	gosub{:3674}:iftr%<1then{:3164}
+{:3162}
+	s%=rnd(sa):s%=sa:&"{f6}{lt. blue}Move{shft space}({lt. green}{pound}%s{lt. blue} left ) ?":ifsa>.thengosub6
+{:3164}
+	a$=left$(an$,1):iftr%<1or(sa<1)then:&"{f6}{orange}Check Out Time!{f6}":goto{:3234}
+	t=(-(a$="E")-(a$="N")*2-(a$="W")*3-(a$="S")*4-(a$="U")*5-(a$="D")*6-1)
+	ifa$="M"thengosub{:3066}:goto{:3162}
+	if(t>-1)thenifac%(t)>.thenbn=ac%(t):sa=sa-1:goto{:3158}
+	t=(-(a$="H")-(a$="P")*2-(a$="G")*3):ontgoto{:3012},{:3508},{:3018}
+	ifa$="R"thengosub{:3620}:goto{:3160}
+	t=(-(a$="X")-(a$="#")*2):ontgoto{:3512},{:3014}
+	t=(-(a$="T")-(a$="L")*2-(a$="I")*3-(a$="Q")*4):ontgoto{:3186},{:3198},{:3210},{:3634}
+	ifnot(a$<>"K"oru(e,2)<>bnoru$(n,2)=u$(n,.))then{:3214}
+	ifa$="{f2}"then:gosub{:3008}:goto{:3160}
+	&"{f6}{pound}b1You can't use '":&a$:&"' here!":goto{:3160}
+{:3186}
+	&nn$(36):gosub6:t=val(an$):ift>91ort<1ortr%<1then{:3160}
+	ift=91then{:3078}
+	if(ug=5)or((fndf(.)>1)and(t>59))then:&nn$(45):goto{:3160}
+	iff%(int((t-1)/6+1))<>.then:&"{pound}b1{f6}You have that !!!{f6}":goto{:3160}
+{:3194}
+	sa=sa-1:ifbn<>w(t)then:&"{f6}{pound}b1 It's not here!!!{f6}":goto{:3160}
+	w$(t)=m$:f%(int((t-1)/6+1))=val(an$):ug=ug+1:&nn$(39):goto{:3160}
+{:3198}
+	sa=sa-1:&"{f6}":fort=1to15:iff%(t)=.then{:3206}
+	&"{f6}{lt. blue}Leave ":&nn$(int((f%(t)-1)/6+1)):&" (Y/N) "
+	gosub6:ontr%+1goto{:3164}:b=-(an$="Y")
+	x=f%(t):ifbthenw$(x)="/":ug=ug-1:w(x)=bn:f%(t)=.
+{:3206}
+	next:ifbt<>.then{:3082}
+	goto{:3160}
+{:3210}
+	&nn$(37):fort=1to15:iff%(t)>.then:&nn$(int((f%(t)-1)/6+1)):&"{f6}"
+{:3212}
+	next:gosub{:3090}:&"An urge to kill {white}":&u$(n,2):&"!{lt. blue}":goto{:3158}
+{:3214}
+	ifval(u$(31,.))<2then:&"{f6}You CAN'T do that.{f6:2}":goto{:3160}
+	&nn$(46):gosub6:a$=an$:iftr%<1then{:3164}
+	t=abs(val(a$))*-(a$<"6"):iff%(t)=.orf%(t+5)=.then:&nn$(38):goto{:3160}
+	ifso%(t+10)<>.thengosub{:3526}:bn=int(rnd(1)*140+1):goto{:3158}
+	&nn$(t+int(rnd(1)*3)*5+15):&"{white}":&u$(n,2):&"!!!{lt. blue}":sa=sa-1:nr=.
+	b$=na$+" kills "+u$(n,2)+"!!!":gosub{:3504}
+	u$(e,1)=na$:forx=1to90:ifw$(x)=u$(n,2)thenw$(x)="/":w(x)=bn
+	next:u(e,.)=1:u(e,5)=-1:u$(n,2)=u$(e,2):u$(e,2)="no-one":u(e,6)=u(e,6)+1
+	s%=int(rnd(1)*10+3):&"{f6}Bonus Moves = {pound}%s{f6}":sa=sa+s%:u(e,9)=u(e,9)-20
+	u$(31,.)=str$(val(u$(31,.))-1):fort=.to15:so%(t)=.:next:bz=bz+1:goto{:3614}
+{:3234}
+	&nn$(35):u(n,2)=bn:u(n,1)=bz:u(n,3)=sa:gosub{:3116}
+	an$=d1$:&,15:b$=na$+" returns to their room at "+an$+"."+chr$(13):gosub{:3504}
+	gosub{:3460}:fork=1to31:&".":ifu(k,5)=-1thengosub{:3468}
+	next:ifbt<>.thenbt=.:w(91)=bn
+	gosub{:3116}:goto{:3350}
+	&"{f6}"
+{:3246}
+	close2:close1:goto300
+{:3248}
+	ifnr=bnthen{:3256}
+	ifbn=150thenbn=int(rnd(1)*140+1)
+	k=bn:x=.:gosub{:3294}:&,2,2:rd$=a$
+	forx=.to5:&,2,2:ac%(x)=val(a$):next
+{:3256}
+	nr=bn:&"{f6:2}{lt. blue}You are now {yellow}":&rd$:&".{f6}{lt. blue}Exits are:{orange}":fort=.to5
+	ifac%(t)>.then:&dt$(t):&","
+	next:&"{pound}h1.{lt. blue}{f6}":&"Here you find":sp=.:fort=1to90:ifw(t)<>bnthennext:goto{:3266}
+	ifw$(t)="/"then:&"{f6}":&nn$(int((t-1)/6+1)):&" #":&str$(t):sp=1
+	next
+{:3266}
+	ifbt=.andw(91)=bnthen:&"{f6}BOOBY-TRAP #91":sp=1
+	ifsp=.then:&nn$(42)
+	ifsp>.then:&"."
+	fort=1to30:ifu(t,2)<>bnthennext:return
+	ifu(t,.)=.thennext:return
+	ift=nthen{:3280}
+	&"{f6}{white}":&u$(t,.):&"{lt. blue} is here. ":ifu(t,.)=1then:&"DEAD"
+{:3280}
+	next:return
+{:3282}
+	gosub{:3294}:&,2,2:u$(k,.)=a$:&,2,2:u(k,.)=val(a$)
+	ifu(k,.)<1thenifk<31thenreturn
+	&,2,2:u(k,1)=val(a$):&,2,2:u$(k,1)=a$
+	&,2,2:u$(k,2)=a$:&,2,2:u(k,2)=val(a$):&,2,2:u(k,3)=val(a$)
+	&,2,2:u(k,4)=val(a$):&,2,2:u(k,6)=val(a$):&,2,2:u(k,7)=val(a$)
+	&,2,2:u(k,8)=val(a$):&,2,2:u(k,9)=val(a$):return
+{:3294}
+	gosub{:3296}:&,22,1
+{:3296}
+	print#15,"p"chr$(96+2)chr$(k)chr$(.)chr$(.):return
+	goto{:3462}
+{:3300}
+	deffndf(z)=-((f%(11)>.)+(f%(12)>.)+(f%(13)>.)+(f%(14)>.)+(f%(15)>.)):return
+{:3302}
+	&"{uppercase}":dr=1:a$="s.murderreg,s,r":gosub4:&,3,2:close2:&"{pound}Q0{lowercase}{f6}":jm=.
+	&"{f6}{lt. red}>>>> Register to play MURDER MOTEL <<<<{cyan}{f6}"
+{:3306}
+	gosub{:3460}:gosub{:3308}:goto{:3314}
+{:3308}
+	m$=na$:sn$=m$
+	y=.:fork=1to31:gosub{:3282}:&".":u(k,5)=.:ifu$(k,.)=m$theny=k
+	next:close2:return
+{:3314}
+	ify<>.then:&"{f6}You Are Already Registered!!!{f6}":goto{:3358}
+{:3316}
+	gosub{:3366}:ift>30then:&"{f6}Sorry, No More Rooms Left{f6:2}":tq=.:goto{:3016}
+	&"{f6}":u$(31,.)=str$(val(u$(31,.))+1):u$(t,.)=left$(m$,20):u(t,.)=2
+	u(t,1)=abs(bz):u$(t,1)="no-one":u(t,2)=10:u(t,3)=f1:u(t,6)=.:iftd=.then{:3324}
+	u(t,2)=int(rnd(1)*140+1)
+{:3324}
+	u(t,5)=-1:u(t,4)=.:u(31,5)=-1:u(t,7)=32:u(t,8)=.:u(t,9)=.
+	b$=m$+" has registered at the motel.":gosub{:3504}
+{:3328}
+	ifval(u$(31,.))=1then:&"{f6}You are the only player.{f6}":u$(t,2)=m$:goto{:3340}
+	r=int(rnd(1)*val(u$(31,.))+1)
+{:3332}
+	forkk=rto30:if(kk=t)or(u(kk,.)<>2)then{:3338}
+	t$=u$(kk,2):u$(kk,2)=m$:u$(t,2)=t$:u(kk,5)=-1:u(t,5)=-1
+	&"{f6}You must kill ":&u$(t,2):&"!!!{f6}":goto{:3340}
+{:3338}
+	nextkk:ifkk=31thenr=1:goto{:3332}
+{:3340}
+	m$=sn$:ifjm=1thenjm=-1:goto{:3374}
+	u(31,5)=-1:&"{f6}Saving any changes to disk.{f6}"
+	gosub{:3460}
+	fork=1to31:&".":ifu(k,5)thengosub{:3468}
+	next:close2:ifnot(jm)then{:3354}
+{:3350}
+	gosub{:3466}
+	fork=1to90:&".":print#2,w(k):print#2,w$(k):next:print#2,w(k)
+{:3354}
+	close2:close1:gosub{:3478}:iftq=128thentq=.:goto{:3118}
+	goto{:3016}
+{:3358}
+	ifu(y,.)<>1then{:3354}
+	&"I assume you're here to be revived.{f6}"
+	b$=u$(y,.)+" has been revived!"+chr$(13):gosub{:3504}
+	u(y,.)=2:t=y:u$(31,.)=str$(val(u$(31,.))+1):goto{:3328}
+{:3366}
+	fort=1to30:ifu(t,.)<>.thennext
+	return
+{:3370}
+	x=.:fort=.to30:x=x-(u(t,.)=2):next:u$(31,.)=str$(x)
+	tt$(1)="dead":tt$(.)="no player":tt$(2)="playing"
+{:3374}
+	&"{f6}{lt. red}>>>>>>>>> MURDER MOTEL EDITOR{shft space}<<<<<<<<<<{lt. green}":td=128
+{:3376}
+	&"{f6} 1) List players{f6} 2) Delete a player{f6} 3) Add a player{f6}"
+	jm$="Close":ifu(31,.)=.thenjm$="Open"
+	&" 4) Redistribute weapons{f6} 5) "+jm$+" motel{f6} 6) Exit editor{f6:2}"
+	&"MM Editor  {pound}i1":iftr%<1then{:3016}
+	jm=-1:if(val(an$)<1orval(an$)>6)then{:3374}
+	nn$="":bz=.:onval(an$)goto{:3388},{:3402},{:3420},{:3430},{:3442},{:3516}
+{:3388}
+	&"{f6}{orange}Player list, with status{lt. blue}{f6}":fork=1to30
+	&right$(str$(k),2)+" {white}"+u$(k,.)+" {cyan}("+tt$(u(k,.))+"){f6}"
+	ifu(k,.)>.then:&"{lt. blue}  Room={lt. green}"+right$(("  "+str$(u(k,2))),3)+", {lt. green}"
+	ifu(k,.)>.then:&"Target={yellow}"+u$(k,2)+"{f6}{lt. blue}"
+	if(rc<>1)thennext:goto{:3400}
+	k=31:next
+{:3400}
+	&"{f6}There are"+str$(val(u$(31,.)))+" people playing.{f6}":goto{:3376}
+{:3402}
+	&"Give the handle, or position (1-30) of  the user to delete: {pound}i1"
+	iftr%<1then{:3016}
+	ifval(an$)>.thenifval(an$)<31thenn=val(an$):goto{:3410}
+	forn=1to30:ifu$(n,.)<>an$thennext:ifn=31then:&"{f6}NOT FOUND!{pound}b1{f6}":goto{:3374}
+{:3410}
+	ifu(n,.)<1then:&"{f6}That player is already deleted{pound}b2{f6}":goto{:3374}
+	u(n,5)=-1:j=u(n,.):t$=u$(n,2):fork=1to30:ifu$(k,2)<>u$(n,.)thennext
+	nn$=u$(n,.):ifj>1thenu$(k,2)=t$:u$(n,2)=chr$(1):u(k,5)=-1
+	u(n,.)=.:u$(n,.)=chr$(2):u(31,5)=-1:b$="":ifj=1then{:3434}
+	u$(31,.)=str$(val(u$(31,.))-1):goto{:3434}
+{:3420}
+	&"Enter Handle{f6:2}: {pound}i1":iftr%<1then{:3016}
+	fort=.to30:ifu$(t,.)<>an$thennext
+	ift<31then:&"{f6}{pound}b1That handle is being used.":t=31:next:goto{:3374}
+	sn$=m$:m$=an$:jm=1:&"{f6}How many kills (0)? {pound}i1":iftr%<1then{:3016}
+	bz=val(left$(an$,3)):goto{:3316}
+{:3430}
+	&"{f6}New locations? {pound}i1":ontr%+1goto{:3016}:b$=an$
+	&"{f6}Ownerless? {pound}i1":iftr%<1then{:3016}
+{:3434}
+	&"{f6}Working...":fork=1to90:t=w(k)
+	ifb$="Y"thent=int(rnd(1)*140+1)
+	a$=w$(k):ifan$="Y"ora$=nn$thena$="/"
+	w(k)=t:w$(k)=a$:next:w(k)=int(rnd(1)*140+1):goto{:3374}
+{:3442}
+	jm=.:ifu(31,.)=.thenjm=1
+	u(31,.)=jm:u(31,5)=-1:goto{:3374}
+	return
+{:3448}
+	&"{f6}Please Wait, making the beds..."
+	&,28:forx=.to30:ac%(x)=.:e%(x)=.:so%(x)=.:next
+	forx=.to60:f%(x)=.:c%(x)=.:next:jb=int(rnd(1)*70+1)
+	gosub82:uq=int(rnd(1)*140+1):bj=int(rnd(1)*70+70)
+	wl=int(rnd(1)*140+1):wh=20
+	dimu$(31,2),u(31,9),w$(90),w(91):goto{:3002}
+{:3460}
+	a$="e.player's files":dr=3:goto4
+{:3462}
+	a$="s.playground":dr=1:goto4
+	rem a$="e.playground":dr=3:goto4
+{:3466}
+	dr=3:a$="e.weapons file":goto18
+{:3468}
+	gosub{:3294}:b$=u$(k,.)+chr$(13)+str$(u(k,.))+chr$(13)
+	b$=b$+str$(u(k,1))+chr$(13)+u$(k,1)+chr$(13)+u$(k,2)+chr$(13)
+	fort=2to4:b$=b$+str$(u(k,t))+chr$(13):nextt:ifu(k,9)<.thenu(k,9)=.
+	fort=6to9:b$=b$+str$(u(k,t))+chr$(13):nextt
+	print#2,b$:return
+{:3478}
+	fork=1to31:&".":fort=0to2:u$(k,t)="":nextt:nextk:&"{f6}"
+	fork=1to90:w$(k)="":next:&"{f6}"
+	fork=1to46:nn$(k)="":next:&"{f6}":return
+{:3484}
+	ifbn<>w(91)thenreturn
+	w(91)=int(rnd(1)*140+1)
+	fort=1to3:&"{f6:2}TICK{f6:3}":forx=1to100:next:next:ifint(rnd(1)*100)<15then{:3500}
+	&"BLAM!!!   BOOM!!!   CRASH!!!":u(n,9)=u(n,9)-30
+	&"{f6:2}You were BOOBY-TRAPPED and lost"
+	s%=int(rnd(1)*15+10):sa=sa-s%:&str$(s%):&" moves!{f6:2}"
+	b$=na$+" was BOOBY-TRAPPED!!!":gosub{:3504}
+{:3498}
+	return
+{:3500}
+	&"PHHHhhhhffffffftttttttt........{f6:2}BOOBY-TRAP BACKFIRED!!!!!!{f6:2}"
+	b$="BOOBY-TRAP backfired on "+na$:gosub{:3504}:goto{:3498}
+{:3504}
+	dr=3:gosub2:close5:open5,dv%,5,dr$+"e.motel news,a"
+	print#5,b$:close5:dr=3:gosub2:return
+{:3508}
+	dr=3:gosub2:close5:open5,dv%,5,dr$+"e.motel news,s,r":&,3,5:close5
+	dr=3:gosub2:goto{:3062}
+{:3512}
+	ifna$<>mid$(i1$,2)then{:3158}
+	m$="!":y=.:goto{:3370}
+{:3516}
+	m$=na$:gosub{:3116}:gosub{:3460}:fork=1to31:&".":ifu(k,5)=-1thengosub{:3468}
+	next:gosub{:3116}:ifw(91)<1orw(91)>140thenw(91)=bn
+	gosub{:3466}:fork=1to90:&".":print#2,w(k)
+	print#2,w$(k):next:print#2,w(k):gosub{:3116}
+	gosub{:3478}:goto{:3002}
+{:3526}
+	&nn$(40):&nn$(t+10):&nn$(41)
+	b$=na$+" trys to kill "+u$(n,2)+", but "+u$(n,2)+chr$(13)
+	b$=b$+" has "+nn$(t+10)+" for protection!!!":gosub{:3504}
+	u(n,9)=u(n,9)-5:return
+{:3534}
+	ifu(k,4)=cathen{:3548}
+	s%=val(mid$(d1$,6,2))
+	ifu(k,7)<>s%thenu(k,7)=val(mid$(d1$,6,2)):u(k,8)=.:goto{:3548}
+	u(k,8)=u(k,8)+1:ifu(k,8)<>2then{:3548}
+	&"{f6:2}Sorry, you have played your 2"
+	&" games for today.  Please try"
+	&"  again tomorrow.{f6:2}":goto{:3016}
+{:3548}
+	&"{f6}You may play":&str$(1-u(k,8)):&" more time(s).{f6}":goto{:3130}
+{:3550}
+	ifuq<>bnthen{:3572}
+	&"{f6:2}THIEF! THIEF!  You were ATTACKED!{f6}":u(n,9)=u(n,9)-5
+	b$=na$+" was attacked by the THIEF!":gosub{:3504}
+	uq=.:fort=1to15:iff%(t)=.then{:3562}
+	x=f%(t)
+	ifint(rnd(1)*10)<4then{:3570}
+{:3562}
+	nextt:ifuq=-1thenuq=.:goto{:3568}
+	b$="The THIEF was fought OFF!":u(n,9)=u(n,9)+15
+{:3566}
+	&"{f6}{pound}$b{f6}":gosub{:3504}:goto{:3572}
+{:3568}
+	b$="The THIEF STOLE something!":goto{:3566}
+{:3570}
+	w$(x)="/":ug=ug-1:w(x)=int(rnd(1)*140+1):f%(t)=.:uq=-1:goto{:3562}
+{:3572}
+	ifbj=bnthenbj=.:goto{:3578}
+	ifjb=bnthenjb=.:goto{:3578}
+	goto{:3584}
+{:3578}
+	s%=int(rnd(1)*15+5):&"{f6:2}You found a TREASURE ROOM!{f6} Bonus of {pound}%s moves!{f6}"
+	sa=sa+s%:b$=na$+" found a TREASURE ROOM!":gosub{:3504}
+	u(n,9)=u(n,9)+5
+{:3584}
+	ifwl<>bnthenreturn
+{:3586}
+	&"{f6:2}There is a RABID wolf snarling at you!{f6:2}"
+	&"A - Attack Wolf{f6}I - Ignore Wolf{f6}"
+	&"F - Flee Room{f6:2}Make Selection":gosub6
+	a$=left$(an$,1):iftr%<1thenreturn
+	t=(-(a$="I")-(a$="F")*2-(a$="A")*3):s%=.:ontgoto{:3598},{:3658},{:3642}
+	goto{:3586}
+{:3598}
+	ifrnd(1)<.6thens%=int(rnd(1)*10+10)
+{:3600}
+	gosub{:3670}
+{:3602}
+	wl=ac%(int(rnd(1)*6)):ifwl>.andwl<141then{:3610}
+	t=t+1:ift<6then{:3602}
+	fort=.to5:ifac%(t)=.thennext
+	wl=ac%(t)
+{:3610}
+	return
+{:3612}
+	s%=int(rnd(1)*3):goto{:3600}
+{:3614}
+	u(n,9)=u(n,9)+25:ifval(u$(31,.))>1then{:3150}
+	&"{f6}{white}You're the only player left!{f6}":u(n,9)=u(n,9)+100
+	b$=na$+" is the only player left!":gosub{:3504}:goto{:3150}
+{:3620}
+	&"{f6}Report findings to the paper!"
+	poke53252,76:&"{f6:2}Go ahead and write{f6}:{pound}i0":ifan$=""ortr%<1thenreturn
+	b$=na$+" reports:"+chr$(13)+an$:gosub{:3504}:sa=sa-1
+	return
+{:3628}
+	&"{f6}{white}Super {lt. red}Murder Motel {yellow}PLUS {lt. green}Version {white}4{f6}1989 {lt. green}By Mark A. Dickenson"
+	&"{f6:2}{cyan}Based on the original code from"
+	&"{f6}{red}Murder {lt. red}Motel {yellow}by SEAN D. WAGLE  (C) 1987{f6:2}":return
+{:3634}
+	&"{f6}Are you sure? (Y/N)":gosub6
+	ontr%+1goto{:3234}:b=-(an$="Y")
+	&"{f6}":ifbthen{:3234}
+	goto{:3160}
+{:3642}
+	&nn$(46):gosub6:a$=an$:iftr%<1thenreturn
+	t=abs(val(a$))*-(a$<"6"):iff%(t)=.orf%(t+5)=.then:&nn$(38):goto{:3598}
+	s%=int(rnd(1)*6+1):&"{f6}You remove":&str$(s%*5):&"% of the wolf's strength!"
+	u(n,9)=u(n,9)+5:wh=wh-s%:ifwh<.thenwh=.
+	&"{f6}Leaving the wolf with":&str$(wh*5):&"% strength.{f6}"
+	s%=.:ifwh>.then{:3612}
+	wl=.:&"{f6}You KILLED the wolf!!!{f6}":u(n,9)=u(n,9)+500
+	b$=na$+" KILLED the wolf!!!":gosub{:3504}:return
+{:3658}
+	t=.:ifrnd(1)<.4thens%=int(rnd(1)*10+5)
+{:3660}
+	bn=ac%(int(rnd(1)*6)):ifbn>.andbn<141then{:3668}
+	t=t+1:ift<6then{:3660}
+	fort=.to5:ifac%(t)=.thennext
+	bn=ac%(t)
+{:3668}
+	gosub{:3670}:&"{f6}":gosub{:3248}:goto{:3602}
+{:3670}
+	&"{f6}The wolf claws you for {pound}%s moves!{f6}":t=.:sa=sa-s%:ifsa<.thensa=.
+	return
+{:3674}
+	an$=d1$:&,15:b$=right$(an$,7):&"{f6:2} - {pound}$bM":a%=tr%:ifa%>99thenreturn
+	&" - {pound}%a Min. Left":return
+{:3700}
+	&"{f6:2}{white}Disabling More Mode...{f6:2}":&,42,34,3:ad%=a%:&,52,34,0:return
+{:3704}
+	&"{f6:2}{white}Re-Enabling More{shft space}Mode...{f6:2}":&,52,34,ad%:return
+	rem
+	rem super and plus additions by mark a. dickenson 5/25/89
+	rem re-moded by little john for 12.0 on 1/11/88
+	rem murder motel image v1.0 9/1 pc
