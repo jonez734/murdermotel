@@ -1,12 +1,9 @@
 import copy
 import random
 
-#import ttyio6 as ttyio
-#import bbsengine6 as bbsengine
 from bbsengine6 import io, util, database, member
 
-from . import lib
-from . import data
+from . import lib as libmm, data, player as libplayer, room as libroom
 
 def init(args, **kwargs):
     return True
@@ -26,42 +23,56 @@ def maintmode(args, **kwargs):
         room.shortname = shortname
         room.save()
     def goto():
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            pool = kwargs.get("pool", None)
+            if pool is None:
+                io.echo(f"mm.play.maint.goto.100: {pool=}", level="error")
+                return False
+
         dest = io.inputstring("{var:promptcolor}goto - room id or shortname: {var:inputcolor}", noneok=True)
         if dest.isnumeric() is True:
             dest = int(dest)
             if player.roomid == dest:
                 io.echo("You twitch briefly.")
                 return True
-            if dest > 0 and dest <= lib.getroomcount(args):
+            if dest > 0 and dest <= libroom.getcount(args, **kwargs):
                 player.roomid = dest
                 return True
-        
-        sql = "select roomid from murdermotel.playground where shortname=%s"
-        dat = (dest,)
-        dbh = database.connect(args)
-        cur = dbh.cursor()
-        cur.execute(sql, dat)
-        if cur.rowcount == 0:
-            io.echo("room not found")
+        room = libroom.load(args, dest, **kwargs)
+        if room is None:
+            io.echo(f"{{var:labelcolor}}room '{{var:valuecolor}}{dest}{{var:labelcolor}}' not found")
             return False
-        rec = cur.fetchone()
-        if player.roomid == rec["roomid"]:
-            io.echo("You twitch briefly.")
-            return True
-        player.roomid = rec["roomid"]
+        
+        player.roomid = room.id
+        player.moves -= 2
+        player.save()
+        
+        with database.cursor(conn) as cur:
+            sql = "select id from murdermotel.playground where shortname=%s"
+            dat = (dest,)
+            cur.execute(sql, dat)
+            if cur.rowcount == 0:
+                io.echo("room not found")
+                return False
+            rec = cur.fetchone()
+            if player.roomid == rec["id"]:
+                io.echo("You twitch briefly.")
+                return True
+            player.roomid = rec["id"]
     
-    player = kw["player"] if "player" in kw else None
+    player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")
         return False
     
-    room = kw["room"] if "room" in kw else None
+    room = kwargs.get("room", None)
     if room is None:
         io.echo("Your room does not exist! Go away!")
         return False
 
-    io.echo("Z - Maint Mode")
-    ch = io.inputchoice("[G]oto [E]dit room [Q]uit", "GEQ", "Q")
+    io.echo("Z - Maint Mode ", end="")
+    ch = io.inputchoice(f"{{var:optioncolor}}[G]{{var:labelcolor}}oto {{var:optioncolor}}[E]{{var:labelcolor}}dit room {{var:optioncolor}}(Q){{var:labelcolor}}uit", "GEQ", "Q")
     if ch == "Q":
         return True
     elif ch == "G":
@@ -72,13 +83,13 @@ def maintmode(args, **kwargs):
     return True
 
 def playgroundhelp(**kwargs):
-    io.echo(f"kw={kw!r}")
-    room = kw["room"] if "room" in kw else None
+    io.echo(f"mm.play.300: {kwargs=}", level="debug")
+    room = kwargs["room"] if "room" in kwargs else None
     if room is None:
         io.echo("Your room does not exist! Go Away!")
         return False
 
-    player = kw["player"] if "player" in kw else None
+    player = kwargs["player"] if "player" in kwargs else None
     if player is None:
         io.echo("You do not exist! Go Away!")
         return False
@@ -110,21 +121,36 @@ def playgroundhelp(**kwargs):
     util.filedisplay(data.get("s.menu.txt"), **kwargs)
 
 def main(args, **kwargs):
-    io.echo("murdermotel.play.100: running!", level="debug")
-    name = member.getcurrentmoniker(args)
-    if lib.getroomcount(args) == 0:
+    from datetime import datetime
+    import dateutil.tz
+
+    if libroom.getcount(args, **kwargs) == 0:
         io.echo("{f6}the playground is not set up properly.{f6}")
         return False
-    player = lib.Player(args)
-    if player.load(name) is False:
-        player.roomid = random.randint(10, lib.getroomcount(args)-10+1)
+    currentmembermoniker = member.getcurrentmoniker(args, **kwargs)
+    player = libplayer.load(args, currentmembermoniker, **kwargs)
+    if player is None:
+        playermoniker = libplayer.inputmoniker("new player moniker: ", currentmembermoniker, verify=libplayer.verifyPlayerNameNotFound, multiple=False, args=args, returnseq=False, **kwargs)
+        if playermoniker == "":
+            io.echo("aborted.")
+            return False
+
+        player = libplayer.create(args, playermoniker, **kwargs)
+        if player is None:
+            io.echo(f"mm.play.main.100: unable to create player", level="error")
+            return False
+        player.roomid = random.randint(10, libroom.getcount(args, **kwargs)-10+1)
         player.save()
 
+    tzlocal = dateutil.tz.tzlocal()
+    player.datelastplayed = datetime.now(tzlocal)
+
+    player.info()
     util.heading("playground")
 
-    boobytrap = lib.BoobyTrap(args)
-    thief = lib.Thief(args)
-    wolf = lib.RabidWolf(args)
+    boobytrap = libmm.BoobyTrap(args, **kwargs)
+    thief = libmm.Thief(args, **kwargs)
+    wolf = libmm.RabidWolf(args, **kwargs)
 
     io.echo(f"{wolf.short()}  roomid={wolf.roomid} health={wolf.healthpoints}")
     io.echo(f"{thief.short()} roomid={thief.roomid}") # supervillian
@@ -134,7 +160,7 @@ def main(args, **kwargs):
     while not done:
         roomchange = False
 
-        if player.turn >= lib.TURNSPERDAY:
+        if player.turn >= libmm.TURNSPERDAY:
             io.echo("You are out of turns for today")
             if io.inputboolean("{var:promptcolor}reset turns? [Yn]: {var:inputcolor}", "Y") is True:
                 player.turn = 0
@@ -144,25 +170,25 @@ def main(args, **kwargs):
             player.moves = 0
 
             if io.inputboolean("{var:promptcolor}reset moves? {var:optioncolor}[Yn]{var:promptcolor}: {var:inputcolor}", "Y") is True:
-                player.moves = lib.MOVESPERTURN
+                player.moves = libmm.MOVESPERTURN
                 if player.turn > 0:
                     player.turn += 1
 
         player.save()
 
-        lib.setarea(args, player, "playground", help=True)
-        room = lib.getroom(args, player.roomid)
+        libmm.setarea(args, player, "playground", help=True, **kwargs)
+        room = libroom.load(args, player.roomid, **kwargs)
         if room is None:
             io.echo("your room does not exist! go away!", level="error")
             return False
         if args.debug is True:
-            io.echo(f"room.exits={room.exits!r}", level="debug")
+            io.echo(f"mm.play.220: {room.exits=}", level="debug")
 #        ttyio.echo("player=%r" % (player), level="debug")
 
         io.echo(f"{{var:labelcolor}}You are {room.title.title()}")
 
         if args.debug is True:
-            io.echo("roomitems={room.items!r}", level="debug")
+            io.echo("mm.play.200: {room.items=}", level="debug")
 
         if len(room.items) > 0:
             label = util.pluralize(len(room.items), "item", "items", quantity=False)
@@ -176,9 +202,9 @@ def main(args, **kwargs):
             value = util.oxfordcomma(items)
             io.echo(f"{{var:labelcolor}}player {label}: {{var:valuecolor}}{value}")
 
-        if wolf.roomid == player.roomid:
+        if player.roomid == wolf.roomid:
             currentroomid = player.roomid
-            if lib.runmodule(args, "rabidwolf", room=room, wolf=wolf, **kwargs) is False:
+            if libmm.runmodule(args, "rabidwolf", room=room, wolf=wolf, **kwargs) is False:
                 io.echo("trouble running 'rabidwolf' prg")
                 return False
             if player.roomid != currentroomid:
@@ -215,7 +241,7 @@ def main(args, **kwargs):
 #        ttyio.echo(f"roomitems={len(room.items)} playeritems={len(player.items)}", level="debug")
         # limit to 2 defenses
         io.echo(f"len(player.items)={len(player.items)}", level="debug")
-        if len(room.items) > 0 and len(player.items) <= lib.MAXITEMSPERPLAYER:
+        if len(room.items) > 0 and len(player.items) <= libmm.MAXITEMSPERPLAYER:
             options += "T"
         
         if len(player.items) > 0:
@@ -223,7 +249,7 @@ def main(args, **kwargs):
         
         options += "I"
         
-        players = lib.getroomplayers(args, room.roomid)
+        players = libmm.getroomplayers(args, room.id, **kwargs)
         io.echo(":person: {var:labelcolor}%s: {var:valuecolor}%s" % (util.pluralize(len(players), "player", "players", quantity=False), util.oxfordcomma(players)))
         
         io.echo(":door: {var:labelcolor}%s: {var:valuecolor}%s" % (util.pluralize(len(exitdir), "exit", "exits", quantity=False), util.oxfordcomma(exitdir)))
@@ -270,22 +296,22 @@ def main(args, **kwargs):
         elif ch == "G":
             util.filedisplay(data.get("s.explain.txt"))
         elif ch == "Z":
-            res = maintmode(args, player=player, room=room)
+            res = maintmode(args, player=player, room=room, **kwargs)
             if res is False:
                 io.echo("something went wrong.")
                 continue
-        elif ch == "Z":
-            io.echo("edit room")
-            shortname = io.inputstring("{var:promptcolor}room short name: {var:inputcolor}", room.shortname, noneok=True)
-            if shortname is None:
-                continue
-            room.shortname = shortname
-            room.save()
+#        elif ch == "Z":
+#            io.echo("edit room")
+#            shortname = io.inputstring("{var:promptcolor}room short name: {var:inputcolor}", room.shortname, noneok=True)
+#            if shortname is None:
+#                continue
+#            room.shortname = shortname
+#            room.save()
         elif ch == "?" or ch == "KEY_HELP":
             io.echo("menu")
             util.filedisplay(data.get("s.menu.txt"))
         elif ch == "T":
-            itemname = io.inputstring("Take - {var:promptcolor}item name: {var:inputcolor}", noneok=True, completer=lib.completeItemName(args, roomid=player.roomid))
+            itemname = io.inputstring("Take - {var:promptcolor}item name: {var:inputcolor}", noneok=True, completer=libmm.completeItemName(args, roomid=player.roomid))
             if itemname == "":
                 io.echo("aborted.")
                 continue
@@ -300,15 +326,15 @@ def main(args, **kwargs):
             player.save()
             room.save()
         elif ch == "L":
-            itemname = io.inputstring("Leave - {var:promptcolor}item name: {var:inputcolor}", noneok=True, completer=lib.completeItemName(args, playername=player.name))
+            itemname = io.inputstring("Leave - {var:promptcolor}item name: {var:inputcolor}", noneok=True, completer=libmm.completeItemName(args, playername=player.name))
             itemindex = player.finditem(itemname)
             if itemindex is None:
                 io.echo("aborted.", level="error")
                 continue
-            io.echo(f"player.items={player.items!r} itemindex={itemindex}", level="debug")
+            io.echo(f"mm.play.118: {player.items=} {itemindex=}", level="debug")
             item = player.items[itemindex]
             del player.items[itemindex]
-            io.echo(f"item={item!r}", level="debug")
+            io.echo(f"mm.play.120: {item=}", level="debug")
             room.items.append(item)
             
             player.save()
@@ -316,9 +342,8 @@ def main(args, **kwargs):
         elif ch == "I":
             io.echo("Info")
             player.info()
-        else:
-            io.echo()
-            continue
 
+        io.echo()
         player.moves -= 1
         player.save()
+        room.save()

@@ -21,13 +21,13 @@ def init(args=None, **kw):
 # r"(?P<whitspace>[\s]+)?data(\")?(?P<name>[\w\s']+)(\")?,(?P<east>\d{,3}),(?P<north>\d{,3}),(?P<west>\d{,3}),(?P<south>\d{,3}),(?P<up>\d{,3}),(?P<down>\d{,3})"g
 #
 
-def access(args, op, **kw):
+def access(args, op, **kwargs):
   return True
 
-def buildargs(args=None, **kw):
+def buildargs(args=None, **kwargs):
   return None
 
-def weapons(args):
+def weapons(args, **kwargs):
 #\c8axe handle\cl
 #\c8pistol\cl
 #\c8chlorine gas\cl
@@ -64,35 +64,23 @@ def weapons(args):
 #[x] You barbecue 
 #[x] You boil away 
 
-  items = {
-    "axeblade" :      {"title":"axe blade",       "usemessages":["You swing the axe with all your might and slaughter", "THUCK! WHACK! THUCK! You hack away and finish", "You butcher"], "type":"component"},
-    "pistol"   :      {"title":"pistol",          "usemessages":["You take aim.. pull the trigger.. and waste", "BANG! BANG! You gun down the vermin called", "You take aim and shoot"], "type":"component"},
-    "chlorinegas" :   {"title":"chlorine gas",    "usemessages":["The noxious fumes spread from the sprayer and poison","The chlorine spews out and asphyxiates your mortal enemy", "You gas"], "type":"component"},
-    "flamethrower" :  {"title":"flame thrower",   "usemessages":["You barbecue", "You pull out your flame thrower and fry", "Heat and light burst from the flame gun as you cook"], "type":"component"},
-    "industrialacid": {"title":"industrial acid", "usemessages":["You boil away","You pump the acid sprayer furiously and disolve", "The acid hisses from the nozzle of your sprayer. It liquifies"], "type":"component"},
-
-    "axehandle" :     {"title":"axe handle", "type":"component"},
-    "bullets":        {"title":"bullets", "type":"component"},
-    "gassprayer":     {"title":"gas sprayer", "type":"component"},
-    "lighterfluid":   {"title":"lighter fluid", "type":"component"},
-    "acidsprayer":    {"title":"acid sprayer", "type":"component"},
-    
-    "riotshield":       {"title":"riot shield", "type":"defense"},
-    "flakjacket":       {"title":"flak jacket", "type":"defense"},
-    "gasmask":          {"title":"gas mask", "type":"defense"},
-    "fireextinguisher": {"title":"fire extinguisher", "type":"defense"},
-    "lye":              {"title":"lye", "type":"defense"},
-    
-    "boobytrap":        {"title":"booby trap", "type":"special"},
-
-  }
-  kk = lib.getroomcount(args)
+  kk = lib.getroomcount(args, **kwargs)
   if kk == 0:
     io.echo("playground has not been created", level="error")
     return False
 
   io.echo("reticulating splines...")
   total = len(items)*6
+
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"mm.maint.200: {pool=}", level="error")
+      return False
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
   dbh = database.connect(args)
   
@@ -161,42 +149,11 @@ def weapons(args):
   io.echo("{var:promptcolor}press any key: ", end="", flush=True)
   io.getch()
 
-def playground(args):
-  playground = {}
-  x = re.compile(r"(?:[\s]+)?data(\")?(?P<title>[\w\s'\(\)/#!.{}-]+)(\")?,(?P<east>\d{,3}),(?P<north>\d{,3}),(?P<west>\d{,3}),(?P<south>\d{,3}),(?P<up>\d{,3}),(?P<down>\d{,3})")
-  dbh = database.connect(args)
-  def process(f):
-    roomid = 1
-    for line in f:
-      r = x.match(line)
-      if r is not None:
-        room = {}
-        room["roomid"] = roomid
-        room["title"] = r.group("title").lower()
-        for exit in ("north", "south", "east", "west", "up", "down"):
-          rn = int(r.group(exit))
-          if rn == 0:
-            rn = None
-          room[exit] = rn
-        io.echo("room=%r" % (room))
-
-        res = database.insert(args, "murdermotel.playground", room, "roomid")
-        io.echo("res=%r" % (res), level="debug")
-        roomid += 1
-      else:
-        io.echo("no match: %r (roomid=%s)" % (line, roomid), level="debug")
-  filename = data.get("playground.txt")
-  # ttyio.echo("playground.100: filename=%r type=%r" % (filename, type(filename)), level="debug")
-  with filename as f:
-    process(f)
-  dbh.commit()
-  return
-
-def main(args, **kw):
+def main(args, **kwargs):
     if args is not None and "debug" in args and args.debug is True:
         io.echo(f"mm.maint.main.100: {args=}", level="debug")
 
     if io.inputboolean("{var:promptcolor}create playground? {var:optioncolor}[{var:currentoptioncolor}Y{var:optioncolor}n]{var:promptcolor}]: {var:inputcolor}", "Y") is True:
-      playground(args)
+      playground(args, **kwargs)
     if io.inputboolean("{var:promptcolor}create weapons? {var:optioncolor}[{var:currentoptioncolor}Y{var:optioncolor}n]{var:promptcolor}: {var:inputcolor}", "Y") is True:
-      weapons(args)
+      weapons(args, **kwargs)

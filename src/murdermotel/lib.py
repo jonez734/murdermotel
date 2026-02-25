@@ -3,10 +3,12 @@ import copy
 import random
 
 from bbsengine6 import io, database, util, member, screen, module
+from . import player as libplayer, room as libroom
 
 # @since 20220813
+SCHEMA = "murdermotel"
 PACKAGENAME = "murdermotel"
-MOVESPERTURN = 60
+DEFAULTMOVESPERTURN = 60
 TURNSPERDAY = 2
 PLAYGROUNDSIZE = 140
 MAXITEMSPERPLAYER = 5
@@ -58,90 +60,6 @@ class Obj(object):
     dbh.commit()
     return True
 
-class Room(object):
-    def __init__(self, args): # , name, location, description):
-      self.fields = ("shortname", "roomid", "title")
-      self.args = args
-      self.shortname = None
-      self.roomid = None
-      self.title = None
-      self.items = []
-      self.exits = {}
-      self.table = "murdermotel.playground"
-
-    def finditem(self, shortname):
-      if self.args.debug is True:
-        io.echo("Room.finditem.100: items={self.items!r} shortname={shortname}", level="debug")
-      for x in range(0, len(self.items)):
-        if self.items[x].name == shortname:
-          return x
-      return None
-
-    def load(self, roomid) -> bool:
-      if self.args.debug is True:
-        io.echo(f"Room.load({roomid})", level="debug")
-      sql = "select * from murdermotel.playground where roomid=%s"
-      dat = (roomid,)
-      dbh = database.connect(self.args)
-      cur = dbh.cursor()
-      if self.args.debug is True:
-        io.echo("room.load.100: %r" % (cur.mogrify(sql, dat)), level="debug")
-      cur.execute(sql, dat)
-      if cur.rowcount == 0:
-        io.echo(f"unable to load room {roomid!r}", level="error")
-        return False
-
-      rec = cur.fetchone()
-      for f in self.fields:
-        setattr(self, f, rec[f])
-
-      for f in ("north", "south", "east", "west", "up", "down"):
-        self.exits[f] = rec[f]
-        
-      self.items = getroomitems(self.args, roomid)
-
-      return True
-
-    def save(self, mogrify=False):
-      r = {}
-      for f in self.fields:
-        r[f] = getattr(self, f)
-
-      for e in ("north", "south", "east", "west", "up", "down"):
-        r[e] = self.exits[e]
-
-      if self.args.debug is True:
-        io.echo(f"Room.save.100: r={r!r}", level="debug")
-
-      dbh = database.connect(self.args)
-      if self.args.debug is True:
-        io.echo("Room.save.140: trying update", level="debug")
-      res = database.update(args, "murdermotel.playground", self.roomid, r, primarykey="roomid", mogrify=mogrify)
-      if self.args.debug is True:
-        io.echo("Room.save.120: res=%r" % (res), level="debug")
-      if res == 0:
-        if self.args.debug is True:
-          io.echo("Room.save.160: update failed, trying insert r=%r" % (r), level="debug")
-        database.insert(args, "murdermotel.playground", r, primarykey="roomid", returnid=False, mogrify=mogrify)
-      self.isdirty = False
-
-      cur = dbh.cursor()
-      sql = "delete from murdermotel.map_item_room where roomid=%s"
-      dat = (self.roomid,)
-      if mogrify is True and self.args.debug is True:
-        io.echo(cur.mogrify(sql, dat), level="debug")
-      cur.execute(sql, dat)
-      for i in self.items:
-        if self.args.debug is True:
-          io.echo(f"Room.save.200: saving room item {i.name}", level="debug")
-        m = {}
-        m["itemname"] = i.name
-        m["roomid"] = self.roomid
-        database.insert(args, "murdermotel.map_item_room", m, returnid=False, mogrify=mogrify)
-
-      dbh.commit()
-      return True
-
 class Living(object):
   def __init__(self, args):
     self.args = args
@@ -157,46 +75,49 @@ class Item(object):
     return "NEEDINFO.item"
 
 class RabidWolf(Living):
-  def __init__(self, args):
+  def __init__(self, args, **kwargs):
     super().__init__(args)
     self.healthpoints = 35
-    self.roomid = random.randint(10, getroomcount(args)-10)
+    self.roomid = random.randint(10, libroom.getcount(args, **kwargs)-10)
   def short(self):
     return ":wolf: rabid wolf"
 
 class Thief(Living):
-  def __init__(self, args):
+  def __init__(self, args, **kwargs):
     super().__init__(args)
     self.healthpoints = 35
-    self.roomid = random.randint(10, getroomcount(args)-10)
+    self.roomid = random.randint(10, libroom.getcount(args, **kwargs)-10)
     self.items = []
   def short(self):
-    return "Thief"
+    return ":supervillian: Thief"
 
 class BoobyTrap(Item):
-  def __init__(self, args):
+  def __init__(self, args, **kwargs):
     super().__init__(args)
     self.healthpoints = 20
-    self.roomid = random.randint(10, getroomcount(args)-10+1)
+    self.roomid = random.randint(10, libroom.getcount(args, **kwargs)-10+1)
     self.playerid = None
+    self.type = "boobytrap"
+    self.module = "boobytrap"
 
   def short(self):
     return ":mousetrap: Booby-Trap"
 
 class Player(Living):
-    def __init__(self, args):
+    def __init__(self, args, **kwargs):
       super().__init__(args)
-      self.fields = ("moniker", "roomid", "turn", "moves", "memberid", "datelastplayed", "points", "bodycount")
+      self.fields = ("moniker", "roomid", "turn", "moves", "membermoniker", "datelastplayed", "points", "bodycount")
       self.args = args
-      self.moniker = member.getcurrentmoniker(args) # getmembername(args)
+      self.moniker = member.getcurrentmoniker(args, **kwargs) # getmembername(args)
       self.turn = 1
       self.moves = MOVESPERTURN
       self.datelastplayed = "now()"
-      self.memberid = member.getcurrentid(args) # getcurrentmemberid(args)
+      self.membermoniker = member.getcurrentmoniker(args, **kwargs) # getcurrentmemberid(args)
       self.items = []
       self.isdirty = False
       self.points = 0
       self.bodycount = 0
+      self.pool = kwargs.get("pool", None)
 
     def __repr__(self):
       buf = ""
@@ -206,7 +127,7 @@ class Player(Living):
 
     def __str__(self):
       status = "alive" if self.moves > 0 else "dead"
-      buf = f"{self.moniker} ({status} {self.moves} {self.turn})"
+      buf = f"{self.moniker} ({status} {self.moves} {self.turn} {self.healthpoints})"
       return buf
 
     def weapons(self, items=None):
@@ -248,7 +169,7 @@ class Player(Living):
 
     def finditem(self, shortname):
       if self.args.debug is True:
-        io.echo(f"Room.finditem.100: items={self.items!r} shortname={shortname}", level="debug")
+        io.echo(f"Room.finditem.100: {self.items=} {self.shortname=}", level="debug")
       for x in range(0, len(self.items)):
         if self.args.debug is True:
           io.echo(f"room.finditem.120: name={self.items[x].name}", level="debug")
@@ -257,64 +178,46 @@ class Player(Living):
       return None
 
     def load(self, moniker) -> bool:
-      if self.args.debug is True:
-        io.echo(f"Player.load({moniker!r})", level="debug")
-      sql = "select * from murdermotel.player where moniker=%s"
-      dat = (moniker,)
-      dbh = database.connect(self.args)
-      cur = dbh.cursor()
-      if self.args.debug is True:
-        io.echo(f"player.load.100: {cur.mogrify(sql, dat)!r}", level="debug")
-      cur.execute(sql, dat)
-      if cur.rowcount == 0:
-        if self.args.debug is True:
-          io.echo(f"unable to load player {name!r}", level="debug")
-        return False
+      def _work(conn):
+        sql = "select * from murdermotel.player where moniker=%s"
+        dat = (moniker,)
+        with database.cursor(conn) as cur:
+          cur.execute(sql, dat)
+          if cur.rowcount == 0:
+            if self.args.debug is True:
+              io.echo(f"unable to load player {name!r}", level="debug")
+              return False
 
-      rec = cur.fetchone()
-      for f in self.fields:
-        setattr(self, f, rec[f])
+          rec = cur.fetchone()
+          for f in self.fields:
+            setattr(self, f, rec[f])
         
-      self.items = getplayeritems(self.args, self.moniker)
+          self.items = getplayeritems(self.args, self.moniker)
       
-      return True
+        return True
 
     def save(self, mogrify=False):
-      if self.args.debug is True:
-        io.echo(f"self.memberid={self.memberid}", level="debug")
       p = {}
       for f in self.fields:
         p[f] = getattr(self, f)
 
-      if self.args.debug is True:
-        io.echo(f"Player.save.100: p={p!r}", level="debug")
+      if libplayer.exists(args, self.moniker) is True:
+        database.update(self.args, "murdermotel.player", self.moniker, p, primarykey="moniker", mogrify=mogrify, pool=self.pool)
+      else:
+        database.insert(self.args, "murdermotel.player", p, primarykey="moniker", returnid=False, mogrify=mogrify, pool=self.pool)
 
-      if self.args.debug is True:
-        io.echo("Player.save.140: trying update", level="debug")
-      res = database.update(self.args, "murdermotel.player", self.moniker, p, primarykey="moniker", mogrify=mogrify)
-      if self.args.debug is True:
-        io.echo(f"Player.save.120: res={res!r}", level="debug")
-      if res == 0:
-        if self.args.debug is True:
-          io.echo(f"Player.save.160: update failed, trying insert p={p!r}", level="debug")
-        database.insert(self.args, "murdermotel.player", p, primarykey="moniker", returnid=False, mogrify=mogrify)
-
-      dbh = database.connect(self.args)
-      cur = dbh.cursor()
-      sql = "delete from murdermotel.map_item_player where playermoniker=%s"
-      dat = (self.moniker,)
-      if mogrify is True and self.args.debug is True:
-        io.echo(cur.mogrify(sql, dat), level="debug")
-      cur.execute(sql, dat)
-      for i in self.items:
-        if self.args.debug is True:
-          io.echo(f"Player.save.200: saving player item {i.name!r}", level="debug")
-        m = {}
-        m["itemname"] = i.name
-        m["playermoniker"] = self.moniker
-        database.insert(self.args, "murdermotel.map_item_player", m, returnid=False, mogrify=True)
+      with database.connect(self.args, pool=self.pool) as conn:
+        with database.cursor(conn) as cur:
+          sql = "delete from murdermotel.map_item_player where playermoniker=%s"
+          dat = (self.moniker,)
+          cur.execute(sql, dat)
+          for i in self.items:
+            m = {}
+            m["itemname"] = i.name
+            m["playermoniker"] = self.moniker
+            database.insert(self.args, "murdermotel.map_item_player", m, returnid=False, mogrify=True, conn=conn)
         
-      database.commit(self.args)
+        conn.commit()
       return True
 
     def info(self):
@@ -466,10 +369,9 @@ class Item(object):
     database.commit(self.args)
     return True
 
-def setarea(args, player, left, **kw):
-    # ttyio.echo(f"kw={kw!r}")
+def setarea(args, player, left, **kwargs):
     def right():
-        help = " | F1: Help" if "help" in kw and kw["help"] is True else ""
+        help = " | F1: Help" if "help" in kwargs and kwargs["help"] is True else ""
         debug = " | debug" if args.debug is True else ""
         room = ""
         playername = ""
@@ -487,7 +389,7 @@ def setarea(args, player, left, **kw):
 
           if player.roomid is not None:
             room = f" | room #{player.roomid}"
-            currentroom = getroom(args, player.roomid)
+            currentroom = libroom.load(args, player.roomid, **kwargs)
             if currentroom is not None and currentroom.shortname is not None:
               room += " "+currentroom.shortname
           else:
@@ -501,7 +403,7 @@ def setarea(args, player, left, **kw):
 
         return buf
 
-    screen.setarea(left, right)
+    screen.setbottombar(left, right)
     return
 
 def init(args=None):
@@ -525,124 +427,191 @@ def buildargs(args=None, **kw):
 
     parser.add_argument("--verbose", action="store_true", dest="verbose")
     parser.add_argument("--debug", action="store_true", dest="debug")
-    parser.add_argument("--terminalwidth", action="store", dest="terminalwidth", default=io.getterminalwidth())
-    parser.add_argument("--node", action="store", dest="node", default="cyclops")
+    parser.add_argument("--terminalwidth", action="store", dest="terminalwidth", default=io.terminal.width())
+    #parser.add_argument("--node", action="store", dest="node", default="cyclops")
 
     defaults = {"databasename": "zoid6", "databasehost":"localhost", "databaseuser": None, "databaseport":5432, "databasepassword":None}
-    database.buildargdatabasegroup(parser, defaults)
+    database.buildargdatabasegroup(parser, defaults, suppress=True)
     return parser
 
-def buildroomdict(res):
-  room = {}
-  for f in ("north", "south", "east", "west", "up", "down", "title", "shortname"):
-    room[f] = res[f] if f in res else None
-  return room
+def getitemcount(args, **kwargs):
+  def _work(conn):
+    with database.cursor(conn) as cur:
+        sql = f"select count(*) from {SCHEMA}.item"
+        cur.execute(sql)
+        if cur.rowcount == 0:
+            return 0
+        row = cur.fetchone()
+        return row["count"]
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"libmm.getitemcount.100: {pool=}", level="error")
+      return False
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
-def buildroomob(args, res):
-  room = Room(args)
-  roomid = res["roomid"]
-  room.load(roomid)
-  return room
+def getnpccount(args, **kwargs):
+  def _work(conn):
+    with database.cursor(conn) as cur:
+        sql = f"select count(*) from {SCHEMA}.npc"
+        cur.execute(sql)
+        if cur.rowcount == 0:
+            return 0
+        row = cur.fetchone()
+        return row["count"]
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo("libmm.getnpccount.100: {pool=}", level="error")
+      return None
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
-def getroom(args, roomid):
-  sql = "select * from murdermotel.playground where roomid=%s"
-  dat = (roomid,)
-  dbh = database.connect(args)
-  cur = dbh.cursor()
-  cur.execute(sql, dat)
-  if cur.rowcount == 0:
-    return None
+def getitem(args, name, **kwargs):
+  def _work(conn):
+    with database.cursor(conn) as cur:
+      sql = "select * from murdermotel.item as i where name=%s"
+      dat = (name,)
+      cur.execute(sql, dat)
+      if cur.rowcount == 0:
+        return None
+      i = Item(args)
+      for f in ("type", "name", "title", "usemessages"):
+        setattr(i, f, rec.get(f, None))
+      return i
 
-  res = cur.fetchone()
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"libmm.getitem.100: {pool=}", level="error")
+      return False
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
-  return buildroomob(args, res)
+def getroomplayers(args, roomid, **kwargs):
+  def _work(conn):
+    with database.cursor(conn) as cur:
+      sql = f"select moniker from murdermotel.player as p where p.roomid=%s"
+      dat = (roomid,)
+      cur.execute(sql, dat)
+      players = []
+      if cur.rowcount > 0:
+        for rec in database.resultiter(cur):
+          p = libplayer.load(args, rec["moniker"], conn=conn)
+          players.append(p)
 
-def getroomcount(args):
-  dbh = database.connect(args)
-  sql = "select count(roomid) from murdermotel.playground"
-  dat = ()
-  cur = dbh.cursor()
-  cur.execute(sql)
-  if cur.rowcount == 0:
-    io.echo("no rooms in the playground. notify sysop.", level="error")
-    return None
-  return cur.fetchone()["count"]
+      return players
 
-# @since 20220921
-def getroomitems(args, roomid, mogrify=True):
-  sql = "select * from murdermotel.item as i, murdermotel.map_item_room as m where m.roomid = %s and m.itemname = i.name"
-  dat = (roomid,)
-  dbh = database.connect(args)
-  cur = dbh.cursor()
-  cur.execute(sql, dat)
-  if mogrify is True and args.debug is True:
-    io.echo("getroomitems.100: %s" % (cur.mogrify(sql, dat)), level="debug")
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"libmm.getroomplayers.100: {pool=}", level="error")
+      return []
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
-  if cur.rowcount == 0:
-    return []
+def countdistributeditems(args, **kwargs):
+  def _work(conn):
+    count = 0
+    with database.cursor(conn) as cur:
+      sql = f"select count(*) from {SCHEMA}.map_item_player"
+      cur.execute(sql)
+      if cur.rowcount > 0:
+        res = cur.fetchone()
+        count += res["count"]
+      sql = f"select count(*) from {SCHEMA}.map_item_room"
+      cur.execute(sql)
+      if cur.rowcount > 0:
+        res = cur.fetchone()
+        count += res["count"]
+    return count
 
-  items = []
-  for rec in database.resultiter(cur):
-    i = Item(args)
-    i.name = rec["name"]
-    i.title = rec["title"]
-    i.type = rec["type"]
-    i.usemessages = rec["usemessages"] if "usemessages" in rec else []
-    items.append(i)
-  return items
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"libmm.countdistributed.100: {pool=}", level="error")
+      return 0
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
 
-def getplayeritems(args, playername, mogrify=True):
-  if args.debug is True:
-    io.echo("getplayeritems.100: foo", level="debug")
-  sql = "select * from murdermotel.item as i, murdermotel.map_item_player as m where m.playermoniker = %s and m.itemname = i.name"
-  dat = (playername,)
-  dbh = database.connect(args)
-  cur = dbh.cursor()
-  cur.execute(sql, dat)
-  if mogrify is True and args.debug is True:
-    io.echo("getplayeritems.100: %s" % (cur.mogrify(sql, dat)), level="debug")
+def distributeitems(args, **kwargs):
+  import random
 
-  if cur.rowcount == 0:
-    return []
+  def _clearitemmaps(conn):
+    io.echo(f"libmm.distributeitems.100: _clearitemmaps called", level="debug")
+    with database.cursor(conn) as cur:
+      sql = f"delete from {SCHEMA}.map_item_player"
+      cur.execute(sql)
+      sql = f"delete from {SCHEMA}.map_item_room"
+      cur.execute(sql)
+      return True
+  
+  def _work(conn):
+    import random
+    if clear is True:
+      _clearitemmaps(conn)
 
-  items = []
-  for rec in database.resultiter(cur):
-    i = Item(args)
-    i.type = rec["type"]
-    i.name = rec["name"]
-    i.title = rec["title"]
-    i.usemessages = rec["usemessages"] if "usemessages" in rec else []
-    items.append(i)
-  return items
+    with database.cursor(conn) as cur:
+      sql = f"select name from {SCHEMA}.item"
+      cur.execute(sql)
+      if cur.rowcount == 0:
+        io.echo("items not populated")
+        return False
 
-def getitem(args, name):
-  sql = "select * from murdermotel.item as i where name=%s"
-  dat = (name,)
-  dbh = database.connect(args)
-  cur = dbh.cursor()
-  cur.execute(sql, dat)
-  if cur.rowcount == 0:
-    return None
-  i = Item(args)
-  i.type = rec["type"]
-  i.name = rec["name"]
-  i.title = rec["title"]
-  i.usemessages = rec["usemessages"] if "usemessages" in rec else []
+      rows = cur.fetchmany()
+      item_rows = rows  # from your psycopg3 query
+      item_names = [row['name'] for row in item_rows]
+      io.echo(f"{item_names=}", level="debug")
 
-def getroomplayers(args, roomid, mogrify=True):
-  sql = "select moniker from murdermotel.player as p where p.roomid=%s"
-  dat = (roomid,)
+      # Eligible room IDs: 10 to 140 inclusive
+      roomcount = libroom.getcount(args, conn=conn)
+      eligible_rooms = list(range(10, roomcount-10))
 
-  dbh = database.connect(args)
-  cur = dbh.cursor()
-  if mogrify is True:
-    io.echo("mm.lib.getroomplayers.100: %s" % (cur.mogrify(sql, dat)), level="debug")
-  cur.execute(sql, dat)
-  players = []
-  if cur.rowcount > 0:
-    for rec in database.resultiter(cur):
-      p = Player(args)
-      p.load(rec["moniker"])
-      players.append(p)
+      # Prepare result and room count tracking
+#      assignments = []
+      room_counts = {}
 
-  return players
+      for item_name in item_names:
+        while True:
+          roomid = random.choice(eligible_rooms)
+          count = room_counts.get(roomid, 0)
+          if count < 3:
+            map = { "roomid": roomid, "itemname": item_name }
+            database.insert(args, f"{SCHEMA}.map_item_room", map, conn=conn, primarykey="itemname")
+            room_counts[roomid] = count + 1
+            break
+
+#      cur.executemany(f"insert into {SCHEMA}.map_item_room(roomid, itemname) values (%(roomid)s, %(itemname)s)", assignments)
+
+      # Now `assignments` is ready for insertion
+      # Example:
+      # [{'roomid': 42, 'itemid': 'item1'}, {'roomid': 57, 'itemid': 'item2'}, ...]
+
+      # Optionally, insert into the database
+      # cur.executemany("INSERT INTO item_room_map (roomid, itemid) VALUES (%(roomid)s, %(itemid)s)", assignments)
+
+    return True
+
+  clear = kwargs.get("clear", False)
+  conn = kwargs.get("conn", None)
+  if conn is None:
+    pool = kwargs.get("pool", None)
+    if pool is None:
+      io.echo(f"libmm.distributeitems.100: {pool=}", level="error")
+      return False
+    with database.connect(args, pool=pool) as conn:
+      return _work(conn)
+  return _work(conn)
+
+  

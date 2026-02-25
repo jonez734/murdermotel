@@ -209,6 +209,8 @@ def main(args, **kwargs):
         conn.commit()
         return True
         
+    io.echo("running startup...")
+
     conn = kwargs.get("conn", None)
     io.echo(f"{conn=}", level="debug")
     if conn is None:

@@ -14,14 +14,14 @@ os.system("./updateversion.sh")
 setup(
   name=projectname,
   version=v,
-  url="https://repo.zoidtechnologies.com/%s/" % (projectname),
+  url="https://zoidtechnologies.com/%s/" % (projectname),
   author="zoidtechnologies.com",
   author_email="%s@projects.zoidtechnologies.com" % (projectname),
   requires=["bbsengine6",],
-  scripts=["../bin/murdermotel"],
+  scripts=[f"../bin/{projectname}"],
   license="GPLv2",
   provides=[projectname],
-  packages=["murdermotel", "murdermotel.data"],
+  packages=[projectname, f"{projectname}.data"],
   long_description = """murder motel -- turn based game involving assassination of other players""",
   include_package_data = True,
 )

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python -W all -m "homicidehotel" "$@"
+python -W all -m "murdermotel" "$@"

@@ -30,8 +30,8 @@ if __name__ == "__main__":
         try:
             libmm.runmodule(args, "lobby", pool=pool)
         except KeyboardInterrupt:
-            io.echo("{/all}**INTR**")
+            io.echo("{/all}*INTR*")
         except EOFError:
-            io.echo("{/all}**EOF**")
+            io.echo("{/all}*EOF*")
         finally:
-            io.echo(f"{{decsc}}{{curpos:{io.getterminalheight()},0}}{{el}}{{decrc}}{{reset}}{{/all}}")
+            io.echo(f"{{decsc}}{{curpos:{io.terminal.height()},0}}{{el}}{{reset}}{{decrc}}")
