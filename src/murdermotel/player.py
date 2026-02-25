@@ -314,7 +314,7 @@ class completePlayerName(object):
           results = [x for x in vocab if x.startswith(text)] + [None]
           return results[state]
 
-def verifyPlayerNameFound(moniker:str, **kwargs:dict) -> bool:
+def verifyPlayerNameFound(args, moniker:str, **kwargs:dict) -> bool:
     import argparse
     args = kwargs.get("args", argparse.Namespace())
     def _work(conn):
@@ -336,7 +336,7 @@ def verifyPlayerNameFound(moniker:str, **kwargs:dict) -> bool:
     with database.connect(args, pool=pool) as conn:
         return _work(conn)
 
-def verifyPlayerNameNotFound(moniker:str, **kwargs:dict) -> bool:
+def verifyPlayerNameNotFound(args, moniker:str, **kwargs:dict) -> bool:
     import argparse
     args = kwargs.get("args", argparse.Namespace())
     def _work(conn):
