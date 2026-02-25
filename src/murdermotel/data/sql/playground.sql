@@ -1,8 +1,8 @@
 --\echo playground
 create table if not exists murdermotel.playground (
-    roomid bigint unique not null primary key,
+    id bigint unique not null primary key,
     module text,
-    shortname text unique,
+    shortname citext unique,
     title text unique not null,
     description text,
     east bigint, --constraint fk_playground_east references murdermotel.playground(roomid) on update cascade on delete set null,

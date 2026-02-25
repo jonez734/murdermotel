@@ -19,7 +19,7 @@ create unique index idx_map_item_player on murdermotel.map_item_player(itemname,
 --\echo map_item_room
 create table if not exists murdermotel.map_item_room (
     itemname citext, -- constraint fk_map_item_room references murdermotel.item(name) on update cascade on delete cascade,
-    roomid bigint constraint fk_map_item_player references murdermotel.playground(roomid) on update cascade on delete cascade
+    roomid bigint constraint fk_map_item_player references murdermotel.playground(id) on update cascade on delete cascade
 );
 
 create unique index idx_map_item_room on murdermotel.map_item_player(itemname, playermoniker);
