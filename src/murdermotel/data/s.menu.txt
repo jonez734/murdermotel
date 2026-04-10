@@ -1,19 +1,20 @@
-{indent:20}{var:acscolor}{acs:ulcorner}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:urcorner}{f6}
-{acs:vline}{var:engine.title.color}          Murder Motel           {var:acscolor}{acs:vline}{f6}
-{acs:ltee}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:rtee}{f6}
-{acs:vline}  {var:U}U - Up         {var:D}D - Down        {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:N}N - North      {var:S}S - South       {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:E}E - East       {var:W}W - West        {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:I}I - Information on YOU         {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:K}K - Kill your target           {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:L}L - Leave an Item behind       {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:T}T - Take an Item from the room {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:R}R - Send a Report to the Paper {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:M}M - Motel Level Maps 1-5       {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:P}P - Read the Motel Newspaper   {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:#}# - Read High Point List       {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:H}H - Read High Kill List        {var:acscolor}{acs:vline}{f6}
-{acs:vline}  {var:G}G - Read Game Instructions     {var:acscolor}{acs:vline}{f6}
-{acs:vline}  ? - This Help Screen           {var:acscolor}{acs:vline}{f6}
-{acs:vline}  Q - Quit the Game              {var:acscolor}{acs:vline}{f6}
-{acs:llcorner}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:lrcorner}{f6}
+{indent:20}
+{var:acscolor}{acs:ulcorner}{acs:hline:33}{acs:urcorner}
+{acs:vline}{var:engine.title.color}          Murder Motel           {var:acscolor}{acs:vline}
+{acs:rtee}{acs:hline:33}{acs:ltee}
+{acs:vline}  {var:U}U - Up         {var:D}D - Down        {var:acscolor}{acs:vline}
+{acs:vline}  {var:N}N - North      {var:S}S - South       {var:acscolor}{acs:vline}
+{acs:vline}  {var:E}E - East       {var:W}W - West        {var:acscolor}{acs:vline}
+{acs:vline}  {var:I}I - Information on YOU         {var:acscolor}{acs:vline}
+{acs:vline}  {var:K}K - Kill your target           {var:acscolor}{acs:vline}
+{acs:vline}  {var:L}L - Leave an Item behind       {var:acscolor}{acs:vline}
+{acs:vline}  {var:T}T - Take an Item from the room {var:acscolor}{acs:vline}
+{acs:vline}  {var:R}R - Send a Report to the Paper {var:acscolor}{acs:vline}
+{acs:vline}  {var:M}M - Motel Level Maps 1-5       {var:acscolor}{acs:vline}
+{acs:vline}  {var:P}P - Read the Motel Newspaper   {var:acscolor}{acs:vline}
+{acs:vline}  {var:#}# - Read High Point List       {var:acscolor}{acs:vline}
+{acs:vline}  {var:H}H - Read High Kill List        {var:acscolor}{acs:vline}
+{acs:vline}  {var:G}G - Read Game Instructions     {var:acscolor}{acs:vline}
+{acs:vline}  ? - This Help Screen           {var:acscolor}{acs:vline}
+{acs:vline}  Q - Quit the Game              {var:acscolor}{acs:vline}
+{acs:llcorner}{acs:hline:33}{acs:lrcorner}
