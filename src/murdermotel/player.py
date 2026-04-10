@@ -477,6 +477,6 @@ def create(args, playermoniker, **kwargs):
                 return _work(conn, playermoniker)
         else:
             return _work(conn, playermoniker)
-    except Exception as e:
-        io.echo(f"empyre.lib.create.100: exception {e}", level="error")
+    except Exception:
+        io.echo_traceback("mm.player.create.100")
         raise

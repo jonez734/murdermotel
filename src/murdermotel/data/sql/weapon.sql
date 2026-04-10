@@ -5,13 +5,11 @@ create table if not exists murdermotel.component (
 );
 
 create table if not exists murdermotel.weapon (
---    weaponid bigint unique not null,
---    name citext unique not null,
---    module text,
---    state jsonb,
+    name citext unique not null,
     component1 bigint constraint fk_weapon_component1 references murdermotel.component(componentid) on update cascade on delete cascade,
-    component2 bigint constraint fk_weapon_component2 references murdermotel.component(componentid) on update cascade on delete cascade
-) inherits (murdermotel.item);
+    component2 bigint constraint fk_weapon_component2 references murdermotel.component(componentid) on update cascade on delete cascade,
+    constraint fk_weapon_item foreign key (name) references murdermotel.item(name) on update cascade on delete cascade
+);
 
 create table if not exists murdermotel.map_weaponcomponent_player (
     componentid bigint constraint fk_map_component_id references murdermotel.component(componentid) on update cascade on delete cascade,

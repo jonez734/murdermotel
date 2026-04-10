@@ -63,7 +63,12 @@ class Obj(object):
                     level="debug",
                 )
             database.insert(
-                self.args, self.table, p, primarykey="name", returnid=False, mogrify=True
+                self.args,
+                self.table,
+                p,
+                primarykey="name",
+                returnid=False,
+                mogrify=True,
             )
         self.isdirty = False
         dbh.commit()
@@ -133,6 +138,7 @@ class RabidWolf(Living):
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
         from . import rabidwolf as libwolf
+
         return libwolf.turn(args, wolf=self, **kwargs)
 
 
@@ -169,20 +175,48 @@ class Thief(Living):
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
         from . import thief as libthief
+
         return libthief.turn(args, thief=self, **kwargs)
 
 
 class BoobyTrap(Item):
     def __init__(self, args, **kwargs):
         super().__init__(args)
+        self.name = "boobytrap"
         self.healthpoints = 20
-        self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10 + 1)
+        self.running = False
+        self.timer = 0
+        pool = kwargs.get("pool", None)
+        if pool:
+            loaded = kwargs.get("loaded_boobytrap", None)
+            if loaded:
+                self.roomid = loaded.roomid
+                self.running = loaded.running
+                self.timer = loaded.timer
+            else:
+                self.roomid = random.randint(
+                    10, libroom.getcount(args, **kwargs) - 10 + 1
+                )
+        else:
+            self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10 + 1)
         self.playerid = None
         self.type = "boobytrap"
         self.module = "boobytrap"
 
     def short(self):
         return ":mousetrap: Booby-Trap"
+
+    def buildrec(self, **kwargs):
+        rec = {}
+        rec["name"] = self.name
+        rec["running"] = self.running
+        rec["timer"] = self.timer
+        return rec
+
+    def on_turn(self, args, room=None, **kwargs) -> bool:
+        from . import boobytrap as libboobytrap
+
+        return libboobytrap.turn(args, boobytrap=self, **kwargs)
 
 
 class Player(Living):
@@ -290,7 +324,7 @@ class Player(Living):
                 for f in self.fields:
                     setattr(self, f, rec[f])
 
-                self.items = self.getitems() if hasattr(self, 'getitems') else []
+                self.items = self.getitems() if hasattr(self, "getitems") else []
 
             return True
 
@@ -431,7 +465,9 @@ def getcurrentplayer():
 class completeItemName(object):
     def __init__(self, args, **kwargs):
         self.roomid = kwargs["roomid"] if "roomid" in kwargs else None
-        self.playermoniker = kwargs["playermoniker"] if "playermoniker" in kwargs else None
+        self.playermoniker = (
+            kwargs["playermoniker"] if "playermoniker" in kwargs else None
+        )
 
         self.args = args
 
@@ -609,7 +645,9 @@ def runmodule(args, obj, operation, room=None, **kwargs):
     modulename = obj.module
 
     try:
-        m = __import__(modulename, fromlist=["init", "access", "buildargs", "main", "turn"])
+        m = __import__(
+            modulename, fromlist=["init", "access", "buildargs", "main", "turn"]
+        )
     except ModuleNotFoundError:
         io.echo(f"module {modulename!r} not found", level="error")
         return False
@@ -647,7 +685,9 @@ def runmodule(args, obj, operation, room=None, **kwargs):
         return False
 
     if debug is True:
-        io.echo(f"lib.runmodule.200: {modulename}.{operation}() = {result}", level="debug")
+        io.echo(
+            f"lib.runmodule.200: {modulename}.{operation}() = {result}", level="debug"
+        )
 
     return result if result is not None else True
 

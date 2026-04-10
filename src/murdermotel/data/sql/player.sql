@@ -6,6 +6,7 @@ create table if not exists murdermotel.player (
     bodycount bigint,
     points bigint,
     died bigint,
+    module text,
     membermoniker citext constraint fk_mm_player_membermoniker references engine.__member(moniker) on update cascade on delete set null,
     datelastplayed timestamptz,
     datecreated timestamptz

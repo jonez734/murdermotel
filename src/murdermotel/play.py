@@ -5,7 +5,15 @@ from typing import Any, Optional
 
 from bbsengine6 import io, util, database, member
 
-from . import lib as libmm, data, player as libplayer, room as libroom, thief as libthief, rabidwolf as libwolf
+from . import (
+    lib as libmm,
+    data,
+    player as libplayer,
+    room as libroom,
+    thief as libthief,
+    rabidwolf as libwolf,
+    boobytrap as libboobytrap,
+)
 
 
 def init(args: argparse.Namespace, **kwargs: Any) -> bool:
@@ -193,7 +201,10 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player.info()
     util.heading("playground")
 
-    boobytrap = libmm.BoobyTrap(args, **kwargs)
+    loaded_boobytrap = libboobytrap.load(args, **kwargs)
+    if loaded_boobytrap is None:
+        loaded_boobytrap = libboobytrap.create(args, **kwargs)
+    boobytrap = libmm.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
     loaded_thief = libthief.load(args, **kwargs)
     if loaded_thief is None:
         loaded_thief = libthief.create(args, **kwargs)
@@ -252,7 +263,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             io.echo("mm.play.200: {room.items=}", level="debug")
 
         if len(room.items) > 0:
-            label: str = util.pluralize(len(room.items), "item", "items", quantity=False)
+            label: str = util.pluralize(
+                len(room.items), "item", "items", quantity=False
+            )
             value: str = util.oxfordcomma(room.items)
             io.echo(f"{{var:labelcolor}}room {label}: {{var:valuecolor}}{value}")
 
@@ -441,6 +454,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.save()
         room.save()
         libthief.save(args, thief, **kwargs)
+        libboobytrap.save(args, boobytrap, **kwargs)
 
         player.on_turn(args, room=room, **kwargs)
 
