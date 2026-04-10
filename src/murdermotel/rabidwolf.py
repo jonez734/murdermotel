@@ -25,7 +25,7 @@ def buildargs(args=None, **kw):
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.wolf where name=%s"
+            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
             dat = (WOLF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
@@ -52,7 +52,7 @@ def save(args, wolf, **kwargs):
         rec = wolf.buildrec()
         database.update(
             args,
-            f"{libmm.SCHEMA}.wolf",
+            f"{libmm.SCHEMA}.rabidwolf",
             WOLF_NAME,
             rec,
             primarykey="name",
@@ -85,7 +85,7 @@ def create(args, **kwargs):
 
         database.insert(
             args,
-            f"{libmm.SCHEMA}.wolf",
+            f"{libmm.SCHEMA}.rabidwolf",
             rec,
             primarykey="name",
             mogrify=True,
@@ -118,7 +118,7 @@ def create(args, **kwargs):
 def exists(args, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.wolf where name=%s"
+            sql = f"select name from {libmm.SCHEMA}.rabidwolf where name=%s"
             dat = (WOLF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
