@@ -1,18 +1,17 @@
-import time
-import locale
+from bbsengine6 import bbsengine, database, io
 
-from bbsengine6 import io, database
-
-from . import lib
 
 def init(args=None, **kw):
-  return True
+    return True
+
 
 def access(args, op, **kw):
-  return bbsengine.checksysop(args)
+    return bbsengine.checksysop(args)
+
 
 def buildargs(args, **kw):
-  return None
+    return None
+
 
 def main(args, **kw):
     dbh = database.connect(args)
@@ -21,6 +20,8 @@ def main(args, **kw):
     cur = dbh.cursor()
     cur.execute(sql, dat)
     for rec in database.resultiter(cur):
-      io.echo(f"{rec['name']} ({rec['type']}) is {rec['playgroundtitle']} (#{rec['roomid']})")
-      # ttyio.echo(f"{rec!r}", level="debug")
+        io.echo(
+            f"{rec['name']} ({rec['type']}) is {rec['playgroundtitle']} (#{rec['roomid']})"
+        )
+        # ttyio.echo(f"{rec!r}", level="debug")
     return True
