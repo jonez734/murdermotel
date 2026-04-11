@@ -234,10 +234,9 @@ class RabidWolf(Living):
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
-                conn.commit()
         else:
-            _work(conn)
-            conn.commit()
+            with conn:
+                _work(conn)
         return True
 
 
@@ -342,10 +341,9 @@ class Thief(Living):
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
-                conn.commit()
         else:
-            _work(conn)
-            conn.commit()
+            with conn:
+                _work(conn)
         return True
 
 
@@ -454,10 +452,9 @@ class BoobyTrap(Item):
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
-                conn.commit()
         else:
-            _work(conn)
-            conn.commit()
+            with conn:
+                _work(conn)
         return True
 
 

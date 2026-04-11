@@ -165,10 +165,9 @@ class Player(object):
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
-                conn.commit()
         else:
-            _work(conn)
-            conn.commit()
+            with conn:
+                _work(conn)
 
     def info(self):
         io.echo(f"{{var:labelcolor}}Moves: {{var:valuecolor}}{self.moves}")
