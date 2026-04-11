@@ -10,15 +10,15 @@ WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
 
 
-def init(args, **kw):
+def init(args, **kwargs):
     return True
 
 
-def access(args, op, **kw):
+def access(args, op, **kwargs):
     return True
 
 
-def buildargs(args=None, **kw):
+def buildargs(args=None, **kwargs):
     return None
 
 
@@ -149,9 +149,7 @@ def wolf_attack_player(args, player, wolf, **kwargs):
     damage = randomlib.randint(1, 10) + 10
     io.echo(f"damage={damage}", level="debug")
     io.echo(
-        "The {} claws you for {}".format(
-            wolf.short(), util.pluralize(damage, "move", "moves")
-        )
+        f"The {wolf.short()} claws you for {util.pluralize(damage, 'move', 'moves')}"
     )
     player.moves -= damage
     if player.moves < 0:
@@ -166,7 +164,7 @@ def turn(args, **kwargs):
     if player is None:
         io.echo("You do not exist! Go Away!")
         util.logentry(
-            "murdermotel.rabidwolf.turn.100: player does not exist", prg="murdermotel"
+            "murdermotel.rabidwolf.turn.100: player does not exist", logger_name="murdermotel"
         )
         return False
 
@@ -174,7 +172,7 @@ def turn(args, **kwargs):
     if wolf is None:
         io.echo("The wolf does not exist!")
         util.logentry(
-            "murdermotel.rabidwolf.turn.120: wolf does not exist", prg="murdermotel"
+            "murdermotel.rabidwolf.turn.120: wolf does not exist", logger_name="murdermotel"
         )
         return False
 
@@ -182,11 +180,11 @@ def turn(args, **kwargs):
     ignored = kwargs.get("ignored", False)
 
     if attacked:
-        if util.diceroll(10) < WOLF_AUTO_ATTACK_CHANCE:
+        if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
             wolf_attack_player(args, player, wolf, **kwargs)
 
     if ignored:
-        if util.diceroll(10) < WOLF_AUTO_ATTACK_CHANCE:
+        if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
             io.echo(f"The {wolf.short()} attacks you!")
             wolf_attack_player(args, player, wolf, **kwargs)
 
@@ -197,8 +195,8 @@ def turn(args, **kwargs):
     return True
 
 
-def help(**kw):
-    player = kw["player"] if "player" in kw else None
+def help(**kwargs):
+    player = kwargs["player"] if "player" in kwargs else None
 
     if player is None:
         io.echo("You do not exist! Go Away!", level="error")
@@ -231,11 +229,13 @@ def attack(args, player, weapons, wolf, **kwargs):
             options,
             "",
         )
+        if ch is None:
+            return
         weapon = weapons[ord(ch) - ord("1")]
         io.echo(f"{ch} {{var:sepcolor}}- {{var:labelcolor}}{weapon}")
 
     io.echo(f"{wolf=}", level="debug")
-    damage = util.diceroll(6) * 5
+    damage = util.diceroll(6, mode="single") * 5
     io.echo(f"You remove {damage}% of the {wolf.short()}'s strength!")
     player.moves += 5
     wolf.healthpoints -= damage
@@ -245,7 +245,7 @@ def attack(args, player, weapons, wolf, **kwargs):
         wolf.roomid = 0
         io.echo(f"You killed the {wolf.short()}!")
         player.moves += 500
-        util.logentry(f"{player.name} killed the {wolf.short()}!", prg="murdermotel")
+        util.logentry(f"{player.name} killed the {wolf.short()}!", logger_name="murdermotel")
 
     if player.moves < 1:
         io.echo("You have died.")
@@ -277,17 +277,17 @@ def flee(args, player, exits):
     return
 
 
-def main(args, **kw):
-    player = kw["player"] if "player" in kw else None
+def main(args, **kwargs):
+    player = kwargs["player"] if "player" in kwargs else None
     if player is None:
         io.echo("You do not exist! Go Away!")
         return False
-    wolf = kw["wolf"] if "wolf" in kw else None
+    wolf = kwargs["wolf"] if "wolf" in kwargs else None
     if wolf is None:
         io.echo("The wolf does not exist!")
         return False
 
-    room = kw["room"] if "room" in kw else None
+    room = kwargs["room"] if "room" in kwargs else None
     if room is None:
         io.echo("The room you are in does not exist!")
         return False
@@ -312,15 +312,15 @@ def main(args, **kw):
         )
         if ch == "A":
             io.echo(f"Attack {wolf.short()}")
-            attack(args, player, weapons, wolf, **kw)
+            attack(args, player, weapons, wolf, **kwargs)
             if wolf.roomid == 0:
                 break
-            wolf.on_turn(args, room=room, attacked=True, **kw)
+            wolf.on_turn(args, room=room, attacked=True, **kwargs)
             if player.moves < 1:
                 break
         elif ch == "I":
             io.echo("Ignore")
-            wolf.on_turn(args, room=room, ignored=True, **kw)
+            wolf.on_turn(args, room=room, ignored=True, **kwargs)
             break
         elif ch == "F":
             io.echo("Flee")
