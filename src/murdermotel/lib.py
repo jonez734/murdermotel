@@ -141,6 +141,7 @@ class RabidWolf(Living):
         super().__init__(args)
         self.name = "wolf"
         self.healthpoints = 35
+        self.conn = kwargs.get("conn", None)
         self.pool = kwargs.get("pool", None)
         if self.pool:
             loaded = kwargs.get("loaded_wolf", None)
@@ -226,7 +227,7 @@ class RabidWolf(Living):
             )
             return True
 
-        conn = kwargs.get("conn", None)
+        conn = kwargs.get("conn", None) or self.conn
         if conn is None:
             if self.pool is None:
                 io.echo(f"mm.RabidWolf.save.100: {self.pool=}", level="error")
@@ -246,6 +247,7 @@ class Thief(Living):
         self.name = "thief"
         self.bag = []
         self.healthpoints = 35
+        self.conn = kwargs.get("conn", None)
         self.pool = kwargs.get("pool", None)
         if self.pool:
             loaded = kwargs.get("loaded_thief", None)
@@ -333,7 +335,7 @@ class Thief(Living):
                     )
             return True
 
-        conn = kwargs.get("conn", None)
+        conn = kwargs.get("conn", None) or self.conn
         if conn is None:
             if self.pool is None:
                 io.echo(f"mm.Thief.save.100: {self.pool=}", level="error")
@@ -355,6 +357,7 @@ class BoobyTrap(Item):
         self.healthpoints = 20
         self.running = False
         self.timer = 0
+        self.conn = kwargs.get("conn", None)
         self.pool = kwargs.get("pool", None)
         if self.pool:
             loaded = kwargs.get("loaded_boobytrap", None)
@@ -444,7 +447,7 @@ class BoobyTrap(Item):
                 )
             return True
 
-        conn = kwargs.get("conn", None)
+        conn = kwargs.get("conn", None) or self.conn
         if conn is None:
             if self.pool is None:
                 io.echo(f"mm.BoobyTrap.save.100: {self.pool=}", level="error")
@@ -483,6 +486,7 @@ class Player(Living):
         self.isdirty = False
         self.points = 0
         self.bodycount = 0
+        self.conn = kwargs.get("conn", None)
         self.pool = kwargs.get("pool", None)
         registry.register(self)
 

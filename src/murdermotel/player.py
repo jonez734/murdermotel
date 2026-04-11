@@ -121,7 +121,7 @@ class Player(object):
                 return x
         return None
 
-    def save(self):
+    def save(self, **kwargs):
         def _work(conn):
             rec = self.buildrec()
             io.echo(f"mm.player.save.300: {rec=}", level="debug")
@@ -158,11 +158,15 @@ class Player(object):
                     )
             return True
 
-        if self.pool is None:
-            io.echo(f"mm.player.save.120: {self.pool=}", level="error")
-            return False
-
-        with database.connect(self.args, pool=self.pool) as conn:
+        conn = kwargs.get("conn", None) or self.conn
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.player.save.120: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                _work(conn)
+                conn.commit()
+        else:
             _work(conn)
             conn.commit()
 
