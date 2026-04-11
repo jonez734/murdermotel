@@ -1,0 +1,26 @@
+@import "zoid6vars";
+
+// Smoothstate: smooth AJAX page transitions configured via $smoothstate-* variables in zoid6vars
+// @see zoid6/handbook/SMOOTHSTATE.md
+
+// Original empyre tan/brown color scheme (commented out 2026-04-01)
+// Updated to match www/asimov/achilles green color scheme
+// $page-backgroundcolor: #e6ccb2;    // Original empyre tan
+// $page-textcolor: #ede0d4;          // Original empyre light tan
+// $blurb-backgroundcolor: #344e41;   // Original empyre dark green-gray
+// $blurb-header-backgroundcolor: #b08968;  // Original empyre brown
+// $blurb-header-textcolor: #e6ccb2;  // Original empyre tan
+// $pageheader-backgroundcolor: #b08968;    // Original empyre brown
+
+// New unified green color scheme (matching www/asimov/achilles)
+$page-backgroundcolor: #3a5a40;     // Green (matches www/asimov/achilles)
+$page-textcolor: #dad7cd;           // Cream (matches www/asimov/achilles)
+$blurb-backgroundcolor: #344e41;
+$blurb-header-backgroundcolor: #a3b18a;  // Sage green (matches bbsengine6)
+$blurb-header-textcolor: #dad7cd;   // Cream text on sage header
+$blurb-border-size: 0.125em;
+$blurb-border-style: solid;
+$blurb-border-color: #3A5A40 !default;
+$blurb-border: $blurb-border-size $blurb-border-style $blurb-border-color;
+$pageheader-backgroundcolor: #a3b18a;    // Sage green (matches bbsengine6)
+$body-fontsize: 1.125em;
