@@ -16,22 +16,20 @@ namespace {
 
 namespace config {
 
-    define("SITENAME", "empyre");
-    define("SITEADMINEMAIL", "empyre <empyre@projects.zoidtechnologies.com>");
+    define("SITENAME", "murdermotel");
+    define("SITEADMINEMAIL", "murdermotel <murdermotel@projects.zoidtechnologies.com>");
 
-    define("SITETITLE", "Empyre - Turn-based multi-player economy game");
-    define("SITEURL", "https://zoidtechnologies.com/empyre/");
-//    define("SITEKEYWORDS", "project achilles, monosodium glutamate, mono-sodium glutamate, msg, glutamate, disodium glutamate, truth in labeling, health, nutrition, consumer protection, food additives");
-    define("SITEDESCRIPTION", "Empyre");
-    //define("SITETYPE", "website");
+    define("SITETITLE", "Murder Motel - a multi-player assasination game");
+    define("SITEURL", "https://zoidtechnologies.com/murdermotel/");
+    define("SITEDESCRIPTION", "Murder Motel");
 
-    define("config\VHOSTDIR", "/srv/www/vhosts/zoidtechnologies.com/html/empyre/");
+    define("config\VHOSTDIR", "/srv/www/vhosts/zoidtechnologies.com/html/murdermotel/");
     define("DOCUMENTROOT", \config\VHOSTDIR);
 
     define("SKINDIR", DOCUMENTROOT . "skin/");
     define("SKINURL", "/skin/");
     
-    define("JSURL", "/empyre/js/");
+    define("JSURL", "/murdermotel/js/");
 
     define("IMAGESURL", "https://zoidtechnologies.com/static/");
 
@@ -66,7 +64,7 @@ namespace config {
     // This converts namespaced constants (config\SMARTYTEMPLATESDIR) to global constants (SMARTYTEMPLATESDIR)
     require_once("/srv/www/zoid6/php/zoid6config.php");
 
-    define("config\LOGENTRYPREFIX", "empyreprod");
+    define("config\LOGENTRYPREFIX", "murdermotelprod");
 
 //    define("STATICSKINURL", "/static/skin/");
 
