@@ -235,8 +235,7 @@ class RabidWolf(Living):
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
         else:
-            with conn:
-                _work(conn)
+            _work(conn)
         return True
 
 
@@ -342,8 +341,7 @@ class Thief(Living):
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
         else:
-            with conn:
-                _work(conn)
+            _work(conn)
         return True
 
 
@@ -453,8 +451,7 @@ class BoobyTrap(Item):
             with database.connect(self.args, pool=self.pool) as conn:
                 _work(conn)
         else:
-            with conn:
-                _work(conn)
+            _work(conn)
         return True
 
 
