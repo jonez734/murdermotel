@@ -1,4 +1,6 @@
+import argparse
 import random as randomlib
+from typing import Any, Optional
 
 from bbsengine6 import database, io, util
 
@@ -10,19 +12,19 @@ WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
 
 
-def init(args, **kwargs):
+def init(args: argparse.Namespace, **kwargs: Any) -> bool:
     return True
 
 
-def access(args, op, **kwargs):
+def access(args: argparse.Namespace, op: str, **kwargs: Any) -> bool:
     return True
 
 
-def buildargs(args=None, **kwargs):
+def buildargs(args: Optional[argparse.Namespace] = None, **kwargs: Any) -> Optional[str]:
     return None
 
 
-def load(args, **kwargs):
+def load(args: argparse.Namespace, **kwargs: Any) -> Optional[libmm.RabidWolf]:
     def _work(conn):
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
@@ -47,7 +49,7 @@ def load(args, **kwargs):
     return _work(conn)
 
 
-def save(args, wolf, **kwargs):
+def save(args: argparse.Namespace, wolf: libmm.RabidWolf, **kwargs: Any) -> bool:
     def _work(conn):
         rec = wolf.buildrec()
         database.update(
@@ -71,7 +73,7 @@ def save(args, wolf, **kwargs):
     return True
 
 
-def create(args, **kwargs):
+def create(args: argparse.Namespace, **kwargs: Any) -> libmm.RabidWolf | bool:
     pool = kwargs.get("pool", None)
     if pool is None:
         io.echo(f"mm.rabidwolf.create.100: {pool=}", level="error")
@@ -115,7 +117,7 @@ def create(args, **kwargs):
         raise
 
 
-def exists(args, **kwargs) -> bool:
+def exists(args: argparse.Namespace, **kwargs: Any) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
             sql = f"select name from {libmm.SCHEMA}.rabidwolf where name=%s"
@@ -136,7 +138,7 @@ def exists(args, **kwargs) -> bool:
     return _work(conn)
 
 
-def build(args, rec, **kwargs):
+def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> libmm.RabidWolf:
     pool = kwargs.get("pool", None)
     w = libmm.RabidWolf(args, pool=pool)
     w.name = rec.get("name", WOLF_NAME)
@@ -145,7 +147,7 @@ def build(args, rec, **kwargs):
     return w
 
 
-def wolf_attack_player(args, player, wolf, **kwargs):
+def wolf_attack_player(args: argparse.Namespace, player: Any, wolf: libmm.RabidWolf, **kwargs: Any) -> None:
     damage = randomlib.randint(1, 10) + 10
     io.echo(f"damage={damage}", level="debug")
     io.echo(
@@ -159,7 +161,7 @@ def wolf_attack_player(args, player, wolf, **kwargs):
     player.save()
 
 
-def turn(args, **kwargs):
+def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
     player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")
@@ -195,7 +197,7 @@ def turn(args, **kwargs):
     return True
 
 
-def help(**kwargs):
+def help(**kwargs: Any) -> Optional[bool]:
     player = kwargs["player"] if "player" in kwargs else None
 
     if player is None:
@@ -210,7 +212,7 @@ def help(**kwargs):
     return
 
 
-def attack(args, player, weapons, wolf, **kwargs):
+def attack(args: argparse.Namespace, player: Any, weapons: list[str], wolf: libmm.RabidWolf, **kwargs: Any) -> None:
     io.echo(f"weapons={weapons!r}", level="debug")
     weapon = None
     if len(weapons) == 1:
@@ -259,7 +261,7 @@ def attack(args, player, weapons, wolf, **kwargs):
         save(args, wolf, pool=pool)
 
 
-def flee(args, player, exits):
+def flee(args: argparse.Namespace, player: Any, exits: dict) -> None:
     io.echo(f"total exits: {len(exits)}", level="debug")
     k = []
     for e in exits.keys():
@@ -277,7 +279,7 @@ def flee(args, player, exits):
     return
 
 
-def main(args, **kwargs):
+def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player = kwargs["player"] if "player" in kwargs else None
     if player is None:
         io.echo("You do not exist! Go Away!")
