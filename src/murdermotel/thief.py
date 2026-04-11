@@ -65,14 +65,16 @@ def save(args, thief, **kwargs):
                 )
         return True
 
-    pool = kwargs.get("pool", None)
-    if pool is None:
-        io.echo(f"mm.thief.save.100: {pool=}", level="error")
-        return False
-
-    with database.connect(args, pool=pool) as conn:
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"mm.thief.save.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            _work(conn)
+    else:
         _work(conn)
-        conn.commit()
     return True
 
 
