@@ -14,6 +14,7 @@ from . import (
     rabidwolf as libwolf,
     boobytrap as libboobytrap,
 )
+from .lib import registry
 
 
 def init(args: argparse.Namespace, **kwargs: Any) -> bool:
@@ -201,22 +202,26 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player.info()
     util.heading("playground")
 
+    registry.clear()
+
     loaded_boobytrap = libboobytrap.load(args, **kwargs)
     if loaded_boobytrap is None:
         loaded_boobytrap = libboobytrap.create(args, **kwargs)
-    boobytrap = libmm.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
+    libmm.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
     loaded_thief = libthief.load(args, **kwargs)
     if loaded_thief is None:
         loaded_thief = libthief.create(args, **kwargs)
-    thief = libmm.Thief(args, loaded_thief=loaded_thief, **kwargs)
+    libmm.Thief(args, loaded_thief=loaded_thief, **kwargs)
     loaded_wolf = libwolf.load(args, **kwargs)
     if loaded_wolf is None:
         loaded_wolf = libwolf.create(args, **kwargs)
-    wolf = libmm.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
+    libmm.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
-    io.echo(f"{wolf.short()}  roomid={wolf.roomid} health={wolf.healthpoints}")
-    io.echo(f"{thief.short()} roomid={thief.roomid}")
-    io.echo(f"{boobytrap.short()} roomid={boobytrap.roomid}")
+    for obj in registry.all():
+        health_info = (
+            f" health={obj.healthpoints}" if hasattr(obj, "healthpoints") else ""
+        )
+        io.echo(f"{obj.short()} roomid={obj.roomid}{health_info}")
 
     done: bool = False
     while not done:
@@ -276,27 +281,23 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             value = util.oxfordcomma(items)
             io.echo(f"{{var:labelcolor}}player {label}: {{var:valuecolor}}{value}")
 
-        if player.roomid == wolf.roomid:
-            currentroomid: int = player.roomid
-            if (
-                libmm.runsubmodule(args, "rabidwolf", room=room, wolf=wolf, **kwargs)
-                is False
-            ):
-                io.echo("trouble running 'rabidwolf' prg")
-                return False
-            if player.roomid != currentroomid:
-                continue
-            wolf.on_turn(args, room=room, **kwargs)
+        for obj in registry.get_by_room(player.roomid):
+            io.echo(f"{obj.short()}")
+            if hasattr(obj, "name") and obj.name == "wolf":
+                currentroomid: int = player.roomid
+                if (
+                    libmm.runsubmodule(args, "rabidwolf", room=room, wolf=obj, **kwargs)
+                    is False
+                ):
+                    io.echo("trouble running 'rabidwolf' prg")
+                    return False
+                if player.roomid != currentroomid:
+                    continue
+            obj.on_turn(args, room=room, **kwargs)
 
-        if player.roomid == thief.roomid:
-            io.echo(
-                "{var:highlightcolor}the :supervillian: thief{var:labelcolor} is here. watch your back!"
-            )
-            thief.on_turn(args, room=room, **kwargs)
-
-        if player.roomid == boobytrap.roomid:
-            io.echo(f"{boobytrap.short()}")
-            boobytrap.on_turn(args, room=room, **kwargs)
+        for obj in registry.all():
+            if hasattr(obj, "name") and obj.name == "boobytrap":
+                obj.on_turn(args, room=room, **kwargs)
 
         if roomchange is True:
             continue
@@ -346,7 +347,8 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             )
         )
 
-        io.echo(f"{wolf.short()} roomid={wolf.roomid}")
+        for obj in registry.all():
+            io.echo(f"{obj.short()} roomid={obj.roomid}")
 
         options = "".join(sorted(options))
         ch: Optional[str] = io.inputchar(
@@ -453,8 +455,14 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.moves -= 1
         player.save()
         room.save()
-        libthief.save(args, thief, **kwargs)
-        libboobytrap.save(args, boobytrap, **kwargs)
+        for obj in registry.all():
+            if hasattr(obj, "name"):
+                if obj.name == "thief":
+                    obj.save(**kwargs)
+                elif obj.name == "wolf":
+                    obj.save(**kwargs)
+                elif obj.name == "boobytrap":
+                    obj.save(**kwargs)
 
         player.on_turn(args, room=room, **kwargs)
 

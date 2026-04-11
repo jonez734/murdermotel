@@ -15,6 +15,33 @@ PLAYGROUNDSIZE = 140
 MAXITEMSPERPLAYER = 5
 
 
+class ObjectRegistry:
+    """Registry for active game objects (NPCs, items) that need turn processing."""
+
+    def __init__(self):
+        self._objects: list = []
+
+    def register(self, obj) -> None:
+        if obj not in self._objects:
+            self._objects.append(obj)
+
+    def unregister(self, obj) -> None:
+        if obj in self._objects:
+            self._objects.remove(obj)
+
+    def get_by_room(self, roomid: int) -> list:
+        return [obj for obj in self._objects if obj.roomid == roomid]
+
+    def all(self) -> list:
+        return list(self._objects)
+
+    def clear(self) -> None:
+        self._objects.clear()
+
+
+registry = ObjectRegistry()
+
+
 class Obj(object):
     def __init__(self, args):
         self.args = args
@@ -114,8 +141,8 @@ class RabidWolf(Living):
         super().__init__(args)
         self.name = "wolf"
         self.healthpoints = 35
-        pool = kwargs.get("pool", None)
-        if pool:
+        self.pool = kwargs.get("pool", None)
+        if self.pool:
             loaded = kwargs.get("loaded_wolf", None)
             if loaded:
                 self.roomid = loaded.roomid
@@ -125,6 +152,7 @@ class RabidWolf(Living):
         else:
             self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
         self.module = None
+        registry.register(self)
 
     def short(self):
         return ":wolf: rabid wolf"
@@ -137,9 +165,79 @@ class RabidWolf(Living):
         return rec
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
-        from . import rabidwolf as libwolf
+        import random as randomlib
 
-        return libwolf.turn(args, wolf=self, **kwargs)
+        player = kwargs.get("player", None)
+        if player is None:
+            io.echo("You do not exist! Go Away!")
+            util.logentry(
+                "murdermotel.rabidwolf.turn.100: player does not exist", logger_name="murdermotel"
+            )
+            return False
+
+        attacked = kwargs.get("attacked", False)
+        ignored = kwargs.get("ignored", False)
+
+        WOLF_AUTO_ATTACK_CHANCE = 6
+
+        if attacked:
+            if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
+                damage = randomlib.randint(1, 10) + 10
+                io.echo(f"damage={damage}", level="debug")
+                io.echo(
+                    f"The {self.short()} claws you for {util.pluralize(damage, 'move', 'moves')}"
+                )
+                player.moves -= damage
+                if player.moves < 0:
+                    player.moves = 0
+                    io.echo("You are out of moves. You are dead.")
+                player.save()
+
+        if ignored:
+            if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
+                io.echo(f"The {self.short()} attacks you!")
+                damage = randomlib.randint(1, 10) + 10
+                io.echo(f"damage={damage}", level="debug")
+                io.echo(
+                    f"The {self.short()} claws you for {util.pluralize(damage, 'move', 'moves')}"
+                )
+                player.moves -= damage
+                if player.moves < 0:
+                    player.moves = 0
+                    io.echo("You are out of moves. You are dead.")
+                player.save()
+
+        pool = getattr(self, "pool", None)
+        if pool:
+            self.save()
+
+            return True
+
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            rec = self.buildrec()
+            database.update(
+                self.args,
+                f"{SCHEMA}.rabidwolf",
+                self.name,
+                rec,
+                primarykey="name",
+                conn=conn,
+            )
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.RabidWolf.save.100: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                _work(conn)
+                conn.commit()
+        else:
+            _work(conn)
+            conn.commit()
+        return True
 
 
 class Thief(Living):
@@ -148,8 +246,8 @@ class Thief(Living):
         self.name = "thief"
         self.bag = []
         self.healthpoints = 35
-        pool = kwargs.get("pool", None)
-        if pool:
+        self.pool = kwargs.get("pool", None)
+        if self.pool:
             loaded = kwargs.get("loaded_thief", None)
             if loaded:
                 self.roomid = loaded.roomid
@@ -161,6 +259,7 @@ class Thief(Living):
             self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
         self.items = []
         self.module = None
+        registry.register(self)
 
     def short(self):
         return ":supervillian: Thief"
@@ -174,20 +273,90 @@ class Thief(Living):
         return rec
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
-        from . import thief as libthief
+        import random as randomlib
 
-        return libthief.turn(args, thief=self, **kwargs)
+        player = kwargs.get("player", None)
+        if player is None:
+            io.echo("You do not exist! Go Away!")
+            util.logentry(
+                "murdermotel.thief.main.100: player does not exist", prg="murdermotel"
+            )
+            return False
+
+        io.echo("THIEF! THIEF!  You were ATTACKED!")
+        player.moves -= 5
+
+        if util.diceroll(10) < 4:
+            if not player.items:
+                stolen = None
+            else:
+                idx = randomlib.randint(0, len(player.items) - 1)
+                stolen = player.items.pop(idx)
+                self.items.append(stolen)
+            if stolen:
+                io.echo(f"The thief stole {stolen.name} from you!")
+
+        if self.pool:
+            self.save()
+
+        player.save()
+        return True
+
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            rec = self.buildrec()
+            database.update(
+                self.args,
+                f"{SCHEMA}.thief",
+                self.name,
+                rec,
+                primarykey="name",
+                conn=conn,
+            )
+
+            with database.cursor(conn) as cur:
+                sql = f"delete from {SCHEMA}.map_item_thief where thiefname=%s"
+                dat = (self.name,)
+                cur.execute(sql, dat)
+
+                for i in self.items:
+                    m = {}
+                    m["itemname"] = i.name
+                    m["thiefname"] = self.name
+                    database.insert(
+                        self.args,
+                        f"{SCHEMA}.map_item_thief",
+                        m,
+                        returnid=False,
+                        mogrify=True,
+                        conn=conn,
+                    )
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.Thief.save.100: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                _work(conn)
+                conn.commit()
+        else:
+            _work(conn)
+            conn.commit()
+        return True
 
 
 class BoobyTrap(Item):
     def __init__(self, args, **kwargs):
         super().__init__(args)
+        self.args = args
         self.name = "boobytrap"
         self.healthpoints = 20
         self.running = False
         self.timer = 0
-        pool = kwargs.get("pool", None)
-        if pool:
+        self.pool = kwargs.get("pool", None)
+        if self.pool:
             loaded = kwargs.get("loaded_boobytrap", None)
             if loaded:
                 self.roomid = loaded.roomid
@@ -202,6 +371,7 @@ class BoobyTrap(Item):
         self.playerid = None
         self.type = "boobytrap"
         self.module = "boobytrap"
+        registry.register(self)
 
     def short(self):
         return ":mousetrap: Booby-Trap"
@@ -214,9 +384,78 @@ class BoobyTrap(Item):
         return rec
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
-        from . import boobytrap as libboobytrap
+        player = kwargs.get("player", None)
+        in_same_room = player is not None and player.roomid == self.roomid
 
-        return libboobytrap.turn(args, boobytrap=self, **kwargs)
+        if self.running:
+            self.timer -= 1
+            if self.timer <= 0:
+                if in_same_room:
+                    io.echo("The boobytrap is triggered! It goes SNAP!")
+                    if player:
+                        player.moves -= 10
+                        player.save()
+                self.running = False
+                self.timer = 0
+        elif in_same_room:
+            io.echo("There's a boobytrap here. It looks inactive.")
+            if (
+                io.inputboolean(
+                    "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N"
+                )
+                is True
+            ):
+                self.running = True
+                self.timer = 3
+                io.echo("You set the boobytrap!")
+
+        if self.pool:
+            self.save()
+
+        return True
+
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            rec = self.buildrec()
+            database.update(
+                self.args,
+                f"{SCHEMA}.boobytrap",
+                self.name,
+                rec,
+                primarykey="name",
+                conn=conn,
+            )
+
+            with database.cursor(conn) as cur:
+                sql = f"delete from {SCHEMA}.map_item_room where itemname=%s"
+                dat = (self.name,)
+                cur.execute(sql, dat)
+
+                m = {}
+                m["itemname"] = self.name
+                m["roomid"] = self.roomid
+                database.insert(
+                    self.args,
+                    f"{SCHEMA}.map_item_room",
+                    m,
+                    returnid=False,
+                    mogrify=True,
+                    conn=conn,
+                )
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.BoobyTrap.save.100: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                _work(conn)
+                conn.commit()
+        else:
+            _work(conn)
+            conn.commit()
+        return True
 
 
 class Player(Living):
@@ -245,6 +484,7 @@ class Player(Living):
         self.points = 0
         self.bodycount = 0
         self.pool = kwargs.get("pool", None)
+        registry.register(self)
 
     def __repr__(self):
         buf = ""

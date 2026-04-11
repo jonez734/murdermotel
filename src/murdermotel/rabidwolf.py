@@ -192,7 +192,7 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     pool = kwargs.get("pool", None)
     if pool:
-        save(args, wolf, pool=pool)
+        wolf.save()
 
     return True
 
@@ -258,7 +258,7 @@ def attack(args: argparse.Namespace, player: Any, weapons: list[str], wolf: libm
 
     pool = kwargs.get("pool", None)
     if pool:
-        save(args, wolf, pool=pool)
+        wolf.save()
 
 
 def flee(args: argparse.Namespace, player: Any, exits: dict) -> None:

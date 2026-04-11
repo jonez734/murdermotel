@@ -198,29 +198,29 @@ def build(args, rec, **kwargs):
 
 
 def turn(args, **kwargs):
-    player = kwargs.get("player", None)
-    if player is None:
-        io.echo("You do not exist! Go Away!")
-        util.logentry(
-            "murdermotel.boobytrap.main.100: player does not exist", prg="murdermotel"
-        )
-        return False
-
     boobytrap = kwargs.get("boobytrap", None)
     if boobytrap is None:
         io.echo("The boobytrap does not exist!")
         util.logentry(
-            "murdermotel.boobytrap.main.120: boobytrap does not exist",
+            "murdermotel.boobytrap.turn.100: boobytrap does not exist",
             prg="murdermotel",
         )
         return False
 
+    player = kwargs.get("player", None)
+    in_same_room = player is not None and player.roomid == boobytrap.roomid
+
     if boobytrap.running:
-        io.echo("The boobytrap is triggered! It goes SNAP!")
-        player.moves -= 10
-        boobytrap.running = False
-        boobytrap.timer = 0
-    else:
+        boobytrap.timer -= 1
+        if boobytrap.timer <= 0:
+            if in_same_room:
+                io.echo("The boobytrap is triggered! It goes SNAP!")
+                if player:
+                    player.moves -= 10
+                    player.save()
+            boobytrap.running = False
+            boobytrap.timer = 0
+    elif in_same_room:
         io.echo("There's a boobytrap here. It looks inactive.")
         if (
             io.inputboolean(
@@ -234,7 +234,6 @@ def turn(args, **kwargs):
 
     pool = kwargs.get("pool", None)
     if pool:
-        save(args, boobytrap, pool=pool)
+        boobytrap.save()
 
-    player.save()
     return True

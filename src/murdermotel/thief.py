@@ -208,7 +208,7 @@ def turn(args, **kwargs):
 
     pool = kwargs.get("pool", None)
     if pool:
-        save(args, thief, pool=pool)
+        thief.save()
 
     player.save()
     return True
@@ -226,6 +226,6 @@ def steal_from_player(player, thief, **kwargs):
     pool = kwargs.get("pool", None)
     if pool and args:
         player.save()
-        save(args, thief, pool=pool)
+        thief.save()
 
     return item
