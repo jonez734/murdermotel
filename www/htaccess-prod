@@ -6,10 +6,10 @@ RewriteEngine On
 RewriteBase /
 RewriteOptions Inherit
 
-# Enforce HTTPS for all requests except .well-known (for SSL verification)
-RewriteCond %{HTTPS} off
-RewriteCond %{REQUEST_URI} !/.well-known [NC]
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+## Enforce HTTPS for all requests except .well-known (for SSL verification)
+#RewriteCond %{HTTPS} off
+#RewriteCond %{REQUEST_URI} !/.well-known [NC]
+#RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Allow direct access to static files and directories
 RewriteCond %{REQUEST_FILENAME} -f [OR]

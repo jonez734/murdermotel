@@ -1,27 +1,37 @@
-PROJECT = murdermotel
-MEDIA = /run/media/jam/BEA6-BBCE
+export PROJECT = murdermotel
+export HOST = merlin
+
+export PROD = $(HOST):/srv/www/vhosts/zoidtechnologies.com/html/$(PROJECT)/
+export STAGE = /srv/www/vhosts/zoidtechnologies.com/html/$(PROJECT)/
+
+export datestamp = $(shell date +%Y%m%d-%H%M)
+export archivename = $(PROJECT)-$(datestamp)-$(USER)
+export installfile = install --mode=0660
+
+export RSYNC = rsync --delete-after --chmod=Dg=rwxs,Fgu=rw,Fo=r --verbose \
+	--archive --update --backup --recursive \
+	--human-readable --rsh=ssh \
+	--no-owner --no-group --checksum --mkpath
+
+export SCSSLOADPATH = --load-path /home/opencode/data/work/zoid6/shared/skin/scss/ \
+	--load-path /home/opencode/data/work/bbsengine6/skin/scss/ \
+	--load-path $(HOME)/projects/$(PROJECT)/www/skin/scss/
+
+export SCSS = sass $(SCSSLOADPATH) --sourcemap=none --stop-on-error --trace --style expanded --update
 
 all:
 
 clean:
 	-rm *~
-	$(MAKE) -C src clean
+	$(MAKE) -C skin clean
+	$(MAKE) -C php clean
 
-push:
-	git push
+prod:
+#	mkdir -p $(STAGE)templates_c/
+#	chmod g=rwxs $(STAGE)templates_c/
 
-version:
-	@echo '__version__ = "'`git log -1 --format='%H' | cut -c 1-16`'"' > murdermotel/_version.py
-	@echo '__datestamp__ = "'`date +%Y%m%d-%H%M`-`whoami`'"' >> murdermotel/_version.py
-
-install:
-	./setup.py build && sudo ./setup.py install
-
-build: version
-	./setup.py build
-
-sdist: version
-	./setup.py sdist
-
-backup:
-	rsync --recursive --verbose --exclude=.venv . $(MEDIA)work/$(PROJECT)/
+	$(MAKE) -C php stage
+	$(MAKE) -C skin stage
+	$(RSYNC) config-prod.php $(STAGE)config.php
+	$(RSYNC) htaccess-prod $(STAGE).htaccess
+	$(RSYNC) --delete-after $(STAGE) $(PROD)

@@ -17,7 +17,7 @@ namespace {
 namespace config {
 
     define("SITENAME", "murdermotel");
-    define("SITEADMINEMAIL", "murdermotel <murdermotel@projects.zoidtechnologies.com>");
+    define("SITEADMINEMAIL", "murder motel <murdermotel@projects.zoidtechnologies.com>");
 
     define("SITETITLE", "Murder Motel - a multi-player assasination game");
     define("SITEURL", "https://zoidtechnologies.com/murdermotel/");
