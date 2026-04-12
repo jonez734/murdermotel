@@ -3,15 +3,55 @@
 {block name="head" append}
 <link rel="stylesheet" type="text/css" href="{$smarty.const.SKINURL}css/murdermotel.css" media="screen" />
 {/block}
-{block name="title"}murder motel{/block}
+{block name="title}murder motel{/block}
 {block name="content"}
 <div class="blurb vstretch">
 <div class="body">
 <ul>
-<li>what it is</li>
-<li>how to play</li>
-<li>history</li>
-<li>technical</li>
+<li><strong>What it is</strong>
+<ul>
+<li>A multiplayer BBS door game where players hunt each other through a 140-room motel</li>
+<li>Each player gets assigned a target to eliminate - kill them and you get a new one</li>
+<li>Last one standing wins (though the dead can revive, so that's rare)</li>
+<li>Inspired by the movies <em>Clue</em> and <em>Friday the 13th</em></li>
+</ul>
+</li>
+<li><strong>How to play</strong>
+<ul>
+<li>Enter the motel and you're automatically registered</li>
+<li>Collect weapon parts scattered around - 2 pieces make a weapon</li>
+<li>Find your target and KILL them before they kill you</li>
+<li>Max 60 moves per call, up to 30 players at once - check STATUS to see your target</li>
+</ul>
+</li>
+<li><strong>History</strong>
+<ul>
+<li>Classic Commodore 64 door game, later ported to Color64, Image BBS 1.X and 3.0</li>
+<li>Original by Mark Dickinson, adapted by Brent Hendricks (Rug Rat)</li>
+<li>Now rebuilt from the ground up for bbsengine6 - objects and NPCs stored in the database for extensibility</li>
+</ul>
+</li>
+<li><strong>Technical</strong>
+<ul>
+<li>Runs as a bbsengine6 module</li>
+<li>5 floors: 4 above ground plus extensive basement</li>
+<li>Object-oriented: Living base class with Player and NPC subclasses (the thief and wolf are NPCs)</li>
+<li>All objects have a <code>turn()</code> method called each loop for behavior (trap movement, attacks, etc.)</li>
+<li>90 items total:
+<ul>
+<li>Weapons: axe, pistol, chlorine, flamethrower, acid (6 of each)</li>
+<li>Defenses: riot shield, bullet jacket, gas mask, extinguisher, eye (6 of each)</li>
+</ul>
+</li>
+<li>Living hazards:
+<ul>
+<li>THE THIEF steals your items</li>
+<li>A RABID WOLF roams the corridors and attacks players (60% chance per turn)</li>
+<li>A TRAP strips 15-30 moves if someone triggers it</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>

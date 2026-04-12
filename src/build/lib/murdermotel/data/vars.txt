@@ -1,0 +1,31 @@
+- nn$ - holds data from s.word-file.txt (more a strings file)
+- u$()
+- u(k, 2) - room of player #k
+- u(k, 9) - moves
+- ac%()
+- a%() - status. 1 = dead
+- c%() - dead count (died x times)
+- d%() - kills
+- e%() - points
+- f%()
+- w() - roomid of weapon
+- w$() - name of weapon from words file
+- bn - current player location
+- bj - location of treasure room - bonus moves between 5 and 15
+- w() - roomids of weapons
+- w(91) - roomid of booby-trap
+- na$ - name
+- uq - roomid of thief
+- ug
+- wl - roomid of wolf
+- sa - turns remaining (decremented when attacked by wolf)
+- nn$(42): "No Weapons Or Defenses"
+- nn$(45): You can carry up to 5 items.And only 2 of them may be defenses.
+- nn$(46): "Kill with which?1)axe 2)pistol 3)chlorine 4)fire 5)acid"
+- tt$() - assassin?
+- a%() - alive or dead (status)
+- c%() - death count
+- d3$
+- dt$(): directions 0: east 1: north 2: west 3: south 4: up 5: down
+- jm
+- tq

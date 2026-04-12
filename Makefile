@@ -1,11 +1,12 @@
 PROJECT = murdermotel
 OUTDIR = /srv/repo/$(PROJECT)/
 VERSION = $(shell date +%Y%m%d%H%M)
-
+MEDIA = /run/media/jam/BEA6-BBCE/work/$(PROJECT)/
 PYTHON = python3
 
 .PHONY: build version
 .PHONY: clean build rename-sdist sign release all
+.PHONY: www
 
 build:
 	VERSION=$(VERSION) python3 -m build --outdir $(OUTDIR)
@@ -38,8 +39,8 @@ sdist:
 	$(PYTHON) -m setup sdist --dist-dir /srv/repo/$(PROJECT)/
 
 #version:
-#	@echo '__version__ = "'`git log -1 --format='%H' | cut -c 1-16`'"' > bbsengine6/_version.py
-#	@echo '__datestamp__ = "'`date +%Y%m%d-%H%M`-`whoami`'"' >> bbsengine6/_version.py
+#	@echo '__version__ = "'`git log -1 --format='%H' | cut -c 1-16`'"' > $(PROJECT)/_version.py
+#	@echo '__datestamp__ = "'`date +%Y%m%d-%H%M`-`whoami`'"' >> $(PROJECT)/_version.py
 
 push: tag
 	git push -u github v$(VERSION)
@@ -51,3 +52,9 @@ tag:
 		git tag -a v$(VERSION) -m "Release v$(VERSION)"; \
 		echo "Tag v$(VERSION) created locally."; \
 	fi
+
+backup:
+	rsync --recursive --verbose --exclude=.venv . $(MEDOA)
+
+www:
+	$(MAKE) -C www prod

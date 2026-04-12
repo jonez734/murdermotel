@@ -6,16 +6,20 @@ from bbsengine6 import io, screen, database
 
 from . import lib as libmm
 
-def init(args, **kwargs:dict) -> bool:
+
+def init(args, **kwargs: dict) -> bool:
     screen.init(args)
     return True
 
-def access(args, op:str, **kwargs:dict) -> bool:
+
+def access(args, op: str, **kwargs: dict) -> bool:
     return True
 
-def buildargs(args=None, **kwargs:dict):
+
+def buildargs(args=None, **kwargs: dict):
     parser = argparse.ArgumentParser("murder motel")
     return parser
+
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_ALL, "")
@@ -34,4 +38,6 @@ if __name__ == "__main__":
         except EOFError:
             io.echo("{/all}*EOF*")
         finally:
-            io.echo(f"{{decsc}}{{curpos:{io.terminal.height()},0}}{{el}}{{reset}}{{decrc}}")
+            io.echo(
+                f"{{decsc}}{{curpos:{io.terminal.height()},0}}{{el}}{{reset}}{{decrc}}"
+            )

@@ -1,0 +1,16 @@
+README.md
+setup.py
+murdermotel/__init__.py
+murdermotel/__main__.py
+murdermotel/boot.py
+murdermotel/editor.py
+murdermotel/housekeeping.py
+murdermotel/lib.py
+murdermotel/lobby.py
+murdermotel/maintenance.py
+murdermotel/version.py
+murdermotel.egg-info/PKG-INFO
+murdermotel.egg-info/SOURCES.txt
+murdermotel.egg-info/dependency_links.txt
+murdermotel.egg-info/top_level.txt
+murdermotel/data/__init__.py

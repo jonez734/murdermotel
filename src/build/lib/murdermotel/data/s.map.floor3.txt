@@ -1,0 +1,30 @@
+Map on the THIRD FLOOR
+
+Up
+Elevator
+(4)
+ {acs:vline}
+Vinegar      Hill of
+Bean Room    Beans Room
+(81){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(82)
+ {acs:vline}            {acs:vline}
+Avacado      Syslob's      Cabbage
+Room         Room          Corner
+(70){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(71){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(72)
+ {acs:vline}                          {acs:vline}
+Booger       Squash        Radish
+Diner        Suite         Room
+(75)         (74){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(73)
+ {acs:vline}                          {acs:vline}
+Spiral       Crud           {acs:vline}
+Staircase    Cafe           {acs:vline}
+(76)         (80)           {acs:vline}
+ {acs:vline}            {acs:vline}            Alter
+Torture      Loosing       Little
+Chamber #1   Sanity        John
+(77){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(79){acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}{acs:hline}(78)
+                            {acs:vline}
+                           Normal
+                           Elevator
+                           (7)
+ 
