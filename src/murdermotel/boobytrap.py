@@ -262,11 +262,6 @@ def create(args, **kwargs):
             conn=conn,
         )
 
-        with database.cursor(conn) as cur:
-            sql = f"insert into {libmm.SCHEMA}.npc (name, kind, module, title) values (%s, %s, %s, %s)"
-            dat = (BOOBYTRAP_NAME, "boobytrap", "boobytrap", "Booby Trap")
-            cur.execute(sql, dat)
-
         roomid = randomlib.randint(10, 140 - 10 + 1)
         b.roomid = roomid
 

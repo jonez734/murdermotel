@@ -7,7 +7,7 @@ from bbsengine6 import database, io, util
 from . import lib as libmm
 
 
-WOLF_NAME = "wolf"
+WOLF_NAME = "rabidwolf"
 WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
 
@@ -26,13 +26,78 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
-def create(args: argparse.Namespace, **kwargs: Any) -> libmm.RabidWolf | bool:
+def load(args: argparse.Namespace, **kwargs) -> Optional[libmm.RabidWolf]:
+    def _work(conn):
+        with database.cursor(conn) as cur:
+            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
+            dat = (WOLF_NAME,)
+            cur.execute(sql, dat)
+            npc_exists = cur.rowcount > 0
+            if npc_exists:
+                io.echo(
+                    "mm.rabidwolf.load.090: npc record exists", level="debug"
+                )
+
+        with database.cursor(conn) as cur:
+            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
+            dat = (WOLF_NAME,)
+            cur.execute(sql, dat)
+            if cur.rowcount == 0:
+                if npc_exists:
+                    io.echo(
+                        "mm.rabidwolf.load.100: npc exists but rabidwolf table empty, "
+                        "skipping create",
+                        level="debug",
+                    )
+                    return None
+                io.echo(
+                    "mm.rabidwolf.load.110: no wolf found, can create", level="debug"
+                )
+                return None
+
+            rec = cur.fetchone()
+            w = build(args, rec, **kwargs)
+            return w
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"mm.rabidwolf.load.120: {pool=}", level="error")
+            return None
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)
+
+
+def create(args: argparse.Namespace, **kwargs) -> libmm.RabidWolf | bool:
     pool = kwargs.get("pool", None)
     if pool is None:
         io.echo(f"mm.rabidwolf.create.100: {pool=}", level="error")
         return False
 
     def _work(conn):
+        with database.cursor(conn) as cur:
+            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
+            cur.execute(sql, (WOLF_NAME,))
+            if cur.rowcount > 0:
+                io.echo(
+                    "mm.rabidwolf.create.110: npc already exists, loading instead",
+                    level="debug",
+                )
+                with database.cursor(conn) as cur2:
+                    sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
+                    cur2.execute(sql, (WOLF_NAME,))
+                    if cur2.rowcount > 0:
+                        rec = cur2.fetchone()
+                        w = build(args, rec, **kwargs)
+                        return w
+                io.echo(
+                    "mm.rabidwolf.create.115: npc exists but rabidwolf table corrupted",
+                    level="error",
+                )
+                return False
+
         w = build(
             args,
             {"name": WOLF_NAME, "roomid": 10, "healthpoints": WOLF_HEALTH},
@@ -53,7 +118,7 @@ def create(args: argparse.Namespace, **kwargs: Any) -> libmm.RabidWolf | bool:
 
         with database.cursor(conn) as cur:
             sql = f"insert into {libmm.SCHEMA}.npc (name, kind, module, title) values (%s, %s, %s, %s)"
-            dat = (WOLF_NAME, "wolf", "rabidwolf", "The Rabid Wolf")
+            dat = (WOLF_NAME, "rabidwolf", "rabidwolf", "The Rabid Wolf")
             cur.execute(sql, dat)
 
         return w

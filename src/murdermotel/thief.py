@@ -23,12 +23,29 @@ def buildargs(args, obj=None, room=None, **kwargs):
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
+            dat = (THIEF_NAME,)
+            cur.execute(sql, dat)
+            npc_exists = cur.rowcount > 0
+            if npc_exists:
+                io.echo(
+                    "mm.thief.load.090: npc record exists", level="debug"
+                )
+
+        with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
             dat = (THIEF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
+                if npc_exists:
+                    io.echo(
+                        "mm.thief.load.100: npc exists but thief table empty, "
+                        "skipping create",
+                        level="debug",
+                    )
+                    return None
                 io.echo(
-                    "mm.thief.load.100: no thief found, creating one", level="debug"
+                    "mm.thief.load.110: no thief found, can create", level="debug"
                 )
                 return None
 
@@ -99,6 +116,28 @@ def create(args, **kwargs):
         return False
 
     def _work(conn):
+        with database.cursor(conn) as cur:
+            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
+            cur.execute(sql, (THIEF_NAME,))
+            if cur.rowcount > 0:
+                io.echo(
+                    "mm.thief.create.110: npc already exists, loading instead",
+                    level="debug",
+                )
+                with database.cursor(conn) as cur2:
+                    sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
+                    cur2.execute(sql, (THIEF_NAME,))
+                    if cur2.rowcount > 0:
+                        rec = cur2.fetchone()
+                        t = build(args, rec, **kwargs)
+                        t.items = getitems(args, **kwargs)
+                        return t
+                io.echo(
+                    "mm.thief.create.115: npc exists but thief table corrupted",
+                    level="error",
+                )
+                return False
+
         t = build(
             args,
             {"name": THIEF_NAME, "bag": [], "roomid": 10, "healthpoints": THIEF_HEALTH},
