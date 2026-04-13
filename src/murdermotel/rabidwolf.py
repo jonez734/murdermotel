@@ -20,7 +20,9 @@ def access(args: argparse.Namespace, op: str, **kwargs: Any) -> bool:
     return True
 
 
-def buildargs(args: Optional[argparse.Namespace] = None, **kwargs: Any) -> Optional[str]:
+def buildargs(
+    args: Optional[argparse.Namespace] = None, **kwargs: Any
+) -> Optional[str]:
     return None
 
 
@@ -31,7 +33,9 @@ def load(args: argparse.Namespace, **kwargs: Any) -> Optional[libmm.RabidWolf]:
             dat = (WOLF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
-                io.echo("mm.rabidwolf.load.100: no wolf found, creating one", level="debug")
+                io.echo(
+                    "mm.rabidwolf.load.100: no wolf found, creating one", level="debug"
+                )
                 return None
 
             rec = cur.fetchone()
@@ -82,7 +86,11 @@ def create(args: argparse.Namespace, **kwargs: Any) -> libmm.RabidWolf | bool:
         return False
 
     def _work(conn):
-        w = build(args, {"name": WOLF_NAME, "roomid": 10, "healthpoints": WOLF_HEALTH}, **kwargs)
+        w = build(
+            args,
+            {"name": WOLF_NAME, "roomid": 10, "healthpoints": WOLF_HEALTH},
+            **kwargs,
+        )
 
         rec = w.buildrec()
         io.echo(f"mm.rabidwolf.create.120: {rec=}", level="debug")
@@ -149,7 +157,9 @@ def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> libmm.RabidWolf
     return w
 
 
-def wolf_attack_player(args: argparse.Namespace, player: Any, wolf: libmm.RabidWolf, **kwargs: Any) -> None:
+def wolf_attack_player(
+    args: argparse.Namespace, player: Any, wolf: libmm.RabidWolf, **kwargs: Any
+) -> None:
     damage = randomlib.randint(1, 10) + 10
     io.echo(f"damage={damage}", level="debug")
     io.echo(
@@ -168,7 +178,8 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
     if player is None:
         io.echo("You do not exist! Go Away!")
         util.logentry(
-            "murdermotel.rabidwolf.turn.100: player does not exist", logger_name="murdermotel"
+            "murdermotel.rabidwolf.turn.100: player does not exist",
+            logger_name="murdermotel",
         )
         return False
 
@@ -176,7 +187,8 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
     if wolf is None:
         io.echo("The wolf does not exist!")
         util.logentry(
-            "murdermotel.rabidwolf.turn.120: wolf does not exist", logger_name="murdermotel"
+            "murdermotel.rabidwolf.turn.120: wolf does not exist",
+            logger_name="murdermotel",
         )
         return False
 
@@ -214,7 +226,13 @@ def help(**kwargs: Any) -> Optional[bool]:
     return
 
 
-def attack(args: argparse.Namespace, player: Any, weapons: list[str], wolf: libmm.RabidWolf, **kwargs: Any) -> None:
+def attack(
+    args: argparse.Namespace,
+    player: Any,
+    weapons: list[str],
+    wolf: libmm.RabidWolf,
+    **kwargs: Any,
+) -> None:
     io.echo(f"weapons={weapons!r}", level="debug")
     weapon = None
     if len(weapons) == 1:
@@ -249,7 +267,9 @@ def attack(args: argparse.Namespace, player: Any, weapons: list[str], wolf: libm
         wolf.roomid = 0
         io.echo(f"You killed the {wolf.short()}!")
         player.moves += 500
-        util.logentry(f"{player.name} killed the {wolf.short()}!", logger_name="murdermotel")
+        util.logentry(
+            f"{player.name} killed the {wolf.short()}!", logger_name="murdermotel"
+        )
 
     if player.moves < 1:
         io.echo("You have died.")

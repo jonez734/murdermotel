@@ -36,7 +36,12 @@ class Item(object):
 
         with database.connect(self.args, pool=self.pool) as conn:
             database.update(
-                self.args, f"{libmm.SCHEMA}.item", self.name, i, primarykey="name", conn=conn
+                self.args,
+                f"{libmm.SCHEMA}.item",
+                self.name,
+                i,
+                primarykey="name",
+                conn=conn,
             )
             conn.commit()
         return True

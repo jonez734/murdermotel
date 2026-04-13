@@ -15,7 +15,9 @@ def load(args, **kwargs):
             dat = (THIEF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
-                io.echo("mm.thief.load.100: no thief found, creating one", level="debug")
+                io.echo(
+                    "mm.thief.load.100: no thief found, creating one", level="debug"
+                )
                 return None
 
             rec = cur.fetchone()
@@ -85,7 +87,11 @@ def create(args, **kwargs):
         return False
 
     def _work(conn):
-        t = build(args, {"name": THIEF_NAME, "bag": [], "roomid": 10, "healthpoints": THIEF_HEALTH}, **kwargs)
+        t = build(
+            args,
+            {"name": THIEF_NAME, "bag": [], "roomid": 10, "healthpoints": THIEF_HEALTH},
+            **kwargs,
+        )
 
         rec = t.buildrec()
         io.echo(f"mm.thief.create.120: {rec=}", level="debug")
@@ -134,6 +140,7 @@ def getitems(args, **kwargs):
             res = cur.fetchmany()
             for rec in res:
                 from . import item as libitem
+
                 item = libitem.load(args, rec["itemname"])
                 if item is None:
                     io.echo(f"mm.thief.getitems: {item=}", level="error")

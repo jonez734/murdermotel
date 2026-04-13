@@ -172,7 +172,8 @@ class RabidWolf(Living):
         if player is None:
             io.echo("You do not exist! Go Away!")
             util.logentry(
-                "murdermotel.rabidwolf.turn.100: player does not exist", logger_name="murdermotel"
+                "murdermotel.rabidwolf.turn.100: player does not exist",
+                logger_name="murdermotel",
             )
             return False
 
@@ -847,12 +848,14 @@ def runsubmodule(args, submodule, **kwargs):
 
 
 # @since 20260410
-def runmodule(args, obj, operation, room=None, **kwargs):
+def runmodule(args, obj, operation=None, room=None, **kwargs):
     """
     Run an external module operation on a Living or Item object.
 
     If obj.module is set, loads that module and calls the specified operation.
     If obj.module is None, returns True (no custom module).
+
+    If obj is a string (module name), delegates to bbsengine6's runmodule.
 
     Extended ABI (in addition to standard bbsengine6 module ABI):
         init(args, obj, room, **kwargs) -> bool
@@ -863,7 +866,7 @@ def runmodule(args, obj, operation, room=None, **kwargs):
 
     Args:
         args: argparse.Namespace
-        obj: Living or Item object with .module attribute
+        obj: Living or Item object with .module attribute OR module name string
         operation: str - one of 'init', 'access', 'buildargs', 'main', 'turn'
         room: Optional[Room] - the current room
         **kwargs: additional arguments
@@ -872,6 +875,9 @@ def runmodule(args, obj, operation, room=None, **kwargs):
         bool - True if successful, False on error
         For 'buildargs', returns argparse.ArgumentParser or None
     """
+    if isinstance(obj, str):
+        return module.runmodule(args, f"{PACKAGENAME}.{obj}", **kwargs)
+
     if obj.module is None:
         return True
 
