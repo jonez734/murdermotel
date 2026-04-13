@@ -60,7 +60,7 @@ class BoobyTrap(Item):
             self.roomid = randomlib.randint(10, 140 - 10 + 1)
         self.playerid = None
         self.kind = "boobytrap"
-        self.module = "boobytrap"
+        self.modulepath = "boobytrap"
         libmm.registry.register(self)
 
     def short(self):

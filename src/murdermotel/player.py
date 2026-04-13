@@ -15,7 +15,7 @@ FIELDS = (
     "bodycount",
     "points",
     "died",
-    "module",
+    "modulepath",
     "membermoniker",
     "datelastplayed",
     "datecreated",
@@ -71,7 +71,7 @@ class Player(object):
         self.isdirty = False
         self.points = 0
         self.bodycount = 0
-        self.module = None
+        self.modulepath = None
         self.membermoniker = None
         self.pool = kwargs.get("pool", None)
         self.roomid = None
@@ -85,7 +85,7 @@ class Player(object):
         return buf
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
-        if self.module:
+        if self.modulepath:
             return libmm.runmodule(args, self, "turn", room=room, **kwargs)
         return True
 
@@ -498,7 +498,7 @@ def create(args, playermoniker, **kwargs):
                 "bodycount",
                 "points",
                 "died",
-                "module",
+                "modulepath",
                 "membermoniker",
                 "datelastplayed",
                 "datecreated",

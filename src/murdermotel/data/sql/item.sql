@@ -3,7 +3,7 @@ create table if not exists murdermotel.item (
     "name" citext unique not null primary key,
     "kind" text not null check (kind in ('component', 'defense', 'boobytrap', 'item')),
     "title" text,
-    "module" text,
+    "modulepath" text,
     "state" jsonb,
     "usemessages" text[]
 );

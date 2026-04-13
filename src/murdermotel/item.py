@@ -2,7 +2,7 @@ from bbsengine6 import database, io
 
 from . import lib as libmm
 
-FIELDS = ("kind", "module", "name", "title", "module", "state")
+FIELDS = ("kind", "modulepath", "name", "title", "modulepath", "state")
 
 
 def init(args, obj=None, room=None, **kwargs) -> bool:
@@ -25,7 +25,7 @@ class Item(object):
     def __init__(self, args, **kwargs):
         self.args = args
         self.kind = "item"
-        self.module = "item"
+        self.modulepath = "item"
         self.name = "name"
         self.title = self.name
         self.table = "murdermotel.item"

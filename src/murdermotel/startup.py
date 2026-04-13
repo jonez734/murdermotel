@@ -78,7 +78,7 @@ def main(args, **kwargs):
                 "boobytrap": {
                     "title": "booby trap",
                     "kind": "boobytrap",
-                    "module": "boobytrap",
+                    "modulepath": "boobytrap",
                 },
             }
 
@@ -91,7 +91,7 @@ def main(args, **kwargs):
                 rec["kind"] = data.get("kind", "item")
                 rec["name"] = name
                 rec["title"] = data.get("title", name)
-                rec["module"] = data.get("module", None)
+                rec["modulepath"] = data.get("modulepath", None)
                 rec["state"] = database.Jsonb(
                     {"usemessages": data.get("usemessages", None)}
                 )
@@ -156,12 +156,12 @@ def main(args, **kwargs):
                 "thief": {
                     "kind": "thief",
                     "title": "The Sneaky Thief",
-                    "module": "thief",
+                    "modulepath": "thief",
                 },
                 "rabidwolf": {
                     "kind": "wolf",
                     "title": "Rabid Wolf",
-                    "module": "rabidwolf",
+                    "modulepath": "rabidwolf",
                 },
             }
 
@@ -170,7 +170,7 @@ def main(args, **kwargs):
                 rec["name"] = name
                 rec["kind"] = data.get("kind")
                 rec["title"] = data.get("title", name)
-                rec["module"] = data.get("module", None)
+                rec["modulepath"] = data.get("modulepath", None)
                 rec["state"] = database.Jsonb({})
                 database.insert(
                     args, f"{libmm.SCHEMA}.npc", rec, conn=conn, primarykey="name"

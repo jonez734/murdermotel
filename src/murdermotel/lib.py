@@ -105,7 +105,7 @@ class Obj(object):
 
 
 class Living(object):
-    module: Optional[str] = None
+    modulepath: Optional[str] = None
 
     def __init__(self, args):
         self.args = args
@@ -113,7 +113,7 @@ class Living(object):
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
         """Called each turn when in same room as player."""
-        if self.module:
+        if self.modulepath:
             return runmodule(args, self, "turn", room=room, **kwargs)
         return True
 
@@ -122,7 +122,7 @@ class Living(object):
 
 
 class Item(object):
-    module: Optional[str] = None
+    modulepath: Optional[str] = None
 
     def __init__(self, args):
         super().__init__()
@@ -136,7 +136,7 @@ class Item(object):
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
         """Called each turn when in same room as player."""
-        if self.module:
+        if self.modulepath:
             return runmodule(args, self, "turn", room=room, **kwargs)
         return True
 
@@ -194,7 +194,7 @@ class RabidWolf(Living):
                 self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
         else:
             self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
-        self.module = None
+        self.modulepath = None
         registry.register(self)
 
     def short(self):
@@ -301,7 +301,7 @@ class Thief(Living):
         else:
             self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
         self.items = []
-        self.module = None
+        self.modulepath = None
         registry.register(self)
 
     def short(self):
@@ -389,7 +389,7 @@ class Thief(Living):
 
 
 class Player(Living):
-    module: Optional[str] = "player"
+    modulepath: Optional[str] = "player"
 
     def __init__(self, args, **kwargs):
         super().__init__(args)
@@ -736,8 +736,8 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     """
     Run an external module operation on a Living or Item object.
 
-    If obj.module is set, loads that module and calls the specified operation.
-    If obj.module is None, returns True (no custom module).
+    If obj.modulepath is set, loads that module and calls the specified operation.
+    If obj.modulepath is None, returns True (no custom module).
 
     If obj is a string (module name), delegates to bbsengine6's runmodule.
 
@@ -750,7 +750,7 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
 
     Args:
         args: argparse.Namespace
-        obj: Living or Item object with .module attribute OR module name string
+        obj: Living or Item object with .modulepath attribute OR module name string
         operation: str - one of 'init', 'access', 'buildargs', 'main', 'turn'
         room: Optional[Room] - the current room
         **kwargs: additional arguments
@@ -762,26 +762,32 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     if isinstance(obj, str):
         return module.runmodule(args, f"{PACKAGENAME}.{obj}", **kwargs)
 
-    if obj.module is None:
+    if obj.modulepath is None:
         return True
 
     debug = args.debug if hasattr(args, "debug") and args.debug else False
 
     if debug is True:
-        io.echo(f"lib.runmodule.100: {obj.module=} {operation=}", level="debug")
+        io.echo(f"lib.runmodule.100: {obj.modulepath=} {operation=}", level="debug")
 
-    modulename = obj.module
+    modulename = f"{PACKAGENAME}.{obj.modulepath}"
 
-    try:
-        m = __import__(
-            modulename, fromlist=["init", "access", "buildargs", "main", "turn"]
-        )
-    except ModuleNotFoundError:
-        io.echo(f"module {modulename!r} not found", level="error")
-        return False
-    except Exception:
-        io.echo_traceback(f"lib.runmodule: import {modulename}")
-        return False
+    if hasattr(obj, "module") and obj.module is not None:
+        m = obj.module
+        if debug is True:
+            io.echo(f"lib.runmodule.110: using cached module {modulename}", level="debug")
+    else:
+        try:
+            m = __import__(
+                modulename, fromlist=["init", "access", "buildargs", "main", "turn"]
+            )
+            obj.module = m
+        except ModuleNotFoundError:
+            io.echo(f"module {modulename!r} not found", level="error")
+            return False
+        except Exception:
+            io.echo_traceback(f"lib.runmodule: import {modulename}")
+            return False
 
     if not hasattr(m, operation):
         if debug is True:
@@ -1041,3 +1047,32 @@ def distributeitems(args, **kwargs):
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
+
+
+def reload_module(obj) -> bool:
+    """Clear cached module on obj; will be re-imported on next runmodule() call."""
+    obj.module = None
+    io.echo(f"Reloaded module for {obj}", level="debug")
+    return True
+
+
+def reload_modulepath(modulepath: str) -> int:
+    """Clear cached module on all registered objects with the given modulepath."""
+    count = 0
+    for obj in registry.all():
+        if getattr(obj, "modulepath", None) == modulepath:
+            reload_module(obj)
+            count += 1
+    io.echo(f"Reloaded {count} object(s) with modulepath={modulepath!r}", level="debug")
+    return count
+
+
+def reload_all_modules() -> int:
+    """Clear cached module on all registered objects that have a modulepath."""
+    count = 0
+    for obj in registry.all():
+        if getattr(obj, "modulepath", None) is not None:
+            reload_module(obj)
+            count += 1
+    io.echo(f"Reloaded {count} object(s) total", level="debug")
+    return count

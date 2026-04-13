@@ -5,7 +5,7 @@ from bbsengine6 import database, io
 
 from . import item as libitem, lib as libmm
 
-FIELDS = ("id", "module", "description", "title", "shortname")
+FIELDS = ("id", "modulepath", "description", "title", "shortname")
 EXITS = ("north", "south", "east", "west", "up", "down")
 
 

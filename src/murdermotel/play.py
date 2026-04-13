@@ -108,14 +108,16 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     io.echo("Z - Maint Mode ", end="")
     ch: Optional[str] = io.inputchoice(
-        "{var:optioncolor}[G]{var:labelcolor}oto {var:optioncolor}[E]{var:labelcolor}dit room {var:optioncolor}(Q){var:labelcolor}uit",
-        "GEQ",
+        "{var:optioncolor}[G]{var:labelcolor}oto {var:optioncolor}[E]{var:labelcolor}dit room {var:optioncolor}[R]{var:labelcolor}eload {var:optioncolor}(Q){var:labelcolor}uit",
+        "GERQ",
         "Q",
     )
     if ch == "Q":
         return True
     elif ch == "G":
         return goto()
+    elif ch == "R":
+        return reload(args, player=player, **kwargs)
     elif ch == "E":
         return editroom()
 
@@ -461,5 +463,47 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     obj.save(**kwargs)
 
         player.on_turn(args, room=room, **kwargs)
+
+    return True
+
+
+def reload(args: argparse.Namespace, player: Any, **kwargs: Any) -> bool:
+    if member.issysop(args) is False:
+        io.echo("Sysop access required.", level="error")
+        return False
+
+    io.echo("Reload: ", end="")
+    ch: Optional[str] = io.inputchoice(
+        "{var:optioncolor}[T]{var:labelcolor}his object  {var:optioncolor}[P]{var:labelcolor}ath (all same type)  {var:optioncolor}[M]{var:labelcolor}odule (enter name)  {var:optioncolor}[A]{var:labelcolor}ll objects",
+        "TPMA",
+        "Q",
+    )
+
+    if ch == "Q" or ch is None:
+        return True
+
+    if ch == "T":
+        count = 1
+        libmm.reload_module(player)
+        io.echo("Reloaded module for this object.")
+    elif ch == "P":
+        modulepath = getattr(player, "modulepath", None)
+        if modulepath is None:
+            io.echo("This object has no modulepath.", level="warn")
+            return False
+        count = libmm.reload_modulepath(modulepath)
+        io.echo(f"Reloaded {count} object(s) with modulepath={modulepath!r}.")
+    elif ch == "M":
+        modulepath: Optional[str] = io.inputstring(
+            "{var:promptcolor}modulepath: {var:inputcolor}",
+            noneok=True,
+        )
+        if modulepath is None or modulepath == "":
+            return True
+        count = libmm.reload_modulepath(modulepath)
+        io.echo(f"Reloaded {count} object(s) with modulepath={modulepath!r}.")
+    elif ch == "A":
+        count = libmm.reload_all_modules()
+        io.echo(f"Reloaded {count} object(s) total.")
 
     return True
