@@ -11,11 +11,13 @@ FIELDS = (
     "roomid",
     "turn",
     "moves",
+    "bodycount",
+    "points",
+    "died",
     "module",
     "membermoniker",
     "datelastplayed",
-    "points",
-    "bodycount",
+    "datecreated",
 )
 
 
@@ -419,7 +421,7 @@ def verifyPlayerNameNotFound(args, moniker: str, **kwargs: dict) -> bool:
 def build(args, rec: dict, **kwargs) -> Player:
     p = Player(args, **kwargs)
     for f in FIELDS:
-        setattr(p, f, rec[f])
+        setattr(p, f, rec.get(f))
     return p
 
 
