@@ -251,33 +251,28 @@ def create(args, **kwargs):
         )
 
         rec = b.buildrec()
-        io.echo(f"mm.boobytrap.create.120: {rec=}", level="debug")
+        io.echo(f"mm.boobytrap.create.110: {rec=}", level="debug")
 
-        database.insert(
+        database.upsert(
             args,
             f"{libmm.SCHEMA}.boobytrap",
             rec,
-            primarykey="name",
+            conflict_columns=["name"],
+            update_columns=["running", "timer"],
             mogrify=True,
             conn=conn,
         )
 
-        roomid = randomlib.randint(10, 140 - 10 + 1)
-        b.roomid = roomid
+        with database.cursor(conn) as cur:
+            sql = f"select * from {libmm.SCHEMA}.boobytrap where name=%s"
+            cur.execute(sql, (BOOBYTRAP_NAME,))
+            if cur.rowcount > 0:
+                rec = cur.fetchone()
+                b = build(args, rec, **kwargs)
+                return b
 
-        m = {}
-        m["itemname"] = BOOBYTRAP_NAME
-        m["roomid"] = roomid
-        database.insert(
-            args,
-            f"{libmm.SCHEMA}.map_item_room",
-            m,
-            returnid=False,
-            mogrify=True,
-            conn=conn,
-        )
-
-        return b
+        io.echo("mm.boobytrap.create.120: boobytrap table corrupted", level="error")
+        return False
 
     try:
         conn = kwargs.get("conn", None)

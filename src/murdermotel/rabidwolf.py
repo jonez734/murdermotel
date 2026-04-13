@@ -34,9 +34,7 @@ def load(args: argparse.Namespace, **kwargs) -> Optional[libmm.RabidWolf]:
             cur.execute(sql, dat)
             npc_exists = cur.rowcount > 0
             if npc_exists:
-                io.echo(
-                    "mm.rabidwolf.load.090: npc record exists", level="debug"
-                )
+                io.echo("mm.rabidwolf.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
@@ -77,27 +75,6 @@ def create(args: argparse.Namespace, **kwargs) -> libmm.RabidWolf | bool:
         return False
 
     def _work(conn):
-        with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
-            cur.execute(sql, (WOLF_NAME,))
-            if cur.rowcount > 0:
-                io.echo(
-                    "mm.rabidwolf.create.110: npc already exists, loading instead",
-                    level="debug",
-                )
-                with database.cursor(conn) as cur2:
-                    sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
-                    cur2.execute(sql, (WOLF_NAME,))
-                    if cur2.rowcount > 0:
-                        rec = cur2.fetchone()
-                        w = build(args, rec, **kwargs)
-                        return w
-                io.echo(
-                    "mm.rabidwolf.create.115: npc exists but rabidwolf table corrupted",
-                    level="error",
-                )
-                return False
-
         w = build(
             args,
             {"name": WOLF_NAME, "roomid": 10, "healthpoints": WOLF_HEALTH},
@@ -105,23 +82,35 @@ def create(args: argparse.Namespace, **kwargs) -> libmm.RabidWolf | bool:
         )
 
         rec = w.buildrec()
-        io.echo(f"mm.rabidwolf.create.120: {rec=}", level="debug")
+        io.echo(f"mm.rabidwolf.create.110: {rec=}", level="debug")
 
-        database.insert(
+        database.upsert(
             args,
             f"{libmm.SCHEMA}.rabidwolf",
             rec,
-            primarykey="name",
+            conflict_columns=["name"],
+            update_columns=["roomid", "healthpoints"],
             mogrify=True,
             conn=conn,
         )
 
         with database.cursor(conn) as cur:
-            sql = f"insert into {libmm.SCHEMA}.npc (name, kind, module, title) values (%s, %s, %s, %s)"
+            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, module, title)
+                      VALUES (%s, %s, %s, %s)
+                      ON CONFLICT (name) DO NOTHING"""
             dat = (WOLF_NAME, "rabidwolf", "rabidwolf", "The Rabid Wolf")
             cur.execute(sql, dat)
 
-        return w
+        with database.cursor(conn) as cur:
+            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
+            cur.execute(sql, (WOLF_NAME,))
+            if cur.rowcount > 0:
+                rec = cur.fetchone()
+                w = build(args, rec, **kwargs)
+                return w
+
+        io.echo("mm.rabidwolf.create.120: rabidwolf table corrupted", level="error")
+        return False
 
     try:
         conn = kwargs.get("conn", None)

@@ -1,4 +1,5 @@
 import random as randomlib
+
 from bbsengine6 import database, io, util
 
 from . import lib as libmm
@@ -28,9 +29,7 @@ def load(args, **kwargs):
             cur.execute(sql, dat)
             npc_exists = cur.rowcount > 0
             if npc_exists:
-                io.echo(
-                    "mm.thief.load.090: npc record exists", level="debug"
-                )
+                io.echo("mm.thief.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
@@ -44,9 +43,7 @@ def load(args, **kwargs):
                         level="debug",
                     )
                     return None
-                io.echo(
-                    "mm.thief.load.110: no thief found, can create", level="debug"
-                )
+                io.echo("mm.thief.load.110: no thief found, can create", level="debug")
                 return None
 
             rec = cur.fetchone()
@@ -116,28 +113,6 @@ def create(args, **kwargs):
         return False
 
     def _work(conn):
-        with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
-            cur.execute(sql, (THIEF_NAME,))
-            if cur.rowcount > 0:
-                io.echo(
-                    "mm.thief.create.110: npc already exists, loading instead",
-                    level="debug",
-                )
-                with database.cursor(conn) as cur2:
-                    sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
-                    cur2.execute(sql, (THIEF_NAME,))
-                    if cur2.rowcount > 0:
-                        rec = cur2.fetchone()
-                        t = build(args, rec, **kwargs)
-                        t.items = getitems(args, **kwargs)
-                        return t
-                io.echo(
-                    "mm.thief.create.115: npc exists but thief table corrupted",
-                    level="error",
-                )
-                return False
-
         t = build(
             args,
             {"name": THIEF_NAME, "bag": [], "roomid": 10, "healthpoints": THIEF_HEALTH},
@@ -145,23 +120,36 @@ def create(args, **kwargs):
         )
 
         rec = t.buildrec()
-        io.echo(f"mm.thief.create.120: {rec=}", level="debug")
+        io.echo(f"mm.thief.create.110: {rec=}", level="debug")
 
-        database.insert(
+        database.upsert(
             args,
             f"{libmm.SCHEMA}.thief",
             rec,
-            primarykey="name",
+            conflict_columns=["name"],
+            update_columns=["bag", "roomid", "healthpoints"],
             mogrify=True,
             conn=conn,
         )
 
         with database.cursor(conn) as cur:
-            sql = f"insert into {libmm.SCHEMA}.npc (name, kind, module, title) values (%s, %s, %s, %s)"
+            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, module, title)
+                      VALUES (%s, %s, %s, %s)
+                      ON CONFLICT (name) DO NOTHING"""
             dat = (THIEF_NAME, "thief", "thief", "The Thief")
             cur.execute(sql, dat)
 
-        return t
+        with database.cursor(conn) as cur:
+            sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
+            cur.execute(sql, (THIEF_NAME,))
+            if cur.rowcount > 0:
+                rec = cur.fetchone()
+                t = build(args, rec, **kwargs)
+                t.items = getitems(args, **kwargs)
+                return t
+
+        io.echo("mm.thief.create.120: thief table corrupted", level="error")
+        return False
 
     try:
         conn = kwargs.get("conn", None)

@@ -471,17 +471,39 @@ def create(args, playermoniker, **kwargs):
         rec["moniker"] = playermoniker
         rec["membermoniker"] = p.membermoniker
         rec["datecreated"] = "now()"
-        io.echo(f"{rec=}", level="debug")
+        io.echo(f"mm.player.create.110: {rec=}", level="debug")
 
-        database.insert(
+        database.upsert(
             args,
             f"{libmm.SCHEMA}.player",
             rec,
-            primarykey="moniker",
+            conflict_columns=["moniker"],
+            update_columns=[
+                "roomid",
+                "turn",
+                "moves",
+                "bodycount",
+                "points",
+                "died",
+                "module",
+                "membermoniker",
+                "datelastplayed",
+                "datecreated",
+            ],
             mogrify=True,
             conn=conn,
         )
-        return p
+
+        with database.cursor(conn) as cur:
+            sql = f"select * from {libmm.SCHEMA}.player where moniker=%s"
+            cur.execute(sql, (playermoniker,))
+            if cur.rowcount > 0:
+                rec = cur.fetchone()
+                p = load(args, rec, **kwargs)
+                return p
+
+        io.echo("mm.player.create.120: player table corrupted", level="error")
+        return False
 
     #    io.echo(f"player.new.100: {currentmembermoniker=}", level="debug")
 
