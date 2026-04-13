@@ -96,7 +96,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
     for name, data in items.items():
         i = lib.Item(args)
         i.name = name
-        i.type = data["type"]
+        i.type = data["kind"]
         i.title = data["title"]
         i.usemessages = data["usemessages"] if "usemessages" in data else []
         i.save()

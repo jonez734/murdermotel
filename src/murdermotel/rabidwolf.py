@@ -12,71 +12,18 @@ WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
 
 
-def init(args: argparse.Namespace, **kwargs: Any) -> bool:
+def access(
+    args: argparse.Namespace, op: str, obj=None, room=None, **kwargs: Any
+) -> bool:
     return True
 
 
-def access(args: argparse.Namespace, op: str, **kwargs: Any) -> bool:
+def init(args: argparse.Namespace, obj=None, room=None, **kwargs: Any) -> bool:
     return True
 
 
-def buildargs(
-    args: Optional[argparse.Namespace] = None, **kwargs: Any
-) -> Optional[str]:
+def buildargs(args, obj=None, room=None, **kwargs):
     return None
-
-
-def load(args: argparse.Namespace, **kwargs: Any) -> Optional[libmm.RabidWolf]:
-    def _work(conn):
-        with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
-            dat = (WOLF_NAME,)
-            cur.execute(sql, dat)
-            if cur.rowcount == 0:
-                io.echo(
-                    "mm.rabidwolf.load.100: no wolf found, creating one", level="debug"
-                )
-                return None
-
-            rec = cur.fetchone()
-            w = build(args, rec, **kwargs)
-            return w
-
-    conn = kwargs.get("conn", None)
-    if conn is None:
-        pool = kwargs.get("pool", None)
-        if pool is None:
-            io.echo(f"mm.rabidwolf.load.120: {pool=}", level="error")
-            return None
-        with database.connect(args, pool=pool) as conn:
-            return _work(conn)
-    return _work(conn)
-
-
-def save(args: argparse.Namespace, wolf: libmm.RabidWolf, **kwargs: Any) -> bool:
-    def _work(conn):
-        rec = wolf.buildrec()
-        database.update(
-            args,
-            f"{libmm.SCHEMA}.rabidwolf",
-            WOLF_NAME,
-            rec,
-            primarykey="name",
-            conn=conn,
-        )
-        return True
-
-    conn = kwargs.get("conn", None)
-    if conn is None:
-        pool = kwargs.get("pool", None)
-        if pool is None:
-            io.echo(f"mm.rabidwolf.save.100: {pool=}", level="error")
-            return False
-        with database.connect(args, pool=pool) as conn:
-            _work(conn)
-    else:
-        _work(conn)
-    return True
 
 
 def create(args: argparse.Namespace, **kwargs: Any) -> libmm.RabidWolf | bool:
@@ -173,7 +120,7 @@ def wolf_attack_player(
     player.save()
 
 
-def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
+def turn(args: argparse.Namespace, obj=None, room=None, **kwargs: Any) -> bool:
     player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")
@@ -183,8 +130,7 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
         )
         return False
 
-    wolf = kwargs.get("wolf", None)
-    if wolf is None:
+    if obj is None:
         io.echo("The wolf does not exist!")
         util.logentry(
             "murdermotel.rabidwolf.turn.120: wolf does not exist",
@@ -197,16 +143,16 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     if attacked:
         if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
-            wolf_attack_player(args, player, wolf, **kwargs)
+            wolf_attack_player(args, player, obj, **kwargs)
 
     if ignored:
         if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
-            io.echo(f"The {wolf.short()} attacks you!")
-            wolf_attack_player(args, player, wolf, **kwargs)
+            io.echo(f"The {obj.short()} attacks you!")
+            wolf_attack_player(args, player, obj, **kwargs)
 
     pool = kwargs.get("pool", None)
     if pool:
-        wolf.save()
+        obj.save()
 
     return True
 

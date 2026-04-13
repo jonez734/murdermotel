@@ -8,6 +8,18 @@ THIEF_NAME = "thief"
 THIEF_HEALTH = 35
 
 
+def access(args, op, **kwargs) -> bool:
+    return op in ("init", "run", "turn")
+
+
+def init(args, obj=None, room=None, **kwargs) -> bool:
+    return True
+
+
+def buildargs(args, obj=None, room=None, **kwargs):
+    return None
+
+
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
@@ -190,7 +202,7 @@ def build(args, rec, **kwargs):
     return t
 
 
-def turn(args, **kwargs):
+def turn(args, obj=None, room=None, **kwargs) -> bool:
     player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")
@@ -199,8 +211,7 @@ def turn(args, **kwargs):
         )
         return False
 
-    thief = kwargs.get("thief", None)
-    if thief is None:
+    if obj is None:
         io.echo("The thief does not exist!")
         util.logentry(
             "murdermotel.thief.main.120: thief does not exist", prg="murdermotel"
@@ -211,13 +222,13 @@ def turn(args, **kwargs):
     player.moves -= 5
 
     if util.diceroll(10) < 4:
-        stolen = steal_from_player(player, thief, **kwargs)
+        stolen = steal_from_player(player, obj, **kwargs)
         if stolen:
             io.echo(f"The thief stole {stolen.name} from you!")
 
     pool = kwargs.get("pool", None)
     if pool:
-        thief.save()
+        obj.save()
 
     player.save()
     return True

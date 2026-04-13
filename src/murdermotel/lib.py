@@ -127,6 +127,12 @@ class Item(object):
     def __init__(self, args):
         super().__init__()
         self.roomid = None
+        self.fields = ("type", "name", "title", "usemessages")
+        self.args = args
+        self.type = None
+        self.name = None
+        self.title = None
+        self.usemessages = []
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
         """Called each turn when in same room as player."""
@@ -136,6 +142,40 @@ class Item(object):
 
     def short(self):
         return "NEEDINFO.item"
+
+    def __repr__(self):
+        return f"{self.title} ({self.type})"
+
+    def save(self):
+        p = {}
+        for f in self.fields:
+            p[f] = getattr(self, f)
+
+        if self.args.debug is True:
+            io.echo(f"Item.save.100: p={p!r}", level="debug")
+
+        if self.args.debug is True:
+            io.echo("Item.save.140: trying update", level="debug")
+        res = database.update(
+            self.args, "murdermotel.item", self.name, p, primarykey="name", mogrify=True
+        )
+        io.echo(f"Item.save.120: res={res!r}", level="debug")
+        if res == 0:
+            if self.args.debug is True:
+                io.echo(
+                    f"Item.save.160: update failed, trying insert p={p!r}",
+                    level="debug",
+                )
+            database.insert(
+                self.args,
+                "murdermotel.item",
+                p,
+                primarykey="name",
+                returnid=False,
+                mogrify=True,
+            )
+        database.commit(self.args)
+        return True
 
 
 class RabidWolf(Living):
@@ -349,6 +389,8 @@ class Thief(Living):
 
 
 class Player(Living):
+    module: Optional[str] = "player"
+
     def __init__(self, args, **kwargs):
         super().__init__(args)
         self.fields = (
@@ -580,19 +622,6 @@ class Player(Living):
         return w + items
 
 
-currentplayer = None
-
-
-def setcurrentplayer(player):
-    global currentplayer
-    currentplayer = player
-
-
-def getcurrentplayer():
-    global currentplayer
-    return currentplayer
-
-
 class completeItemName(object):
     def __init__(self, args, **kwargs):
         self.roomid = kwargs["roomid"] if "roomid" in kwargs else None
@@ -637,50 +666,6 @@ class completeItemName(object):
 
         results = [x for x in vocab if x.startswith(text)] + [None]
         return results[state]
-
-
-class Item(object):
-    def __init__(self, args):
-        self.fields = ("type", "name", "title", "usemessages")
-        self.args = args
-        self.type = None
-        self.name = None  # primary key
-        self.title = None
-        self.usemessages = []
-
-    def __repr__(self):
-        return f"{self.title} ({self.type})"
-
-    def save(self):
-        p = {}
-        for f in self.fields:
-            p[f] = getattr(self, f)
-
-        if self.args.debug is True:
-            io.echo(f"Item.save.100: p={p!r}", level="debug")
-
-        if self.args.debug is True:
-            io.echo("Item.save.140: trying update", level="debug")
-        res = database.update(
-            self.args, "murdermotel.item", self.name, p, primarykey="name", mogrify=True
-        )
-        io.echo(f"Item.save.120: res={res!r}", level="debug")
-        if res == 0:
-            if self.args.debug is True:
-                io.echo(
-                    f"Item.save.160: update failed, trying insert p={p!r}",
-                    level="debug",
-                )
-            database.insert(
-                self.args,
-                "murdermotel.item",
-                p,
-                primarykey="name",
-                returnid=False,
-                mogrify=True,
-            )
-        database.commit(self.args)
-        return True
 
 
 def setarea(args, player, left, **kwargs):

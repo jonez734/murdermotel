@@ -21,6 +21,24 @@ FIELDS = (
 )
 
 
+def access(args, op, **kwargs) -> bool:
+    return op in ("init", "run", "turn")
+
+
+def init(args, obj=None, room=None, **kwargs) -> bool:
+    return True
+
+
+def buildargs(args, obj=None, room=None, **kwargs):
+    return None
+
+
+def turn(args, obj=None, room=None, **kwargs) -> bool:
+    if obj is None:
+        return False
+    return True
+
+
 class Player(object):
     args: argparse.Namespace
     moniker: str

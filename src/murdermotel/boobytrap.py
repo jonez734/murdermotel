@@ -9,6 +9,18 @@ BOOBYTRAP_NAME = "boobytrap"
 BOOBYTRAP_HEALTH = 20
 
 
+def access(args, op, **kwargs) -> bool:
+    return op in ("init", "run", "turn")
+
+
+def init(args, obj=None, room=None, **kwargs) -> bool:
+    return True
+
+
+def buildargs(args, obj=None, room=None, **kwargs):
+    return None
+
+
 class Item:
     module: str = None
 
@@ -321,9 +333,8 @@ def build(args, rec, **kwargs):
     return b
 
 
-def turn(args, **kwargs):
-    boobytrap = kwargs.get("boobytrap", None)
-    if boobytrap is None:
+def turn(args, obj=None, room=None, **kwargs) -> bool:
+    if obj is None:
         io.echo("The boobytrap does not exist!")
         util.logentry(
             "murdermotel.boobytrap.turn.100: boobytrap does not exist",
@@ -332,18 +343,18 @@ def turn(args, **kwargs):
         return False
 
     player = kwargs.get("player", None)
-    in_same_room = player is not None and player.roomid == boobytrap.roomid
+    in_same_room = player is not None and player.roomid == obj.roomid
 
-    if boobytrap.running:
-        boobytrap.timer -= 1
-        if boobytrap.timer <= 0:
+    if obj.running:
+        obj.timer -= 1
+        if obj.timer <= 0:
             if in_same_room:
                 io.echo("The boobytrap is triggered! It goes SNAP!")
                 if player:
                     player.moves -= 10
                     player.save()
-            boobytrap.running = False
-            boobytrap.timer = 0
+            obj.running = False
+            obj.timer = 0
     elif in_same_room:
         io.echo("There's a boobytrap here. It looks inactive.")
         if (
@@ -352,12 +363,12 @@ def turn(args, **kwargs):
             )
             is True
         ):
-            boobytrap.running = True
-            boobytrap.timer = 3
+            obj.running = True
+            obj.timer = 3
             io.echo("You set the boobytrap!")
 
     pool = kwargs.get("pool", None)
     if pool:
-        boobytrap.save()
+        obj.save()
 
     return True

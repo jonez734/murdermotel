@@ -15,7 +15,7 @@ def main(args, **kw):
     if args is not None and "debug" in args and args.debug is True:
         ttyio.echo("hotelsetup.main.100: args=%r" % (args))
 
-    player = lib.getcurrentplayer()
+    player = kw.get("player", None)
 
     done = False
     while not done:

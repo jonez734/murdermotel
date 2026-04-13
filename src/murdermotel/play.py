@@ -198,11 +198,13 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     tzlocal = dateutil.tz.tzlocal()
     player.datelastplayed = datetime.now(tzlocal)
+    player.module = "player"
 
     player.info()
     util.heading("playground")
 
     registry.clear()
+    registry.register(player)
 
     loaded_boobytrap = libboobytrap.load(args, **kwargs)
     if loaded_boobytrap is None:
@@ -216,6 +218,16 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     if loaded_wolf is None:
         loaded_wolf = libwolf.create(args, **kwargs)
     libmm.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
+
+    from bbsengine6 import module as bbsmodule
+
+    for obj in registry.all():
+        if hasattr(obj, "module") and obj.module:
+            modulename = f"murdermotel.{obj.module}"
+            if bbsmodule.check(args, modulename, op="init") is False:
+                io.echo(f"check failed for {obj.module}", level="error")
+                continue
+            bbsmodule.run(args, modulename, obj=obj, room=None, **kwargs)
 
     for obj in registry.all():
         health_info = (
@@ -283,21 +295,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
 
         for obj in registry.get_by_room(player.roomid):
             io.echo(f"{obj.short()}")
-            if hasattr(obj, "name") and obj.name == "wolf":
-                currentroomid: int = player.roomid
-                if (
-                    libmm.runsubmodule(args, "rabidwolf", room=room, wolf=obj, **kwargs)
-                    is False
-                ):
-                    io.echo("trouble running 'rabidwolf' prg")
-                    return False
-                if player.roomid != currentroomid:
-                    continue
             obj.on_turn(args, room=room, **kwargs)
-
-        for obj in registry.all():
-            if hasattr(obj, "name") and obj.name == "boobytrap":
-                obj.on_turn(args, room=room, **kwargs)
 
         if roomchange is True:
             continue
