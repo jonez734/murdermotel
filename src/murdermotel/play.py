@@ -345,8 +345,6 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             )
         )
 
-        for obj in registry.all():
-            io.echo(f"{obj.short()} roomid={obj.roomid}")
 
         options = "".join(sorted(options))
         ch: Optional[str] = io.inputchar(
