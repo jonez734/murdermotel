@@ -430,6 +430,9 @@ class Player(Living):
         buf = f"{self.moniker} ({status} {self.moves} {self.turn} {self.healthpoints})"
         return buf
 
+    def short(self):
+        return f":person: {self.moniker}"
+
     def weapons(self, items=None):
         if items is None:
             items = copy.deepcopy(self.items)

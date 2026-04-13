@@ -317,7 +317,7 @@ def exists(args, **kwargs) -> bool:
 def build(args, rec, **kwargs):
     pool = kwargs.get("pool", None)
     roomid = kwargs.get("roomid", None)
-    b = libmm.BoobyTrap(args, pool=pool)
+    b = BoobyTrap(args, pool=pool)
     b.name = rec.get("name", BOOBYTRAP_NAME)
     b.running = rec.get("running", False)
     b.timer = rec.get("timer", 0)

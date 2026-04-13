@@ -209,7 +209,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     loaded_boobytrap = libboobytrap.load(args, **kwargs)
     if loaded_boobytrap is None:
         loaded_boobytrap = libboobytrap.create(args, **kwargs)
-    libmm.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
+    libboobytrap.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
     loaded_thief = libthief.load(args, **kwargs)
     if loaded_thief is None:
         loaded_thief = libthief.create(args, **kwargs)

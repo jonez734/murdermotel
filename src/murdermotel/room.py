@@ -45,6 +45,9 @@ class Room(object):
         self.table = "murdermotel.playground"
         self.pool = kwargs.get("pool", None)
 
+    def short(self) -> str:
+        return self.title or f"Room {self.id}" if self.id else "Room"
+
     def buildrec(self):
         rec = {}
         for f in FIELDS:

@@ -84,10 +84,18 @@ class Player(object):
             buf += "%s=%r " % (f, getattr(self, f))
         return buf
 
+    def on_turn(self, args, room=None, **kwargs) -> bool:
+        if self.module:
+            return libmm.runmodule(args, self, "turn", room=room, **kwargs)
+        return True
+
     def __str__(self):
         status = "alive" if self.moves > 0 else "dead"
         buf = f"{self.moniker} ({status} {self.moves} {self.turn})"
         return buf
+
+    def short(self) -> str:
+        return f":person: {self.moniker}"
 
     def buildrec(self, **kwargs):
         rec = {}
