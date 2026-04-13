@@ -21,6 +21,10 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
+def main(args, **kwargs) -> bool:
+    return True
+
+
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:

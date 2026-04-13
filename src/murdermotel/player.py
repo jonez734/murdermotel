@@ -1,5 +1,6 @@
 import argparse
 import copy
+import datetime
 from typing import Any, Optional
 
 from bbsengine6 import member, database, io, util
@@ -33,6 +34,10 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
+def main(args, **kwargs) -> bool:
+    return True
+
+
 def turn(args, obj=None, room=None, **kwargs) -> bool:
     if obj is None:
         return False
@@ -44,7 +49,7 @@ class Player(object):
     moniker: str
     turn: int
     moves: int
-    datelastplayed: str
+    datelastplayed: datetime.datetime
     items: list
     isdirty: bool
     points: int
@@ -54,14 +59,14 @@ class Player(object):
     pool: Any
     roomid: Optional[int]
     exits: dict
-    datecreated: Optional[str]
+    datecreated: Optional[datetime.datetime]
 
     def __init__(self, args, **kwargs):
         self.args = args
         self.moniker = member.getcurrentmoniker(args)
         self.turn = 1
         self.moves = libmm.DEFAULTMOVESPERTURN
-        self.datelastplayed = "now()"
+        self.datelastplayed = datetime.datetime.now(datetime.timezone.utc)
         self.items = []
         self.isdirty = False
         self.points = 0
@@ -465,12 +470,12 @@ def create(args, playermoniker, **kwargs):
         p = Player(args, pool=pool)
         p.moniker = playermoniker
         p.membermoniker = member.getcurrentmoniker(args, **kwargs)
-        p.datecreated = "now()"
+        p.datecreated = datetime.datetime.now(datetime.timezone.utc)
 
         rec = p.buildrec()
         rec["moniker"] = playermoniker
         rec["membermoniker"] = p.membermoniker
-        rec["datecreated"] = "now()"
+        rec["datecreated"] = datetime.datetime.now(datetime.timezone.utc)
         io.echo(f"mm.player.create.110: {rec=}", level="debug")
 
         database.upsert(
@@ -499,7 +504,7 @@ def create(args, playermoniker, **kwargs):
             cur.execute(sql, (playermoniker,))
             if cur.rowcount > 0:
                 rec = cur.fetchone()
-                p = load(args, rec, **kwargs)
+                p = load(args, playermoniker, **kwargs)
                 return p
 
         io.echo("mm.player.create.120: player table corrupted", level="error")

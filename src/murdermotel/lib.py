@@ -715,6 +715,10 @@ def init(args=None):
     return True
 
 
+def access(args, op, **kwargs) -> bool:
+    return op in ("init", "run", "turn", "buildargs")
+
+
 # @since 20220813
 def runsubmodule(args, submodule, **kwargs):
     #  io.echo("mudermotel.lib.runsubmodule.120: trace") # , level="debug", end="\n")
@@ -835,6 +839,10 @@ def buildargs(args=None, **kwargs):
     }
     database.buildargdatabasegroup(parser, defaults, suppress=True)
     return parser
+
+
+def main(args, **kwargs) -> bool:
+    return True
 
 
 def getitemcount(args, **kwargs):

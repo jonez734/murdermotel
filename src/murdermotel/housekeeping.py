@@ -11,6 +11,10 @@ def access(args, op, **kw):
     return bbsengine.checksysop(args)
 
 
+def buildargs(args, **kw):
+    return None
+
+
 def main(args, **kw):
     if args is not None and "debug" in args and args.debug is True:
         ttyio.echo("hotelsetup.main.100: args=%r" % (args))

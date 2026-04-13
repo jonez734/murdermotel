@@ -21,6 +21,9 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
+def main(args, **kwargs):
+    return True
+
 class Item:
     module: str = None
 
