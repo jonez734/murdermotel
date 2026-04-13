@@ -1,7 +1,7 @@
 --\echo item
 create table if not exists murdermotel.item (
     "name" citext unique not null primary key,
-    "kind" text not null check (kind in ('weapon', 'boobytrap')),
+    "kind" text not null check (kind in ('component', 'defense', 'boobytrap', 'item')),
     "title" text,
     "module" text,
     "state" jsonb,

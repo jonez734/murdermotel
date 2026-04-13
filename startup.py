@@ -27,7 +27,7 @@ def main(args, **kwargs):
                         "THUCK! WHACK! THUCK! You hack away and finish",
                         "You butcher",
                     ],
-                    "type": "component",
+                    "type": "weapon",
                 },
                 "pistol": {
                     "title": "pistol",
@@ -36,7 +36,7 @@ def main(args, **kwargs):
                         "BANG! BANG! You gun down the vermin called",
                         "You take aim and shoot",
                     ],
-                    "type": "component",
+                    "type": "weapon",
                 },
                 "chlorinegas": {
                     "title": "chlorine gas",
@@ -45,7 +45,7 @@ def main(args, **kwargs):
                         "The chlorine spews out and asphyxiates your mortal enemy",
                         "You gas",
                     ],
-                    "type": "component",
+                    "type": "weapon",
                 },
                 "flamethrower": {
                     "title": "flame thrower",
@@ -54,7 +54,7 @@ def main(args, **kwargs):
                         "You pull out your flame thrower and fry",
                         "Heat and light burst from the flame gun as you cook",
                     ],
-                    "type": "component",
+                    "type": "weapon",
                 },
                 "industrialacid": {
                     "title": "industrial acid",
@@ -63,18 +63,18 @@ def main(args, **kwargs):
                         "You pump the acid sprayer furiously and disolve",
                         "The acid hisses from the nozzle of your sprayer. It liquifies",
                     ],
-                    "type": "component",
+                    "type": "weapon",
                 },
-                "axehandle": {"title": "axe handle", "type": "component"},
-                "bullets": {"title": "bullets", "type": "component"},
-                "gassprayer": {"title": "gas sprayer", "type": "component"},
-                "lighterfluid": {"title": "lighter fluid", "type": "component"},
-                "acidsprayer": {"title": "acid sprayer", "type": "component"},
-                "riotshield": {"title": "riot shield", "type": "defense"},
-                "flakjacket": {"title": "flak jacket", "type": "defense"},
-                "gasmask": {"title": "gas mask", "type": "defense"},
-                "fireextinguisher": {"title": "fire extinguisher", "type": "defense"},
-                "lye": {"title": "lye", "type": "defense"},
+                "axehandle": {"title": "axe handle", "type": "weapon"},
+                "bullets": {"title": "bullets", "type": "weapon"},
+                "gassprayer": {"title": "gas sprayer", "type": "weapon"},
+                "lighterfluid": {"title": "lighter fluid", "type": "weapon"},
+                "acidsprayer": {"title": "acid sprayer", "type": "weapon"},
+                "riotshield": {"title": "riot shield", "type": "weapon"},
+                "flakjacket": {"title": "flak jacket", "type": "weapon"},
+                "gasmask": {"title": "gas mask", "type": "weapon"},
+                "fireextinguisher": {"title": "fire extinguisher", "type": "weapon"},
+                "lye": {"title": "lye", "type": "weapon"},
                 "boobytrap": {
                     "title": "booby trap",
                     "type": "boobytrap",
@@ -88,10 +88,9 @@ def main(args, **kwargs):
 
             for name, data in ITEMS.items():
                 rec = {}
-                rec["type"] = data.get("type", "item")
+                rec["kind"] = data.get("type", "item")
                 rec["name"] = name
                 rec["title"] = data.get("title", name)
-                rec["type"] = data.get("type", None)
                 rec["module"] = data.get("module", None)
                 rec["state"] = database.Jsonb(
                     {"usemessages": data.get("usemessages", None)}

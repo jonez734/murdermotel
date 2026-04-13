@@ -91,7 +91,6 @@ def main(args, **kwargs):
                 rec["kind"] = data.get("kind", "item")
                 rec["name"] = name
                 rec["title"] = data.get("title", name)
-                rec["kind"] = data.get("kind", None)
                 rec["module"] = data.get("module", None)
                 rec["state"] = database.Jsonb(
                     {"usemessages": data.get("usemessages", None)}
