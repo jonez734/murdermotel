@@ -178,7 +178,7 @@ class Player(object):
                     )
             return True
 
-        conn = kwargs.get("conn", None) or self.conn
+        conn = kwargs.get("conn", None)
         if conn is None:
             if self.pool is None:
                 io.echo(f"mm.player.save.120: {self.pool=}", level="error")
@@ -409,9 +409,6 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
 
 
 def verifyPlayerNameNotFound(args, moniker: str, **kwargs: dict) -> bool:
-    import argparse
-
-    args = kwargs.get("args", argparse.Namespace())
 
     def _work(conn):
         sql: str = f"select 1 from {libmm.SCHEMA}.player where moniker=%s"
