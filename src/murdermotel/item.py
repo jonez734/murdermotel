@@ -2,7 +2,7 @@ from bbsengine6 import database, io
 
 from . import lib as libmm
 
-FIELDS = ("type", "module", "name", "title", "module", "state")
+FIELDS = ("kind", "module", "name", "title", "module", "state")
 
 
 def init(args, **kwargs):
@@ -12,7 +12,7 @@ def init(args, **kwargs):
 class Item(object):
     def __init__(self, args, **kwargs):
         self.args = args
-        self.type = "item"
+        self.kind = "item"
         self.module = "item"
         self.name = "name"
         self.title = self.name

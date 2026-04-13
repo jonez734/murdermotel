@@ -26,7 +26,7 @@ PostgreSQL schema for the Murder Motel game. Uses explicit joins instead of tabl
 
 | Table | Parent | Additional Columns |
 |-------|--------|---------------------|
-| `murdermotel.wolf` | `npc` | `strength`, `roomid`, `healthpoints` |
+| `murdermotel.rabidwolf` | `npc` | `roomid`, `healthpoints` |
 | `murdermotel.thief` | `npc` | `bag` (citext[]), `roomid`, `healthpoints` |
 
 ### Mapping Tables

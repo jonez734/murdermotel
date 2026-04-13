@@ -143,7 +143,7 @@ def getitems(args, roomid, **kwargs):
                 i = libitem.Item(args)
                 i.name = rec["name"]
                 i.title = rec["title"]
-                i.type = rec["type"]
+                i.kind = rec["kind"]
                 i.usemessages = rec["usemessages"] if "usemessages" in rec else []
                 items.append(i)
         return items

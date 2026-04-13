@@ -15,13 +15,13 @@ def buildargs(args, **kw):
 
 def main(args, **kw):
     dbh = database.connect(args)
-    sql = "select item.type, item.name, playground.roomid, playground.title as playgroundtitle, item.title as itemtitle from murdermotel.map_item_room as map, murdermotel.item as item, murdermotel.playground where map.roomid = playground.roomid and map.itemname = item.name and item.type = 'component' order by item.name asc"
+    sql = "select item.kind, item.name, playground.roomid, playground.title as playgroundtitle, item.title as itemtitle from murdermotel.map_item_room as map, murdermotel.item as item, murdermotel.playground where map.roomid = playground.roomid and map.itemname = item.name and item.kind = 'component' order by item.name asc"
     dat = []
     cur = dbh.cursor()
     cur.execute(sql, dat)
     for rec in database.resultiter(cur):
         io.echo(
-            f"{rec['name']} ({rec['type']}) is {rec['playgroundtitle']} (#{rec['roomid']})"
+            f"{rec['name']} ({rec['kind']}) is {rec['playgroundtitle']} (#{rec['roomid']})"
         )
         # ttyio.echo(f"{rec!r}", level="debug")
     return True

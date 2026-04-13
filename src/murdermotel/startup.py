@@ -27,7 +27,7 @@ def main(args, **kwargs):
                         "THUCK! WHACK! THUCK! You hack away and finish",
                         "You butcher",
                     ],
-                    "type": "component",
+                    "kind": "component",
                 },
                 "pistol": {
                     "title": "pistol",
@@ -36,7 +36,7 @@ def main(args, **kwargs):
                         "BANG! BANG! You gun down the vermin called",
                         "You take aim and shoot",
                     ],
-                    "type": "component",
+                    "kind": "component",
                 },
                 "chlorinegas": {
                     "title": "chlorine gas",
@@ -45,7 +45,7 @@ def main(args, **kwargs):
                         "The chlorine spews out and asphyxiates your mortal enemy",
                         "You gas",
                     ],
-                    "type": "component",
+                    "kind": "component",
                 },
                 "flamethrower": {
                     "title": "flame thrower",
@@ -54,7 +54,7 @@ def main(args, **kwargs):
                         "You pull out your flame thrower and fry",
                         "Heat and light burst from the flame gun as you cook",
                     ],
-                    "type": "component",
+                    "kind": "component",
                 },
                 "industrialacid": {
                     "title": "industrial acid",
@@ -63,35 +63,35 @@ def main(args, **kwargs):
                         "You pump the acid sprayer furiously and disolve",
                         "The acid hisses from the nozzle of your sprayer. It liquifies",
                     ],
-                    "type": "component",
+                    "kind": "component",
                 },
-                "axehandle": {"title": "axe handle", "type": "component"},
-                "bullets": {"title": "bullets", "type": "component"},
-                "gassprayer": {"title": "gas sprayer", "type": "component"},
-                "lighterfluid": {"title": "lighter fluid", "type": "component"},
-                "acidsprayer": {"title": "acid sprayer", "type": "component"},
-                "riotshield": {"title": "riot shield", "type": "defense"},
-                "flakjacket": {"title": "flak jacket", "type": "defense"},
-                "gasmask": {"title": "gas mask", "type": "defense"},
-                "fireextinguisher": {"title": "fire extinguisher", "type": "defense"},
-                "lye": {"title": "lye", "type": "defense"},
+                "axehandle": {"title": "axe handle", "kind": "component"},
+                "bullets": {"title": "bullets", "kind": "component"},
+                "gassprayer": {"title": "gas sprayer", "kind": "component"},
+                "lighterfluid": {"title": "lighter fluid", "kind": "component"},
+                "acidsprayer": {"title": "acid sprayer", "kind": "component"},
+                "riotshield": {"title": "riot shield", "kind": "defense"},
+                "flakjacket": {"title": "flak jacket", "kind": "defense"},
+                "gasmask": {"title": "gas mask", "kind": "defense"},
+                "fireextinguisher": {"title": "fire extinguisher", "kind": "defense"},
+                "lye": {"title": "lye", "kind": "defense"},
                 "boobytrap": {
                     "title": "booby trap",
-                    "type": "boobytrap",
+                    "kind": "boobytrap",
                     "module": "boobytrap",
                 },
             }
 
-            if libitem.getcount(args, conn=conn) > 0:
+            if (libitem.getcount(args, conn=conn) or 0) > 0:
                 io.echo("SKIP", level="warn")
                 return True
 
             for name, data in ITEMS.items():
                 rec = {}
-                rec["type"] = data.get("type", "item")
+                rec["kind"] = data.get("kind", "item")
                 rec["name"] = name
                 rec["title"] = data.get("title", name)
-                rec["type"] = data.get("type", None)
+                rec["kind"] = data.get("kind", None)
                 rec["module"] = data.get("module", None)
                 rec["state"] = database.Jsonb(
                     {"usemessages": data.get("usemessages", None)}
@@ -106,6 +106,11 @@ def main(args, **kwargs):
                 (f"{libmm.SCHEMA}.playground", "playground.sql"),
                 (f"{libmm.SCHEMA}.item", "item.sql"),
                 (f"{libmm.SCHEMA}.npc", "npc.sql"),
+                (f"{libmm.SCHEMA}.defense", "defense.sql"),
+                (f"{libmm.SCHEMA}.weapon", "weapon.sql"),
+                (f"{libmm.SCHEMA}.boobytrap", "boobytrap.sql"),
+                (f"{libmm.SCHEMA}.thief", "thief.sql"),
+                (f"{libmm.SCHEMA}.rabidwolf", "rabidwolf.sql"),
             )
 
             failcount = 0
@@ -148,6 +153,29 @@ def main(args, **kwargs):
             return _work(conn)
 
         def _npcs(args, **kwargs):
+            NPCs = {
+                "thief": {
+                    "kind": "thief",
+                    "title": "The Sneaky Thief",
+                    "module": "thief",
+                },
+                "rabidwolf": {
+                    "kind": "wolf",
+                    "title": "Rabid Wolf",
+                    "module": "rabidwolf",
+                },
+            }
+
+            for name, data in NPCs.items():
+                rec = {}
+                rec["name"] = name
+                rec["kind"] = data.get("kind")
+                rec["title"] = data.get("title", name)
+                rec["module"] = data.get("module", None)
+                rec["state"] = database.Jsonb({})
+                database.insert(
+                    args, f"{libmm.SCHEMA}.npc", rec, conn=conn, primarykey="name"
+                )
             return True
 
         def _rooms(args, **kwargs):
@@ -297,6 +325,7 @@ def main(args, **kwargs):
 
         if failcount > 0:
             io.echo(" startup failed ", level="error")
+            conn.rollback()
             return False
         conn.commit()
         return True
