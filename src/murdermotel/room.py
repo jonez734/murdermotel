@@ -122,7 +122,7 @@ def load(args, roomid, **kwargs):
 
             rec = cur.fetchone()
             if rec is None:
-                io.echo("unable to fetch playground record {roomid=}", level="error")
+                io.echo(f"room {roomid} does not exist. Use 'lrooms' or 'arooms' to list available rooms.", level="error")
                 return False
 
             r = Room(args, **kwargs)
