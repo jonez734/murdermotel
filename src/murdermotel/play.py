@@ -273,6 +273,8 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         if not room:
             io.echo("your room does not exist! go away!", level="error")
             return False
+
+        room.on_turn(args, room=room, player=player, **kwargs)
         if args.debug is True:
             io.echo(f"mm.play.220: {room.exits=}", level="debug")
 
@@ -347,7 +349,6 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             )
         )
 
-
         options = "".join(sorted(options))
         ch: Optional[str] = io.inputchar(
             f"{{var:promptcolor}}playground: [{options}]: {{var:inputcolor}}",
@@ -374,22 +375,94 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 continue
         elif ch == "N":
             io.echo("north")
-            player.roomid = room.exits["north"]
+            if room.exits["north"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["north"]
         elif ch == "S":
             io.echo("south")
-            player.roomid = room.exits["south"]
+            if room.exits["south"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["south"]
         elif ch == "E":
             io.echo("east")
-            player.roomid = room.exits["east"]
+            if room.exits["east"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["east"]
         elif ch == "W":
             io.echo("west")
-            player.roomid = room.exits["west"]
+            if room.exits["west"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["west"]
         elif ch == "U":
             io.echo("up")
-            player.roomid = room.exits["up"]
+            if room.exits["up"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["up"]
         elif ch == "D":
             io.echo("down")
-            player.roomid = room.exits["down"]
+            if room.exits["down"] == player.roomid:
+                result = room.on_turn(args, room=room, player=player, **kwargs)
+                if result is False:
+                    io.echo("You are trapped in the glowing sphere! Try again...")
+                    continue
+                player.roomid = (
+                    libmm.runmodule(
+                        args, room, "escape", room=room, player=player, **kwargs
+                    )
+                    or player.roomid
+                )
+            else:
+                player.roomid = room.exits["down"]
         elif ch == "M":
             floor: int = io.inputinteger(
                 "map - {var:promptcolor}floor (1-5): {var:inputcolor}"

@@ -4,7 +4,7 @@ import random
 from typing import Optional
 
 from bbsengine6 import io, database, util, member, screen, module
-from . import player as libplayer, room as libroom, boobytrap as libboobytrap
+from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 
 BoobyTrap = libboobytrap.BoobyTrap
 
@@ -45,11 +45,21 @@ registry = ObjectRegistry()
 
 
 class Obj(object):
+    modulepath = None
+
     def __init__(self, args):
         self.args = args
         self.table = "murdermotel.player"
         self.fields = ()
         self.classname = self.__class__.__name__
+
+    def on_turn(self, args, room=None, **kwargs):
+        if self.modulepath:
+            return runmodule(args, self, "turn", room=room, **kwargs)
+        return True
+
+    def short(self) -> str:
+        return f"{self.classname}"
 
     def load(self, name) -> bool:
         if self.args.debug is True:
@@ -104,41 +114,24 @@ class Obj(object):
         return True
 
 
-class Living(object):
-    modulepath: Optional[str] = None
-
+class Living(Obj):
     def __init__(self, args):
-        self.args = args
+        super().__init__(args)
         self.roomid = None
-
-    def on_turn(self, args, room=None, **kwargs) -> bool:
-        """Called each turn when in same room as player."""
-        if self.modulepath:
-            return runmodule(args, self, "turn", room=room, **kwargs)
-        return True
 
     def short(self):
         return "NEEDINFO.living"
 
 
-class Item(object):
-    modulepath: Optional[str] = None
-
+class Item(Obj):
     def __init__(self, args):
-        super().__init__()
+        super().__init__(args)
         self.roomid = None
         self.fields = ("type", "name", "title", "usemessages")
-        self.args = args
         self.type = None
         self.name = None
         self.title = None
         self.usemessages = []
-
-    def on_turn(self, args, room=None, **kwargs) -> bool:
-        """Called each turn when in same room as player."""
-        if self.modulepath:
-            return runmodule(args, self, "turn", room=room, **kwargs)
-        return True
 
     def short(self):
         return "NEEDINFO.item"
@@ -692,7 +685,11 @@ def setarea(args, player, left, **kwargs):
             if player.roomid is not None:
                 room = f" | room #{player.roomid}"
                 currentroom = libroom.load(args, player.roomid, **kwargs)
-                if currentroom is not None and currentroom.shortname is not None:
+                if currentroom is False:
+                    io.echo(f"{player.roomid=} does not exist!", level="error")
+                    return False
+
+                if currentroom and currentroom.shortname is not None:
                     room += " " + currentroom.shortname
             else:
                 room = ""
@@ -775,7 +772,9 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     if hasattr(obj, "module") and obj.module is not None:
         m = obj.module
         if debug is True:
-            io.echo(f"lib.runmodule.110: using cached module {modulename}", level="debug")
+            io.echo(
+                f"lib.runmodule.110: using cached module {modulename}", level="debug"
+            )
     else:
         try:
             m = __import__(

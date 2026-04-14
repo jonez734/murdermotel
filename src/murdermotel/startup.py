@@ -9,6 +9,10 @@ from . import lib as libmm, room as libroom
 
 _SQL_PACKAGE = "murdermotel.data.sql"
 
+_ROOM_MODULEPATHS = {
+    128: "inside_glowing_sphere",
+}
+
 # Tables to create, in dependency order.
 _TABLES = (
     (f"{libmm.SCHEMA}.player", "player.sql"),
@@ -201,6 +205,13 @@ def _populate_rooms(args, **kwargs) -> bool:
                     primarykey="id",
                     conn=conn,
                 )
+                if roomid in _ROOM_MODULEPATHS:
+                    database.execute(
+                        args,
+                        f"UPDATE {libmm.SCHEMA}.playground SET modulepath = %s WHERE id = %s",
+                        (_ROOM_MODULEPATHS[roomid], roomid),
+                        conn=conn,
+                    )
                 roomid += 1
         return True
 

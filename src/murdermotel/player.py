@@ -1,7 +1,6 @@
 import argparse
 import copy
 import datetime
-from typing import Any, Optional
 
 from bbsengine6 import member, database, io, util
 
@@ -45,24 +44,10 @@ def turn(args, obj=None, room=None, **kwargs) -> bool:
 
 
 class Player(object):
-    args: argparse.Namespace
-    moniker: str
-    turn: int
-    moves: int
-    datelastplayed: datetime.datetime
-    items: list
-    isdirty: bool
-    points: int
-    bodycount: int
-    module: Optional[str]
-    membermoniker: Optional[str]
-    pool: Any
-    roomid: Optional[int]
-    exits: dict
-    datecreated: Optional[datetime.datetime]
-
     def __init__(self, args, **kwargs):
         self.args = args
+        self.roomid = None
+        self.modulepath = None
         self.moniker = member.getcurrentmoniker(args)
         self.turn = 1
         self.moves = libmm.DEFAULTMOVESPERTURN
@@ -71,10 +56,8 @@ class Player(object):
         self.isdirty = False
         self.points = 0
         self.bodycount = 0
-        self.modulepath = None
         self.membermoniker = None
         self.pool = kwargs.get("pool", None)
-        self.roomid = None
         self.exits = {}
         self.datecreated = None
 
@@ -84,7 +67,7 @@ class Player(object):
             buf += "%s=%r " % (f, getattr(self, f))
         return buf
 
-    def on_turn(self, args, room=None, **kwargs) -> bool:
+    def on_turn(self, args, room=None, **kwargs):
         if self.modulepath:
             return libmm.runmodule(args, self, "turn", room=room, **kwargs)
         return True

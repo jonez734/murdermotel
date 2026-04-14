@@ -1,6 +1,3 @@
-import argparse
-from typing import Any, Optional
-
 from bbsengine6 import database, io
 
 from . import item as libitem, lib as libmm
@@ -26,17 +23,9 @@ def main(args, **kwargs) -> bool:
 
 
 class Room(object):
-    args: argparse.Namespace
-    shortname: Optional[str]
-    id: Optional[int]
-    title: Optional[str]
-    items: list
-    exits: dict
-    table: str
-    pool: Any
-
-    def __init__(self, args, **kwargs):  # , name, location, description):
+    def __init__(self, args, **kwargs):
         self.args = args
+        self.modulepath = None
         self.shortname = None
         self.id = None
         self.title = None
@@ -44,6 +33,12 @@ class Room(object):
         self.exits = {}
         self.table = "murdermotel.playground"
         self.pool = kwargs.get("pool", None)
+        self.fields = ("shortname", "title", "description", "modulepath")
+
+    def on_turn(self, args, room=None, **kwargs):
+        if self.modulepath:
+            return libmm.runmodule(args, self, "turn", room=room, **kwargs)
+        return True
 
     def short(self) -> str:
         return self.title or f"Room {self.id}" if self.id else "Room"
@@ -122,7 +117,10 @@ def load(args, roomid, **kwargs):
 
             rec = cur.fetchone()
             if rec is None:
-                io.echo(f"room {roomid} does not exist. Use 'lrooms' or 'arooms' to list available rooms.", level="error")
+                io.echo(
+                    f"room {roomid} does not exist. Use 'lrooms' or 'arooms' to list available rooms.",
+                    level="error",
+                )
                 return False
 
             r = Room(args, **kwargs)
