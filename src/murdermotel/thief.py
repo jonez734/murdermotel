@@ -137,7 +137,7 @@ def create(args, **kwargs):
         )
 
         with database.cursor(conn) as cur:
-            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, module, title)
+            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, modulepath, title)
                       VALUES (%s, %s, %s, %s)
                       ON CONFLICT (name) DO NOTHING"""
             dat = (THIEF_NAME, "thief", "thief", "The Thief")

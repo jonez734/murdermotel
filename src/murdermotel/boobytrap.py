@@ -46,21 +46,21 @@ class BoobyTrap(Item):
         self.healthpoints = 20
         self.running = False
         self.timer = 0
-        self.conn = kwargs.get("conn", None)
-        self.pool = kwargs.get("pool", None)
-        if self.pool:
-            loaded = kwargs.get("loaded_boobytrap", None)
-            if loaded:
-                self.roomid = loaded.roomid
-                self.running = loaded.running
-                self.timer = loaded.timer
-            else:
-                self.roomid = randomlib.randint(10, 140 - 10 + 1)
-        else:
-            self.roomid = randomlib.randint(10, 140 - 10 + 1)
         self.playerid = None
         self.kind = "boobytrap"
         self.modulepath = "boobytrap"
+
+        self.conn = kwargs.get("conn", None)
+        self.pool = kwargs.get("pool", None)
+
+        loaded = kwargs.get("loaded_boobytrap", None)
+        if loaded:
+            self.roomid = loaded.roomid
+            self.running = loaded.running
+            self.timer = loaded.timer
+        else:
+            self.roomid = randomlib.randint(10, 140 - 10 + 1)
+
         libmm.registry.register(self)
 
     def short(self):

@@ -77,8 +77,8 @@ def main(args, **kwargs):
                 "lye": {"title": "lye", "type": "weapon"},
                 "boobytrap": {
                     "title": "booby trap",
-                    "type": "boobytrap",
-                    "module": "boobytrap",
+                    "kind": "boobytrap",
+                    "modulepath": "boobytrap",
                 },
             }
 
@@ -88,10 +88,10 @@ def main(args, **kwargs):
 
             for name, data in ITEMS.items():
                 rec = {}
-                rec["kind"] = data.get("type", "item")
+                rec["kind"] = data.get("kind", "item")
                 rec["name"] = name
                 rec["title"] = data.get("title", name)
-                rec["module"] = data.get("module", None)
+                rec["modulepath"] = data.get("modulepath", None)
                 rec["state"] = database.Jsonb(
                     {"usemessages": data.get("usemessages", None)}
                 )

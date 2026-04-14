@@ -12,3 +12,5 @@ create table if not exists murdermotel.playground (
     up bigint, --constraint fk_playground_up references murdermotel.playground(roomid) on update cascade on delete set null,
     down bigint --constraint fk_playground_down references murdermotel.playground(roomid) on update cascade on delete set null
 );
+
+alter table if exists murdermotel.playground add column if not exists modulepath text;
