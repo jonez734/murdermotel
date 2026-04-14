@@ -117,17 +117,20 @@ def load(args, roomid, **kwargs):
             cur.execute(sql, dat)
             if cur.rowcount == 0:
                 if args.debug is True:
-                    io.echo(f"unable to load room {roomid!r}", level="error")
+                    io.echo(f"unable to load room {roomid=}", level="error")
                     return False
 
             rec = cur.fetchone()
+            if rec is None:
+                io.echo("unable to fetch playground record {roomid=}", level="error")
+                return False
 
             r = Room(args, **kwargs)
             for f in FIELDS:
-                setattr(r, f, rec[f])
+                setattr(r, f, rec.get(f))
             r.items = getitems(args, r.id, **kwargs)
             for f in EXITS:
-                r.exits[f] = rec[f]
+                r.exits[f] = rec.get(f)
 
             return r
 
