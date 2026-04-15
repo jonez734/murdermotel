@@ -174,7 +174,8 @@ def wolf_attack_player(
     player.save()
 
 
-def turn(args: argparse.Namespace, obj=None, room=None, **kwargs: Any) -> bool:
+def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
+    obj = kwargs.get("obj")
     player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")

@@ -25,7 +25,8 @@ def main(args, **kwargs) -> bool:
     return True
 
 
-def turn(args, obj=None, room=None, **kwargs):
+def turn(args, **kwargs):
+    obj = kwargs.get("obj")
 ##    io.echo(f"murdermotel.inside_glowing....100: called", level="debug")
     player = kwargs.get("player")
     if not player:
@@ -47,7 +48,7 @@ def turn(args, obj=None, room=None, **kwargs):
     return False
 
 
-def escape(args, obj=None, room=None, **kwargs):
+def escape(args, **kwargs):
     """Return random room ID 11-(max-10) for escape."""
     from . import room as libroom
     import random

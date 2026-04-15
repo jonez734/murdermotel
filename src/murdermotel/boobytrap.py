@@ -326,7 +326,8 @@ def build(args, rec, **kwargs):
     return b
 
 
-def turn(args, obj=None, room=None, **kwargs) -> bool:
+def turn(args, **kwargs) -> bool:
+    obj = kwargs.get("obj")
     if obj is None:
         io.echo("The boobytrap does not exist!")
         util.logentry(

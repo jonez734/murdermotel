@@ -37,7 +37,8 @@ def main(args, **kwargs) -> bool:
     return True
 
 
-def turn(args, obj=None, room=None, **kwargs) -> bool:
+def turn(args, **kwargs) -> bool:
+    obj = kwargs.get("obj")
     if obj is None:
         return False
     return True

@@ -17,6 +17,14 @@ PLAYGROUNDSIZE = 140
 MAXITEMSPERPLAYER = 5
 
 
+def _stub_turn(args: argparse.Namespace, /, **kwargs: dict) -> bool | None:
+    pass
+
+
+def _stub_escape(args: argparse.Namespace, /, **kwargs: dict) -> int | None:
+    pass
+
+
 class ObjectRegistry:
     """Registry for active game objects (NPCs, items) that need turn processing."""
 
@@ -733,30 +741,26 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     """
     Run an external module operation on a Living or Item object.
 
-    If obj.modulepath is set, loads that module and calls the specified operation.
-    If obj.modulepath is None, returns True (no custom module).
+    Delegates to bbsengine6.module for standard operations (init, access, buildargs, main).
+    Uses module.check() for validation and module.check_func() for optional operations (turn, escape).
 
-    If obj is a string (module name), delegates to bbsengine6's runmodule.
-
-    Extended ABI (in addition to standard bbsengine6 module ABI):
-        init(args, obj, room, **kwargs) -> bool
-        access(args, op, obj, room, **kwargs) -> bool
-        buildargs(args, obj, room, **kwargs) -> argparse.ArgumentParser
-        main(args, obj, room, **kwargs) -> bool
-        turn(args, obj, room, **kwargs) -> bool  # called each turn
-        escape(args, obj, room, **kwargs) -> Any  # return new room ID
+    Passes obj and room via kwargs for modules to retrieve:
+        obj = kwargs.get("obj")
+        room = kwargs.get("room")
 
     Args:
         args: argparse.Namespace
         obj: Living or Item object with .modulepath attribute OR module name string
-        operation: str - one of 'init', 'access', 'buildargs', 'main', 'turn'
+        operation: str - one of 'init', 'access', 'buildargs', 'main', 'turn', 'escape'
         room: Optional[Room] - the current room
         **kwargs: additional arguments
 
     Returns:
         bool - True if successful, False on error
-        For 'buildargs', returns argparse.ArgumentParser or None
     """
+    kwargs["obj"] = obj
+    kwargs["room"] = room
+
     if isinstance(obj, str):
         return module.runmodule(args, f"{PACKAGENAME}.{obj}", **kwargs)
 
@@ -770,62 +774,28 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
 
     modulename = f"{PACKAGENAME}.{obj.modulepath}"
 
-    if hasattr(obj, "module") and obj.module is not None:
-        m = obj.module
-        if debug is True:
-            io.echo(
-                f"lib.runmodule.110: using cached module {modulename}", level="debug"
-            )
-    else:
-        try:
-            m = __import__(
-                modulename, fromlist=["init", "access", "buildargs", "main", "turn", "escape"]
-            )
-            obj.module = m
-        except ModuleNotFoundError:
-            io.echo(f"module {modulename!r} not found", level="error")
-            return False
-        except Exception:
-            io.echo_traceback(f"lib.runmodule: import {modulename}")
-            return False
+    if operation == "turn" or operation == "escape":
+        m = module.get(modulename, args)
+        if operation == "turn":
+            if not module.check_func(m, "turn", _stub_turn, silent=True):
+                if debug is True:
+                    io.echo(f"{modulename} has no turn()", level="debug")
+                return True
+            return module.runcallback(args, m.turn, **kwargs)
+        if operation == "escape":
+            if not hasattr(m, "escape"):
+                if debug is True:
+                    io.echo(f"{modulename} has no escape()", level="debug")
+                return True
+            if not module.check_func(m, "escape", _stub_escape):
+                io.echo(f"{modulename}.escape() signature invalid", level="error")
+                return False
+            return module.runcallback(args, m.escape, **kwargs)
 
-    if not hasattr(m, operation):
-        if debug is True:
-            io.echo(f"module {modulename} has no {operation}()", level="debug")
-        return True
-
-    func = getattr(m, operation)
-    if not callable(func):
-        io.echo(f"{modulename}.{operation} is not callable", level="error")
+    if not module.check(args, modulename, **kwargs):
         return False
 
-    try:
-        if operation == "init":
-            result = func(args, obj=obj, room=room, **kwargs)
-        elif operation == "access":
-            op = kwargs.get("op", "run")
-            result = func(args, op, obj=obj, room=room, **kwargs)
-        elif operation == "buildargs":
-            result = func(args, obj=obj, room=room, **kwargs)
-        elif operation == "main":
-            result = func(args, obj=obj, room=room, **kwargs)
-        elif operation == "turn":
-            result = func(args, obj=obj, room=room, **kwargs)
-        elif operation == "escape":
-            result = func(args, obj=obj, room=room, **kwargs)
-        else:
-            io.echo(f"unknown operation: {operation}", level="error")
-            return False
-    except Exception:
-        io.echo_traceback(f"lib.runmodule: {modulename}.{operation}()")
-        return False
-
-    if debug is True:
-        io.echo(
-            f"lib.runmodule.200: {modulename}.{operation}() = {result}", level="debug"
-        )
-
-    return result if result is not None else True
+    return module.runmodule(args, modulename, **kwargs)
 
 
 def buildargs(args=None, **kwargs):

@@ -233,7 +233,8 @@ def build(args, rec, **kwargs):
     return t
 
 
-def turn(args, obj=None, room=None, **kwargs) -> bool:
+def turn(args, **kwargs) -> bool:
+    obj = kwargs.get("obj")
     player = kwargs.get("player", None)
     if player is None:
         io.echo("You do not exist! Go Away!")
