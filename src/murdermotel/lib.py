@@ -744,6 +744,7 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
         buildargs(args, obj, room, **kwargs) -> argparse.ArgumentParser
         main(args, obj, room, **kwargs) -> bool
         turn(args, obj, room, **kwargs) -> bool  # called each turn
+        escape(args, obj, room, **kwargs) -> Any  # return new room ID
 
     Args:
         args: argparse.Namespace
@@ -778,7 +779,7 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     else:
         try:
             m = __import__(
-                modulename, fromlist=["init", "access", "buildargs", "main", "turn"]
+                modulename, fromlist=["init", "access", "buildargs", "main", "turn", "escape"]
             )
             obj.module = m
         except ModuleNotFoundError:
@@ -809,6 +810,8 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
         elif operation == "main":
             result = func(args, obj=obj, room=room, **kwargs)
         elif operation == "turn":
+            result = func(args, obj=obj, room=room, **kwargs)
+        elif operation == "escape":
             result = func(args, obj=obj, room=room, **kwargs)
         else:
             io.echo(f"unknown operation: {operation}", level="error")
