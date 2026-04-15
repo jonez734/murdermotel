@@ -36,6 +36,7 @@ class Room(object):
         self.fields = ("shortname", "title", "description", "modulepath")
 
     def on_turn(self, args, room=None, **kwargs):
+        io.echo(f"mm.room.on_turn.100: calling .turn()", level="debug")
         if self.modulepath:
             return libmm.runmodule(args, self, "turn", room=room, **kwargs)
         return True

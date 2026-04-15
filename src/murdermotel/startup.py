@@ -193,10 +193,18 @@ def _populate_rooms(args, **kwargs) -> bool:
                 if m is None:
                     io.echo(f"no match: {line!r} (roomid={roomid})", level="debug")
                     continue
-                room = {"id": roomid, "title": m.group("title").lower()}
+
+                if roomid in _ROOM_MODULEPATHS:
+                    modulepath = _ROOM_MODULEPATHS[roomid]
+                else:
+                    modulepath = None
+                room = {"id": roomid, "title": m.group("title").lower(), "modulepath":modulepath}
                 for direction in ("north", "south", "east", "west", "up", "down"):
                     val = int(m.group(direction))
-                    room[direction] = val if val != 0 else None
+                    if val == 150:
+                        room[direction] = roomid
+                    else:
+                        room[direction] = val if val != 0 else None
                 io.echo(f"{room=}", level="debug")
                 database.insert(
                     args,
@@ -204,14 +212,8 @@ def _populate_rooms(args, **kwargs) -> bool:
                     room,
                     primarykey="id",
                     conn=conn,
+                    commit=True,
                 )
-                if roomid in _ROOM_MODULEPATHS:
-                    database.execute(
-                        args,
-                        f"UPDATE {libmm.SCHEMA}.playground SET modulepath = %s WHERE id = %s",
-                        (_ROOM_MODULEPATHS[roomid], roomid),
-                        conn=conn,
-                    )
                 roomid += 1
         return True
 
