@@ -382,7 +382,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )
@@ -397,7 +397,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )
@@ -412,7 +412,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )
@@ -427,7 +427,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )
@@ -442,7 +442,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )
@@ -457,7 +457,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                     continue
                 player.roomid = (
                     libmm.runmodule(
-                        args, room, "escape", room=room, player=player, **kwargs
+                        args, room.modulepath, obj=room, room=room, player=player, operation="escape", **kwargs
                     )
                     or player.roomid
                 )

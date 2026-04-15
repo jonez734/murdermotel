@@ -63,7 +63,7 @@ class Obj(object):
 
     def on_turn(self, args, room=None, **kwargs):
         if self.modulepath:
-            return runmodule(args, self, "turn", room=room, **kwargs)
+            return runmodule(args, self.modulepath, obj=self, room=room, operation="turn", **kwargs)
         return True
 
     def short(self) -> str:
@@ -737,67 +737,48 @@ def runsubmodule(args, submodule, **kwargs):
 
 
 # @since 20260410
-def runmodule(args, obj, operation=None, room=None, **kwargs):
+def runmodule(args, modulename: str, **kwargs: dict):
     """
-    Run an external module operation on a Living or Item object.
+    Run an external module by name, delegating to bbsengine6.module.
 
-    Delegates to bbsengine6.module for standard operations (init, access, buildargs, main).
-    Uses module.check() for validation and module.check_func() for optional operations (turn, escape).
+    Passes all context via kwargs:
+        obj = kwargs.get("obj")      # Living or Item object
+        room = kwargs.get("room")    # Room object
+        player = kwargs.get("player")  # Player object
+        operation = kwargs.get("operation")  # "run", "turn", "escape", etc.
 
-    Passes obj and room via kwargs for modules to retrieve:
-        obj = kwargs.get("obj")
-        room = kwargs.get("room")
+    For turn/escape operations, calls the appropriate function directly.
+    For standard module operations (init, access, buildargs, main), delegates to bbsengine6.module.
 
     Args:
         args: argparse.Namespace
-        obj: Living or Item object with .modulepath attribute OR module name string
-        operation: str - one of 'init', 'access', 'buildargs', 'main', 'turn', 'escape'
-        room: Optional[Room] - the current room
-        **kwargs: additional arguments
+        modulename: str - module name (e.g., "player", "thief", "lobby")
+        **kwargs: additional arguments including obj, room, player, operation
 
     Returns:
         bool - True if successful, False on error
     """
-    if "obj" not in kwargs:
-        kwargs["obj"] = obj
-    if "room" not in kwargs:
-        kwargs["room"] = room
+    fullname = f"{PACKAGENAME}.{modulename}"
 
-    if isinstance(obj, str):
-        return module.runmodule(args, f"{PACKAGENAME}.{obj}", **kwargs)
+    debug = getattr(args, "debug", False) if args else False
+    if debug:
+        io.echo(f"lib.runmodule.100: {fullname=}", level="debug")
 
-    if obj.modulepath is None:
-        return True
+    operation = kwargs.get("operation")
 
-    debug = args.debug if hasattr(args, "debug") and args.debug else False
+    if operation in ("turn", "escape"):
+        m = module.get(fullname, args)
+        func = getattr(m, operation, None)
+        if func is None:
+            if debug:
+                io.echo(f"{fullname} has no {operation}()", level="debug")
+            return True
+        return module.runcallback(args, func, **kwargs)
 
-    if debug is True:
-        io.echo(f"lib.runmodule.100: {obj.modulepath=} {operation=}", level="debug")
-
-    modulename = f"{PACKAGENAME}.{obj.modulepath}"
-
-    if operation == "turn" or operation == "escape":
-        m = module.get(modulename, args)
-        if operation == "turn":
-            if not module.check_func(m, "turn", _stub_turn, silent=True):
-                if debug is True:
-                    io.echo(f"{modulename} has no turn()", level="debug")
-                return True
-            return module.runcallback(args, m.turn, **kwargs)
-        if operation == "escape":
-            if not hasattr(m, "escape"):
-                if debug is True:
-                    io.echo(f"{modulename} has no escape()", level="debug")
-                return True
-            if not module.check_func(m, "escape", _stub_escape):
-                io.echo(f"{modulename}.escape() signature invalid", level="error")
-                return False
-            return module.runcallback(args, m.escape, **kwargs)
-
-    if not module.check(args, modulename, **kwargs):
+    if not module.check(args, fullname, **kwargs):
         return False
 
-    return module.runmodule(args, modulename, **kwargs)
+    return module.runmodule(args, fullname, **kwargs)
 
 
 def buildargs(args=None, **kwargs):

@@ -70,7 +70,7 @@ class Player(object):
 
     def on_turn(self, args, room=None, **kwargs):
         if self.modulepath:
-            return libmm.runmodule(args, self, "turn", room=room, **kwargs)
+            return libmm.runmodule(args, self.modulepath, obj=self, room=room, operation="turn", **kwargs)
         return True
 
     def __str__(self):
