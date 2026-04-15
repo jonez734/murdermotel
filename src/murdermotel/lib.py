@@ -758,8 +758,10 @@ def runmodule(args, obj, operation=None, room=None, **kwargs):
     Returns:
         bool - True if successful, False on error
     """
-    kwargs["obj"] = obj
-    kwargs["room"] = room
+    if "obj" not in kwargs:
+        kwargs["obj"] = obj
+    if "room" not in kwargs:
+        kwargs["room"] = room
 
     if isinstance(obj, str):
         return module.runmodule(args, f"{PACKAGENAME}.{obj}", **kwargs)
