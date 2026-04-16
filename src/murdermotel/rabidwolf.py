@@ -1,15 +1,121 @@
 import argparse
 import random as randomlib
+import random
 from typing import Any, Optional
 
 from bbsengine6 import database, io, util
 
 from . import lib as libmm
+from . import room as libroom
+from .obj import Living, registry
 
 
 WOLF_NAME = "rabidwolf"
 WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
+SCHEMA = "murdermotel"
+
+
+class RabidWolf(Living):
+    def __init__(self, args, **kwargs):
+        super().__init__(args)
+        self.name = "wolf"
+        self.healthpoints = 35
+        self.conn = kwargs.get("conn", None)
+        self.pool = kwargs.get("pool", None)
+        if self.pool:
+            loaded = kwargs.get("loaded_wolf", None)
+            if loaded:
+                self.roomid = loaded.roomid
+                self.healthpoints = loaded.healthpoints
+            else:
+                self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
+        else:
+            self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
+        self.modulepath = None
+        registry.register(self)
+
+    def short(self):
+        return ":wolf: rabid wolf"
+
+    def buildrec(self, **kwargs):
+        rec = {}
+        rec["name"] = self.name
+        rec["roomid"] = self.roomid
+        rec["healthpoints"] = self.healthpoints
+        return rec
+
+    def on_turn(self, args, room=None, **kwargs) -> bool:
+        import random as randomlib
+
+        player = kwargs.get("player", None)
+        if player is None:
+            io.echo("You do not exist! Go Away!")
+            util.logentry(
+                "murdermotel.rabidwolf.turn.100: player does not exist",
+                logger_name="murdermotel",
+            )
+            return False
+
+        attacked = kwargs.get("attacked", False)
+        ignored = kwargs.get("ignored", False)
+
+        if attacked:
+            if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
+                damage = randomlib.randint(1, 10) + 10
+                io.echo(f"damage={damage}", level="debug")
+                io.echo(
+                    f"The {self.short()} claws you for {util.pluralize(damage, 'move', 'moves')}"
+                )
+                player.moves -= damage
+                if player.moves < 0:
+                    player.moves = 0
+                    io.echo("You are out of moves. You are dead.")
+                player.save()
+
+        if ignored:
+            if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
+                io.echo(f"The {self.short()} attacks you!")
+                damage = randomlib.randint(1, 10) + 10
+                io.echo(f"damage={damage}", level="debug")
+                io.echo(
+                    f"The {self.short()} claws you for {util.pluralize(damage, 'move', 'moves')}"
+                )
+                player.moves -= damage
+                if player.moves < 0:
+                    player.moves = 0
+                    io.echo("You are out of moves. You are dead.")
+                player.save()
+
+        pool = getattr(self, "pool", None)
+        if pool:
+            self.save()
+
+            return True
+
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            rec = self.buildrec()
+            database.update(
+                self.args,
+                f"{libmm.SCHEMA}.rabidwolf",
+                self.name,
+                rec,
+                primarykey="name",
+                conn=conn,
+            )
+            return True
+
+        conn = kwargs.get("conn", None) or self.conn
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.RabidWolf.save.100: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                _work(conn)
+        else:
+            _work(conn)
+        return True
 
 
 def access(

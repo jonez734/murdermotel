@@ -14,7 +14,6 @@ from . import (
     rabidwolf as libwolf,
     boobytrap as libboobytrap,
 )
-from .lib import registry
 
 
 def init(args: argparse.Namespace, **kwargs: Any) -> bool:
@@ -205,8 +204,8 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player.info()
     util.heading("playground")
 
-    registry.clear()
-    registry.register(player)
+    libmm.registry.clear()
+    libmm.registry.register(player)
 
     loaded_boobytrap = libboobytrap.load(args, **kwargs)
     if loaded_boobytrap is None:
@@ -219,11 +218,11 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     loaded_wolf = libwolf.load(args, **kwargs)
     if loaded_wolf is None:
         loaded_wolf = libwolf.create(args, **kwargs)
-    libmm.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
+    libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
     from bbsengine6 import module as bbsmodule
 
-    for obj in registry.all():
+    for obj in libmm.registry.all():
         if hasattr(obj, "module") and obj.module:
             modulename = f"murdermotel.{obj.module}"
             if bbsmodule.check(args, modulename, op="init") is False:
@@ -231,7 +230,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 continue
             bbsmodule.run(args, modulename, obj=obj, room=None, **kwargs)
 
-    for obj in registry.all():
+    for obj in libmm.registry.all():
         health_info = (
             f" health={obj.healthpoints}" if hasattr(obj, "healthpoints") else ""
         )
@@ -297,7 +296,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             value = util.oxfordcomma(items)
             io.echo(f"{{var:labelcolor}}player {label}: {{var:valuecolor}}{value}")
 
-        for obj in registry.get_by_room(player.roomid):
+        for obj in libmm.registry.get_by_room(player.roomid):
             io.echo(f"{obj.short()}")
             obj.on_turn(args, room=room, **kwargs)
 
@@ -526,7 +525,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.moves -= 1
         player.save()
         room.save()
-        for obj in registry.all():
+        for obj in libmm.registry.all():
             if hasattr(obj, "name"):
                 if obj.name == "thief":
                     obj.save(**kwargs)
