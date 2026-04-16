@@ -210,15 +210,18 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     loaded_boobytrap = libboobytrap.load(args, **kwargs)
     if loaded_boobytrap is None:
         loaded_boobytrap = libboobytrap.create(args, **kwargs)
-    libboobytrap.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
+    if libmm.registry.get_by_name("boobytrap") is None:
+        libboobytrap.BoobyTrap(args, loaded_boobytrap=loaded_boobytrap, **kwargs)
     loaded_thief = libthief.load(args, **kwargs)
     if loaded_thief is None:
         loaded_thief = libthief.create(args, **kwargs)
-    libthief.Thief(args, loaded_thief=loaded_thief, **kwargs)
+    if libmm.registry.get_by_name("thief") is None:
+        libthief.Thief(args, loaded_thief=loaded_thief, **kwargs)
     loaded_wolf = libwolf.load(args, **kwargs)
     if loaded_wolf is None:
         loaded_wolf = libwolf.create(args, **kwargs)
-    libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
+    if libmm.registry.get_by_name("rabidwolf") is None:
+        libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
     from bbsengine6 import module as bbsmodule
 
