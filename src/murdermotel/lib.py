@@ -86,56 +86,80 @@ class Obj(object):
     def short(self) -> str:
         return f"{self.classname}"
 
-    def load(self, name) -> bool:
-        if self.args.debug is True:
-            io.echo(f"{name}.load({self.classname})", level="debug")
-        sql = f"select * from {self.table} where moniker=%s"
-        dat = (name,)
-        dbh = database.connect(self.args)
-        cur = dbh.cursor()
-        #    ttyio.echo("%s.load.100: %r" % (self.classname, cur.mogrify(sql, dat)), level="debug")
-        cur.execute(sql, dat)
-        if cur.rowcount == 0:
-            io.echo(f"unable to load record {name!r}", level="error")
-            return False
-
-        rec = cur.fetchone()
-        for f in self.fields:
-            setattr(self, f, rec[f])
-
-        return True
-
-    def save(self):
-        p = {}
-        for f in self.fields:
-            p[f] = getattr(self, f)
-
-        io.echo(f"{self.classname}.save.100: p={p!r}", level="debug")
-
-        dbh = database.connect(self.args)
-        if self.args.debug is True:
-            io.echo(f"{self.classname}.save.120: trying update", level="debug")
-        res = database.update(
-            self.args, self.table, self.name, p, primarykey="moniker", mogrify=True
-        )
-        if self.args.debug is True:
-            io.echo(f"{self.classname}.save.140: res={res!r}", level="debug")
-        if res == 0:
+    def load(self, name, **kwargs) -> bool:
+        def _work(conn):
             if self.args.debug is True:
-                io.echo(
-                    f"{self.classname}.save.160: update failed, trying insert. p={p!r}",
-                    level="debug",
-                )
-            database.insert(
+                io.echo(f"{name}.load({self.classname})", level="debug")
+            sql = f"select * from {self.table} where moniker=%s"
+            dat = (name,)
+            with database.cursor(conn) as cur:
+                cur.execute(sql, dat)
+                if cur.rowcount == 0:
+                    io.echo(f"unable to load record {name!r}", level="error")
+                    return False
+                rec = cur.fetchone()
+                for f in self.fields:
+                    setattr(self, f, rec[f])
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            pool = kwargs.get("pool", None)
+            if pool is None:
+                io.echo(f"{self.classname}.load.100: pool is None", level="error")
+                return False
+            with database.connect(self.args, pool=pool) as conn:
+                return _work(conn)
+        return _work(conn)
+
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            p = {}
+            for f in self.fields:
+                p[f] = getattr(self, f)
+            io.echo(f"{self.classname}.save.100: p={p!r}", level="debug")
+
+            if self.args.debug is True:
+                io.echo(f"{self.classname}.save.120: trying update", level="debug")
+            res = database.update(
                 self.args,
                 self.table,
+                self.name,
                 p,
-                primarykey="name",
-                returnid=False,
+                primarykey="moniker",
                 mogrify=True,
+                conn=conn,
             )
+            if self.args.debug is True:
+                io.echo(f"{self.classname}.save.140: res={res!r}", level="debug")
+            if res == 0:
+                if self.args.debug is True:
+                    io.echo(
+                        f"{self.classname}.save.160: update failed, trying insert. p={p!r}",
+                        level="debug",
+                    )
+                database.insert(
+                    self.args,
+                    self.table,
+                    p,
+                    primarykey="name",
+                    returnid=False,
+                    mogrify=True,
+                    conn=conn,
+                )
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            pool = kwargs.get("pool", None)
+            if pool is None:
+                io.echo(f"{self.classname}.save.100: pool is None", level="error")
+                return False
+            with database.connect(self.args, pool=pool) as conn:
+                _work(conn)
+        else:
+            _work(conn)
         self.isdirty = False
-        dbh.commit()
         return True
 
 
@@ -164,35 +188,54 @@ class Item(Obj):
     def __repr__(self):
         return f"{self.title} ({self.type})"
 
-    def save(self):
-        p = {}
-        for f in self.fields:
-            p[f] = getattr(self, f)
+    def save(self, **kwargs) -> bool:
+        def _work(conn):
+            p = {}
+            for f in self.fields:
+                p[f] = getattr(self, f)
 
-        if self.args.debug is True:
-            io.echo(f"Item.save.100: p={p!r}", level="debug")
-
-        if self.args.debug is True:
-            io.echo("Item.save.140: trying update", level="debug")
-        res = database.update(
-            self.args, "murdermotel.item", self.name, p, primarykey="name", mogrify=True
-        )
-        io.echo(f"Item.save.120: res={res!r}", level="debug")
-        if res == 0:
             if self.args.debug is True:
-                io.echo(
-                    f"Item.save.160: update failed, trying insert p={p!r}",
-                    level="debug",
-                )
-            database.insert(
+                io.echo(f"Item.save.100: p={p!r}", level="debug")
+
+            if self.args.debug is True:
+                io.echo("Item.save.140: trying update", level="debug")
+            res = database.update(
                 self.args,
                 "murdermotel.item",
+                self.name,
                 p,
                 primarykey="name",
-                returnid=False,
                 mogrify=True,
+                conn=conn,
             )
-        database.commit(self.args)
+            io.echo(f"Item.save.120: res={res!r}", level="debug")
+            if res == 0:
+                if self.args.debug is True:
+                    io.echo(
+                        f"Item.save.160: update failed, trying insert p={p!r}",
+                        level="debug",
+                    )
+                database.insert(
+                    self.args,
+                    "murdermotel.item",
+                    p,
+                    primarykey="name",
+                    returnid=False,
+                    mogrify=True,
+                    conn=conn,
+                )
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            pool = kwargs.get("pool", None)
+            if pool is None:
+                io.echo("Item.save.100: pool is None", level="error")
+                return False
+            with database.connect(self.args, pool=pool) as conn:
+                _work(conn)
+        else:
+            _work(conn)
         return True
 
 
@@ -649,7 +692,7 @@ class completeItemName(object):
         self.playermoniker = (
             kwargs["playermoniker"] if "playermoniker" in kwargs else None
         )
-
+        self.pool = kwargs.get("pool", None)
         self.args = args
 
         if self.args.debug is True:
@@ -675,15 +718,19 @@ class completeItemName(object):
             sql = "select name from murdermotel.item as i"
             dat = ()
 
-        dbh = database.connect(self.args)
-        cur = dbh.cursor()
-        if self.args.debug is True:
-            io.echo(f"completeItemName.120: mogrify={cur.mogrify(sql, dat)!r}")
-        cur.execute(sql, dat)
+        if self.pool is None:
+            io.echo("completeItemName.120: pool is None", level="error")
+            return [None]
 
-        vocab = []
-        for rec in util.resultiter(cur):
-            vocab.append(rec["name"])
+        with database.connect(self.args, pool=self.pool) as conn:
+            with database.cursor(conn) as cur:
+                if self.args.debug is True:
+                    io.echo(f"completeItemName.120: mogrify={cur.mogrify(sql, dat)!r}")
+                cur.execute(sql, dat)
+
+                vocab = []
+                for rec in util.resultiter(cur):
+                    vocab.append(rec["name"])
 
         results = [x for x in vocab if x.startswith(text)] + [None]
         return results[state]

@@ -55,15 +55,13 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
     import random
     from bbsengine6 import screen
 
-    dbh = database.connect(args)
-
     step = 0
 
     screen.updateprogress(step, total)
 
     sql = "select count(name) from murdermotel.item"
-    cur = dbh.cursor()
-    cur.execute(sql)
+    with database.cursor(conn) as cur:
+        cur.execute(sql)
 
     screen.updateprogress(step, total)
     step += 1
@@ -78,20 +76,21 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         ):
             return False
 
-    sql = "delete from murdermotel.item"
-    cur.execute(sql)
-    screen.updateprogress(step, total)
-    step += 1
+    with database.cursor(conn) as cur:
+        sql = "delete from murdermotel.item"
+        cur.execute(sql)
+        screen.updateprogress(step, total)
+        step += 1
 
-    sql = "delete from murdermotel.map_item_player"
-    cur.execute(sql)
-    screen.updateprogress(step, total)
-    step += 1
+        sql = "delete from murdermotel.map_item_player"
+        cur.execute(sql)
+        screen.updateprogress(step, total)
+        step += 1
 
-    sql = "delete from murdermotel.map_item_room"
-    cur.execute(sql)
-    screen.updateprogress(step, total)
-    step += 1
+        sql = "delete from murdermotel.map_item_room"
+        cur.execute(sql)
+        screen.updateprogress(step, total)
+        step += 1
 
     for name, data in items.items():
         i = lib.Item(args)
@@ -99,7 +98,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         i.type = data["kind"]
         i.title = data["title"]
         i.usemessages = data["usemessages"] if "usemessages" in data else []
-        i.save()
+        i.save(conn=conn)
 
         step += 1
         screen.updateprogress(step, total)
@@ -108,24 +107,18 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
 
     for x in range(0, 6):
         for name in items.keys():
-            map = {}
-            map["roomid"] = random.randint(10, kk - 10)
-            map["itemname"] = name
+            m = {}
+            m["roomid"] = random.randint(10, kk - 10)
+            m["itemname"] = name
 
             database.insert(
-                args, "murdermotel.map_item_room", map, mogrify=True, returnid=False
+                args, "murdermotel.map_item_room", m, mogrify=True, returnid=False, conn=conn
             )
 
     screen.updateprogress(step, total)
     step += 1
 
-    #  for x in range(0, 90+1):
-    #    roomid = random.randint(10, kk-10)
-    #    i = lib.Item(args)
-    #    ttyio.echo("t=%r" % (t))
-    #    ttyio.echo("randint=%r" % (random.randint(10, kk-10)))
-    dbh.commit()
-    #  bbsengine.updateprogress(total, total)
+    conn.commit()
     io.echo("OK.{f6}reticulation of splines completed")
     io.echo("{var:promptcolor}press any key: ", end="", flush=True)
     io.getch()
