@@ -36,7 +36,7 @@ def main(args, **kwargs):
     if args.debug is True:
         io.echo(f"mm.lobby.100: {name=}", level="debug")
 
-    if libmm.runmodule(args, "startup", **kwargs) is False:
+    if libmm.runmodule(args, "run", "startup", **kwargs) is False:
         io.echo("failed to start up", level="error")
         return False
 
@@ -82,14 +82,14 @@ def main(args, **kwargs):
             break
         elif ch == "M":
             io.echo("Maintenance")
-            res = libmm.runmodule(args, "maintenance", **kwargs)
+            res = libmm.runmodule(args, "run", "maintenance", **kwargs)
         elif ch == "H":
             io.echo("Housekeeping")
-            res = libmm.runmodule(args, "housekeeping", **kwargs)
+            res = libmm.runmodule(args, "run", "housekeeping", **kwargs)
         elif ch == "P":
             io.echo("Play!")
             res = libmm.runmodule(
-                args, "play", **kwargs
+                args, "run", "play", **kwargs
             )  # bbsengine.module.runsubmodule(args, "murdermotel.play", player=player)
             io.echo(f"end play! {res=}")
         else:

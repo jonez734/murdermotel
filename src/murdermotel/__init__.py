@@ -16,5 +16,5 @@ def buildargs(args, **kw: dict) -> bool:
 
 def main(args, **kw: dict):
     util.heading("murder motel")
-    lib.runmodule(args, "lobby")
+    lib.runmodule(args, "run", "lobby")
     return True

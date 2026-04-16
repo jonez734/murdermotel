@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     with database.getpool(args) as pool:
         try:
-            libmm.runmodule(args, "lobby", pool=pool)
+            libmm.runmodule(args, "run", "lobby", pool=pool)
         except KeyboardInterrupt:
             io.echo("{/all}*INTR*")
         except EOFError:
