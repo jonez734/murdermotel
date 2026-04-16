@@ -737,7 +737,7 @@ def runsubmodule(args, submodule, **kwargs):
 
 
 # @since 20260410
-def runmodule(args, operation: str, modulename: str, **kwargs: dict):
+def runmodule(args, op: str, modulename: str, **kwargs: dict):
     """
     Run an external module by name, delegating to bbsengine6.module.
 
@@ -748,7 +748,7 @@ def runmodule(args, operation: str, modulename: str, **kwargs: dict):
 
     Args:
         args: argparse.Namespace
-        operation: str - "run", "turn", "escape", etc.
+        op: str - "run", "turn", "escape", etc.
         modulename: str - module name (e.g., "player", "thief", "lobby")
         **kwargs: additional arguments including obj, room, player
 
@@ -759,18 +759,18 @@ def runmodule(args, operation: str, modulename: str, **kwargs: dict):
 
     debug = getattr(args, "debug", False) if args else False
     if debug:
-        io.echo(f"lib.runmodule.100: {operation=} {fullname=}", level="debug")
+        io.echo(f"lib.runmodule.100: {op=} {fullname=}", level="debug")
 
-    kwargs["operation"] = operation
+    kwargs["operation"] = op
 
-    if operation in ("turn", "escape"):
+    if op in ("turn", "escape"):
         m = module.get(fullname, args)
-        stub = _stub_turn if operation == "turn" else _stub_escape
-        if not module.check_func(m, operation, stub, silent=True):
+        stub = _stub_turn if op == "turn" else _stub_escape
+        if not module.check_func(m, op, stub, silent=True):
             if debug:
-                io.echo(f"{fullname} has no {operation}()", level="debug")
+                io.echo(f"{fullname} has no {op}()", level="debug")
             return True
-        func = getattr(m, operation)
+        func = getattr(m, op)
         return module.runcallback(args, func, **kwargs)
 
     if not module.check(args, fullname, **kwargs):
