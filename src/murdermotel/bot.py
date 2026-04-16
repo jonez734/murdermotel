@@ -381,10 +381,10 @@ def exists(args: argparse.Namespace, moniker: str, **kwargs) -> bool:
 
 
 def build(args: argparse.Namespace, rec: dict, **kwargs) -> Bot:
+    conn = kwargs.get("conn")
     pool = kwargs.get("pool")
-    state = rec.get("state", {})
-    if isinstance(state, str):
-        state = {}
+
+    state = kwargs.get("state")
 
     b = Bot(
         args,
@@ -394,10 +394,9 @@ def build(args: argparse.Namespace, rec: dict, **kwargs) -> Bot:
         targetedby=rec.get("targetedby"),
         is_alive=rec.get("is_alive", True),
         mode=state.get("mode", libmm.BOT_MODE_HYBRID) if state else libmm.BOT_MODE_HYBRID,
-        pool=pool,
+        conn=conn,
     )
     return b
-
 
 def get_player_count(args, **kwargs) -> int:
     def _work(conn):
