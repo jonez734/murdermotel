@@ -24,6 +24,7 @@ def buildargs(args, obj=None, room=None, **kwargs):
 def main(args, **kwargs):
     return True
 
+
 class Item:
     module: str = None
 
@@ -332,7 +333,7 @@ def turn(args, **kwargs) -> bool:
         io.echo("The boobytrap does not exist!")
         util.logentry(
             "murdermotel.boobytrap.turn.100: boobytrap does not exist",
-            prg="murdermotel",
+            logger_name="murdermotel",
         )
         return False
 
