@@ -4,7 +4,11 @@ create table murdermotel.npc (
     modulepath text,
     title  text,
     roomid bigint constraint fk_map_item_player references murdermotel.playground(id) on update cascade on delete cascade,
-    state  jsonb
+    state  jsonb,
+    is_bot boolean DEFAULT false,
+    target text,
+    targetedby text,
+    is_alive boolean DEFAULT true
 );
 
 -- Migrate: rename old 'module' column to 'modulepath' if it exists
@@ -18,3 +22,9 @@ begin
     end if;
 end$$;
 alter table if exists murdermotel.npc add column if not exists modulepath text;
+
+-- Migrate: add bot-related columns if they don't exist
+alter table if exists murdermotel.npc add column if not exists is_bot boolean DEFAULT false;
+alter table if exists murdermotel.npc add column if not exists target text;
+alter table if exists murdermotel.npc add column if not exists targetedby text;
+alter table if exists murdermotel.npc add column if not exists is_alive boolean DEFAULT true;

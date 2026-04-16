@@ -18,6 +18,8 @@ FIELDS = (
     "membermoniker",
     "datelastplayed",
     "datecreated",
+    "target",
+    "targetedby",
 )
 
 
@@ -61,6 +63,8 @@ class Player(object):
         self.pool = kwargs.get("pool", None)
         self.exits = {}
         self.datecreated = None
+        self.target = None
+        self.targetedby = None
 
     def __repr__(self):
         buf = ""
@@ -70,7 +74,9 @@ class Player(object):
 
     def on_turn(self, args, room=None, **kwargs):
         if self.modulepath:
-            return libmm.runmodule(args, "turn", self.modulepath, obj=self, room=room, **kwargs)
+            return libmm.runmodule(
+                args, "turn", self.modulepath, obj=self, room=room, **kwargs
+            )
         return True
 
     def __str__(self):

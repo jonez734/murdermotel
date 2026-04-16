@@ -2,7 +2,7 @@ from bbsengine6 import database, io
 
 from . import lib as libmm
 
-FIELDS = ("kind", "modulepath", "name", "title", "modulepath", "state")
+FIELDS = ("kind", "modulepath", "name", "title", "state")
 
 
 def init(args, obj=None, room=None, **kwargs) -> bool:
@@ -66,7 +66,7 @@ def load(args, itemname, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.item where name=%s"
-            dat = itemname
+            dat = (itemname,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
                 if args.debug is True:
@@ -76,8 +76,15 @@ def load(args, itemname, **kwargs):
             rec = cur.fetchone()
 
             r = Item(args, **kwargs)
+            # Set whichever fields exist in the row
             for f in FIELDS:
-                setattr(r, f, rec[f])
+                if f in rec:
+                    setattr(r, f, rec[f])
+            # Also map legacy column names
+            if "type" in rec:
+                r.kind = rec["type"]
+            if "module" in rec:
+                r.modulepath = rec["module"]
 
             return r
 

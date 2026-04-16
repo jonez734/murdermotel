@@ -2,6 +2,7 @@ from bbsengine6 import io, member, util
 
 from . import lib as libmm
 from . import data
+from . import bot as libbot
 
 
 def init(args=None, **kwargs):
@@ -39,6 +40,10 @@ def main(args, **kwargs):
     if libmm.runmodule(args, "run", "startup", **kwargs) is False:
         io.echo("failed to start up", level="error")
         return False
+
+    pool = kwargs.get("pool")
+    if pool:
+        libbot.generate_bots(args, pool=pool)
 
     player = None
     done = False

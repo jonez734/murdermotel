@@ -7,6 +7,7 @@ from typing import Optional
 from bbsengine6 import io, database, util, member, screen, module
 from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 from . import obj as libobj
+from . import item as libitem
 from . import rabidwolf as librabidwolf
 from . import thief as libthief
 
@@ -18,7 +19,7 @@ ObjectRegistry = libobj.ObjectRegistry
 registry = libobj.registry
 Obj = libobj.Obj
 Living = libobj.Living
-Item = libobj.Item
+Item = libitem.Item
 
 # @since 20220813
 SCHEMA = "murdermotel"
@@ -27,6 +28,21 @@ DEFAULTMOVESPERTURN = 60
 TURNSPERDAY = 2
 PLAYGROUNDSIZE = 140
 MAXITEMSPERPLAYER = 5
+
+# Bot configuration
+BOT_KILL_POINTS = 50
+BOT_MAX_COUNT = 20
+BOT_COUNT_RATIO = 1
+BOT_STARTING_MOVES = 60
+BOT_PICKUP_CHANCE = 0.3
+BOT_DROP_CHANCE = 0.2
+BOT_ATTACK_CHANCE = 0.4
+
+# Bot modes
+BOT_MODE_STATIC = "static"
+BOT_MODE_SIMPLE = "simple"
+BOT_MODE_FULL = "full"
+BOT_MODE_HYBRID = "hybrid"
 
 
 def _stub_turn(args: argparse.Namespace, /, **kwargs: dict) -> bool | None:

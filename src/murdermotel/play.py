@@ -197,11 +197,21 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.roomid = random.randint(10, room_count - 10 + 1)
         player.save()
 
+    from . import bot as libbot
+    bots = libbot.get_alive_bots(args, **kwargs)
+    player_monikers = [currentmembermoniker]
+    if not player.target:
+        libbot.assign_targets(args, player_monikers, bots, **kwargs)
+
     tzlocal = dateutil.tz.tzlocal()
     player.datelastplayed = datetime.now(tzlocal)
     player.module = "player"
 
     player.info()
+
+    if player.target:
+        io.echo(f"{{var:labelcolor}}You are hunting: {{var:valuecolor}}{player.target}")
+
     util.heading("playground")
 
     libmm.registry.clear()
@@ -222,6 +232,12 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         loaded_wolf = libwolf.create(args, **kwargs)
     if libmm.registry.get_by_name("rabidwolf") is None:
         libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
+
+    from . import bot as libbot
+    bots = libbot.get_alive_bots(args, **kwargs)
+    for b in bots:
+        if libmm.registry.get_by_name(b.name) is None:
+            libmm.registry.register(b)
 
     from bbsengine6 import module as bbsmodule
 
@@ -342,6 +358,17 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 util.oxfordcomma(players),
             )
         )
+
+        from . import bot as libbot
+        bots_in_room = [b for b in libbot.get_alive_bots(args, pool=kwargs.get("pool")) if b.roomid == room.id]
+        if bots_in_room:
+            io.echo(
+                ":robot: {var:labelcolor}%s: {var:valuecolor}%s"
+                % (
+                    util.pluralize(len(bots_in_room), "bot", "bots", quantity=False),
+                    util.oxfordcomma([b.short() for b in bots_in_room]),
+                )
+            )
 
         io.echo(
             ":door: {var:labelcolor}%s: {var:valuecolor}%s"
