@@ -1,8 +1,9 @@
-from bbsengine6 import util
+from bbsengine6 import io, util
 from . import lib
 
 
 def init(args, **kw: dict) -> bool:
+    io.register_emojis({"robot": "\U0001f916"})
     return True
 
 
