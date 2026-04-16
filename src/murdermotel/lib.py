@@ -31,6 +31,17 @@ OP_TO_STUB = {
 }
 
 
+def get_op(module_ref: str, op: str, args) -> callable | None:
+    """Get an optional operation function from murdermotel's op map."""
+    m = module.get(module_ref, args)
+    stub = OP_TO_STUB.get(op)
+    if stub is None:
+        return None
+    if module.check_func(m, op, stub, silent=True):
+        return getattr(m, op)
+    return None
+
+
 class ObjectRegistry:
     """Registry for active game objects (NPCs, items) that need turn processing."""
 
@@ -770,13 +781,11 @@ def runmodule(args, op: str, modulename: str, **kwargs: dict):
     kwargs["operation"] = op
 
     if op in ("turn", "escape"):
-        m = module.get(fullname, args)
-        stub = OP_TO_STUB.get(op)
-        if not module.check_func(m, op, stub, silent=True):
+        func = get_op(fullname, op, args)
+        if func is None:
             if debug:
                 io.echo(f"{fullname} has no {op}()", level="debug")
             return True
-        func = getattr(m, op)
         return module.runcallback(args, func, **kwargs)
 
     if not module.check(args, fullname, **kwargs):
