@@ -25,6 +25,12 @@ def _stub_escape(args: argparse.Namespace, /, **kwargs: dict) -> int | None:
     pass
 
 
+OP_TO_STUB = {
+    "turn": _stub_turn,
+    "escape": _stub_escape,
+}
+
+
 class ObjectRegistry:
     """Registry for active game objects (NPCs, items) that need turn processing."""
 
@@ -765,7 +771,7 @@ def runmodule(args, op: str, modulename: str, **kwargs: dict):
 
     if op in ("turn", "escape"):
         m = module.get(fullname, args)
-        stub = _stub_turn if op == "turn" else _stub_escape
+        stub = OP_TO_STUB.get(op)
         if not module.check_func(m, op, stub, silent=True):
             if debug:
                 io.echo(f"{fullname} has no {op}()", level="debug")
