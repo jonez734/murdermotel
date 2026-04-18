@@ -19,6 +19,12 @@ class Item(object):
         self.table = "murdermotel.item"
         self.pool = kwargs.get("pool", None)
 
+    def __str__(self) -> str:
+        return self.short()
+
+    def short(self) -> str:
+        return self.title or f"Item: {self.name}"
+
     def buildrec(self):
         rec = {}
         for f in FIELDS:
