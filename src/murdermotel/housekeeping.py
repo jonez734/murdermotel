@@ -1,55 +1,57 @@
-from bbsengine6 import bbsengine, ttyio, util
+import argparse
+
+from bbsengine6 import io, util, member
 
 from . import lib
 
 
-def init(args=None, **kw):
+def init(args: argparse.Namespace | None = None, **kw: dict) -> bool:
     return True
 
 
-def access(args, op, **kw):
-    return bbsengine.checksysop(args)
+def access(args: argparse.Namespace, op: str, **kw: dict) -> bool | None:
+    return member.checkflag(args, "SYSOP")
 
 
-def buildargs(args, **kw):
+def buildargs(args: argparse.Namespace, **kw: dict) -> argparse.ArgumentParser | None:
     return None
 
 
-def main(args, **kw):
+def main(args: argparse.Namespace, **kw: dict) -> bool | None:
     if args is not None and "debug" in args and args.debug is True:
-        ttyio.echo("hotelsetup.main.100: args=%r" % (args))
+        io.echo("hotelsetup.main.100: args=%r" % (args))
 
     player = kw.get("player", None)
 
     done = False
     while not done:
         util.heading("murder motel housekeeping")
-        ttyio.echo(
+        io.echo(
             "database: %s host: %s:%s"
             % (args.databasename, args.databasehost, args.databaseport),
             level="debug",
         )
-        ttyio.echo()
+        io.echo()
         lib.setarea(args, player, "housekeeping")
-        ttyio.echo("{var:optioncolor}[S]{var:labelcolor}etup")
-        ttyio.echo("{var:optioncolor}[E]{var:labelcolor}dit")
-        ttyio.echo("{var:optioncolor}[W]{var:labelcolor}eapon list")
-        ttyio.echo("{f6}{var:optioncolor}[Q]{var:labelcolor}uit{f6}")
-        ch = ttyio.inputchar(
+        io.echo("{var:optioncolor}[S]{var:labelcolor}etup")
+        io.echo("{var:optioncolor}[E]{var:labelcolor}dit")
+        io.echo("{var:optioncolor}[W]{var:labelcolor}eapon list")
+        io.echo("{f6}{var:optioncolor}[Q]{var:labelcolor}uit{f6}")
+        ch = io.inputchar(
             "{var:promptcolor}housekeeping {var:optioncolor}[SEQW]{var:promptcolor}: {var:inputcolor}",
             "SEQW",
             "",
         )
         if ch == "S":
-            ttyio.echo("Setup Game")
+            io.echo("Setup Game")
             lib.runsubmodule(args, player, "setup")
         elif ch == "E":
-            ttyio.echo("Edit")
+            io.echo("Edit")
             lib.runsubmodule(args, player, "edit")
         elif ch == "W":
-            ttyio.echo("Weapon list")
+            io.echo("Weapon list")
             lib.runsubmodule(args, player, "weaponlist")
         elif ch == "Q":
-            ttyio.echo("Q - Quit")
+            io.echo("Q - Quit")
             done = True
     return True

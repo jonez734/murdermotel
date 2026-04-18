@@ -1,19 +1,21 @@
-from bbsengine6 import bbsengine, database, io
+import argparse
+
+from bbsengine6 import database, io, member
 
 
-def init(args=None, **kw):
+def init(args: argparse.Namespace | None = None, **kw: dict) -> bool:
     return True
 
 
-def access(args, op, **kw):
-    return bbsengine.checksysop(args)
+def access(args: argparse.Namespace, op: str, **kw: dict) -> bool | None:
+    return member.checkflag(args, "SYSOP")
 
 
-def buildargs(args, **kw):
+def buildargs(args: argparse.Namespace, **kw: dict) -> argparse.ArgumentParser | None:
     return None
 
 
-def main(args, **kw):
+def main(args: argparse.Namespace, **kw: dict) -> bool | None:
     pool = kw.get("pool", None)
     if pool is None:
         io.echo(f"mm.weaponlist.main.100: {pool=}", level="error")
