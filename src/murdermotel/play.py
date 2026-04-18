@@ -198,6 +198,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.save()
 
     from . import bot as libbot
+
     bots = libbot.get_alive_bots(args, **kwargs)
     player_monikers = [currentmembermoniker]
     if not player.target:
@@ -234,6 +235,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
     from . import bot as libbot
+
     bots = libbot.get_alive_bots(args, **kwargs)
     for b in bots:
         if libmm.registry.get_by_name(b.name) is None:
@@ -360,7 +362,12 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         )
 
         from . import bot as libbot
-        bots_in_room = [b for b in libbot.get_alive_bots(args, pool=kwargs.get("pool")) if b.roomid == room.id]
+
+        bots_in_room = [
+            b
+            for b in libbot.get_alive_bots(args, pool=kwargs.get("pool"))
+            if b.roomid == room.id
+        ]
         if bots_in_room:
             io.echo(
                 ":robot: {var:labelcolor}%s: {var:valuecolor}%s"

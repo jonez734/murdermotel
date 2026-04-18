@@ -170,6 +170,7 @@ class Player(object):
                     )
                     m = {}
                     m["itemname"] = i.name
+                    m["serial"] = i.serial
                     m["playermoniker"] = self.moniker
                     database.insert(
                         self.args,
@@ -331,14 +332,14 @@ def getitems(args, playermoniker, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.map_item_player where playermoniker=%s"
+            sql = f"select itemname, serial from {libmm.SCHEMA}.map_item_player where playermoniker=%s"
             dat = (playermoniker,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
                 return items
             res = cur.fetchmany()
             for rec in res:
-                item = libitem.load(args, rec["itemname"])
+                item = libitem.load(args, rec["itemname"], serial=rec["serial"])
                 if item is None:
                     io.echo(f"mm.player.getitems: {item=}", level="error")
                     break

@@ -11,9 +11,10 @@ grant all on murdermotel.thief to term, web, sysop;
 -- map items to thief (like map_item_player)
 create table if not exists murdermotel.map_item_thief (
     itemname citext not null,
+    serial int not null default 0,
     thiefname citext not null default 'thief',
     constraint fk_map_item_thief foreign key (thiefname) references murdermotel.thief(name) on update cascade on delete cascade
 );
 
-create unique index idx_map_item_thief on murdermotel.map_item_thief(itemname, thiefname);
+create unique index idx_map_item_thief on murdermotel.map_item_thief(itemname, serial, thiefname);
 grant all on murdermotel.map_item_thief to term, web, sysop;

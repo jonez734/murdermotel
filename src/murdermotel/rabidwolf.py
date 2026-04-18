@@ -132,7 +132,7 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
-def load(args: argparse.Namespace, **kwargs) -> Optional[libmm.RabidWolf]:
+def load(args: argparse.Namespace, **kwargs) -> Optional[RabidWolf]:
     def _work(conn):
         with database.cursor(conn) as cur:
             sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
@@ -174,7 +174,7 @@ def load(args: argparse.Namespace, **kwargs) -> Optional[libmm.RabidWolf]:
     return _work(conn)
 
 
-def create(args: argparse.Namespace, **kwargs) -> libmm.RabidWolf | bool:
+def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
     pool = kwargs.get("pool", None)
     if pool is None:
         io.echo(f"mm.rabidwolf.create.100: {pool=}", level="error")
@@ -255,9 +255,9 @@ def exists(args: argparse.Namespace, **kwargs: Any) -> bool:
     return _work(conn)
 
 
-def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> libmm.RabidWolf:
+def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> RabidWolf:
     pool = kwargs.get("pool", None)
-    w = libmm.RabidWolf(args, pool=pool)
+    w = RabidWolf(args, pool=pool)
     w.name = rec.get("name", WOLF_NAME)
     w.roomid = rec.get("roomid", 10)
     w.healthpoints = rec.get("healthpoints", WOLF_HEALTH)
@@ -265,7 +265,7 @@ def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> libmm.RabidWolf
 
 
 def wolf_attack_player(
-    args: argparse.Namespace, player: Any, wolf: libmm.RabidWolf, **kwargs: Any
+    args: argparse.Namespace, player: Any, wolf: RabidWolf, **kwargs: Any
 ) -> None:
     damage = randomlib.randint(1, 10) + 10
     io.echo(f"damage={damage}", level="debug")
@@ -337,7 +337,7 @@ def attack(
     args: argparse.Namespace,
     player: Any,
     weapons: list[str],
-    wolf: libmm.RabidWolf,
+    wolf: RabidWolf,
     **kwargs: Any,
 ) -> None:
     io.echo(f"weapons={weapons!r}", level="debug")

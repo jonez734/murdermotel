@@ -1,10 +1,9 @@
 --\echo defense
 create table if not exists murdermotel.defense (
---    defenseid bigint unique not null,
---    module text,
---    state jsonb,
---    name citext,
-    description text
+    name citext not null,
+    serial int not null default 0,
+    description text,
+    unique (name, serial)
 );
 
 grant select on murdermotel.defense to web, term;

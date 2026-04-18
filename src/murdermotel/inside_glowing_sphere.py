@@ -27,7 +27,7 @@ def main(args, **kwargs) -> bool:
 
 def turn(args, **kwargs):
     obj = kwargs.get("obj")
-##    io.echo(f"murdermotel.inside_glowing....100: called", level="debug")
+    ##    io.echo(f"murdermotel.inside_glowing....100: called", level="debug")
     player = kwargs.get("player")
     if not player:
         return True

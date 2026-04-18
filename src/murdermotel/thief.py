@@ -97,6 +97,7 @@ class Thief(Living):
                 for i in self.items:
                     m = {}
                     m["itemname"] = i.name
+                    m["serial"] = i.serial
                     m["thiefname"] = self.name
                     database.insert(
                         self.args,
@@ -286,7 +287,7 @@ def getitems(args, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.map_item_thief where thiefname=%s"
+            sql = f"select itemname, serial from {libmm.SCHEMA}.map_item_thief where thiefname=%s"
             dat = (THIEF_NAME,)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
@@ -295,7 +296,7 @@ def getitems(args, **kwargs):
             for rec in res:
                 from . import item as libitem
 
-                item = libitem.load(args, rec["itemname"])
+                item = libitem.load(args, rec["itemname"], serial=rec["serial"])
                 if item is None:
                     io.echo(f"mm.thief.getitems: {item=}", level="error")
                     break

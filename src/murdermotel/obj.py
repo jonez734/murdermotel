@@ -33,7 +33,7 @@ class ObjectRegistry:
 
     def get_by_name(self, name: str):
         for obj in self._objects:
-            if getattr(obj, 'name', None) == name:
+            if getattr(obj, "name", None) == name:
                 return obj
         return None
 
@@ -147,70 +147,3 @@ class Living(Obj):
 
     def short(self):
         return "NEEDINFO.living"
-
-
-class Item(Obj):
-    def __init__(self, args):
-        super().__init__(args)
-        self.roomid = None
-        self.fields = ("type", "name", "title", "usemessages")
-        self.type = None
-        self.name = None
-        self.title = None
-        self.usemessages = []
-
-    def short(self):
-        return "NEEDINFO.item"
-
-    def __repr__(self):
-        return f"{self.title} ({self.type})"
-
-    def save(self, **kwargs) -> bool:
-        def _work(conn):
-            p = {}
-            for f in self.fields:
-                p[f] = getattr(self, f)
-
-            if self.args.debug is True:
-                io.echo(f"Item.save.100: p={p!r}", level="debug")
-
-            if self.args.debug is True:
-                io.echo("Item.save.140: trying update", level="debug")
-            res = database.update(
-                self.args,
-                "murdermotel.item",
-                self.name,
-                p,
-                primarykey="name",
-                mogrify=True,
-                conn=conn,
-            )
-            io.echo(f"Item.save.120: res={res!r}", level="debug")
-            if res == 0:
-                if self.args.debug is True:
-                    io.echo(
-                        f"Item.save.160: update failed, trying insert p={p!r}",
-                        level="debug",
-                    )
-                database.insert(
-                    self.args,
-                    "murdermotel.item",
-                    p,
-                    primarykey="name",
-                    returnid=False,
-                    mogrify=True,
-                    conn=conn,
-                )
-            return True
-
-        conn = kwargs.get("conn", None)
-        if conn is None:
-            pool = kwargs.get("pool", None)
-            if pool is None:
-                io.echo("Item.save.100: pool is None", level="error")
-                return False
-            with database.connect(self.args, pool=pool) as conn:
-                _work(conn)
-        else:
-            _work(conn)
-        return True

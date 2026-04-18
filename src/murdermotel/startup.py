@@ -24,6 +24,7 @@ _TABLES = (
     (f"{libmm.SCHEMA}.boobytrap", "boobytrap.sql"),
     (f"{libmm.SCHEMA}.thief", "thief.sql"),
     (f"{libmm.SCHEMA}.rabidwolf", "rabidwolf.sql"),
+    (f"{libmm.SCHEMA}.npc_player_items", "npc_player_items.sql"),
 )
 
 # Roles granted USAGE on the schema.
@@ -126,7 +127,20 @@ def main(args, **kwargs) -> bool:
         io.echo("{var:labelcolor}populate {var:valuecolor}items: ", end="")
         if (libmm.getitemcount(args, conn=conn) or 0) == 0:
             if not database.importsql(
-                args, "items.sql", conn=conn, package=_SQL_PACKAGE
+                args, "item_data.sql", conn=conn, package=_SQL_PACKAGE
+            ):
+                io.echo("fail", level="error")
+                failcount += 1
+            else:
+                io.echo(" ok ", level="ok")
+        else:
+            io.echo("skip", level="ok")
+
+        # --- defenses ---
+        io.echo("{var:labelcolor}populate {var:valuecolor}defenses: ", end="")
+        if (libmm.getdefensecount(args, conn=conn) or 0) == 0:
+            if not database.importsql(
+                args, "defense_data.sql", conn=conn, package=_SQL_PACKAGE
             ):
                 io.echo("fail", level="error")
                 failcount += 1
@@ -198,7 +212,11 @@ def _populate_rooms(args, **kwargs) -> bool:
                     modulepath = _ROOM_MODULEPATHS[roomid]
                 else:
                     modulepath = None
-                room = {"id": roomid, "title": m.group("title").lower(), "modulepath":modulepath}
+                room = {
+                    "id": roomid,
+                    "title": m.group("title").lower(),
+                    "modulepath": modulepath,
+                }
                 for direction in ("north", "south", "east", "west", "up", "down"):
                     val = int(m.group(direction))
                     if val == 150:

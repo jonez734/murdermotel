@@ -38,7 +38,9 @@ class Room(object):
     def on_turn(self, args, room=None, **kwargs):
         io.echo(f"mm.room.on_turn.100: calling .turn()", level="debug")
         if self.modulepath:
-            return libmm.runmodule(args, "turn", self.modulepath, obj=self, room=room, **kwargs)
+            return libmm.runmodule(
+                args, "turn", self.modulepath, obj=self, room=room, **kwargs
+            )
         return True
 
     def short(self) -> str:
@@ -92,6 +94,7 @@ class Room(object):
                 for i in self.items:
                     m = {}
                     m["itemname"] = i.name
+                    m["serial"] = i.serial
                     m["roomid"] = self.id
                     database.insert(
                         self.args,
@@ -149,7 +152,7 @@ def getitems(args, roomid, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = "select * from murdermotel.item as i, murdermotel.map_item_room as m where (m.roomid=%s) and m.itemname=i.name"
+            sql = "select m.itemname, m.serial, i.title, i.kind, i.usemessages from murdermotel.item as i, murdermotel.map_item_room as m where m.roomid=%s and m.itemname=i.name and m.serial=i.serial"
             dat = (roomid,)
             cur.execute(sql, dat)
 
@@ -157,8 +160,8 @@ def getitems(args, roomid, **kwargs):
                 return []
 
             for rec in database.resultiter(cur):
-                i = libitem.Item(args)
-                i.name = rec["name"]
+                i = libitem.Item(args, serial=rec["serial"])
+                i.name = rec["itemname"]
                 i.title = rec["title"]
                 i.kind = rec["kind"]
                 i.usemessages = rec["usemessages"] if "usemessages" in rec else []

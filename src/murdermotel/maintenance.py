@@ -2,7 +2,7 @@
 # import bbsengine5 as bbsengine
 from bbsengine6 import database, io
 
-from . import lib, room as libroom
+from . import room as libroom, item as libitem
 
 
 def init(args=None, **kw):
@@ -93,7 +93,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         step += 1
 
     for name, data in items.items():
-        i = lib.Item(args)
+        i = libitem.Item(args)
         i.name = name
         i.type = data["kind"]
         i.title = data["title"]
@@ -112,7 +112,12 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
             m["itemname"] = name
 
             database.insert(
-                args, "murdermotel.map_item_room", m, mogrify=True, returnid=False, conn=conn
+                args,
+                "murdermotel.map_item_room",
+                m,
+                mogrify=True,
+                returnid=False,
+                conn=conn,
             )
 
     screen.updateprogress(step, total)

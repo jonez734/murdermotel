@@ -19,19 +19,59 @@ BOT_MODE_HYBRID = libmm.BOT_MODE_HYBRID
 
 
 BOT_PREFIXES = [
-    "Silent", "Shadow", "Ghost", "Dark", "Creep",
-    "Night", "Steel", "Iron", "Crimson", "Pale",
-    "Wicked", "Vile", "Grim", "Haunted", "Obsidian",
-    "Azure", "Cobalt", "Ebon", "Frost", "Onyx",
-    "Ruby", "Silver", "Golden", "Emerald", "Violet",
+    "Silent",
+    "Shadow",
+    "Ghost",
+    "Dark",
+    "Creep",
+    "Night",
+    "Steel",
+    "Iron",
+    "Crimson",
+    "Pale",
+    "Wicked",
+    "Vile",
+    "Grim",
+    "Haunted",
+    "Obsidian",
+    "Azure",
+    "Cobalt",
+    "Ebon",
+    "Frost",
+    "Onyx",
+    "Ruby",
+    "Silver",
+    "Golden",
+    "Emerald",
+    "Violet",
 ]
 
 BOT_SUFFIXES = [
-    "Stalker", "Hunter", "Runner", "Walker", "Slayer",
-    "Blade", "Fang", "Wraith", "Shade", "Reaper",
-    "Viper", "Specter", "Chimera", "Grave", "Howler",
-    "Phoenix", "Dragon", "Wolf", "Bear", "Fox",
-    "Raven", "Tiger", "Panther", "Shadow", "Storm",
+    "Stalker",
+    "Hunter",
+    "Runner",
+    "Walker",
+    "Slayer",
+    "Blade",
+    "Fang",
+    "Wraith",
+    "Shade",
+    "Reaper",
+    "Viper",
+    "Specter",
+    "Chimera",
+    "Grave",
+    "Howler",
+    "Phoenix",
+    "Dragon",
+    "Wolf",
+    "Bear",
+    "Fox",
+    "Raven",
+    "Tiger",
+    "Panther",
+    "Shadow",
+    "Storm",
 ]
 
 
@@ -137,8 +177,12 @@ class Bot(Living):
             self._move_randomly(room)
         if self.mode in (libmm.BOT_MODE_FULL, libmm.BOT_MODE_HYBRID):
             self._handle_items(room)
-        if self.mode in (libmm.BOT_MODE_STATIC, libmm.BOT_MODE_SIMPLE, 
-                         libmm.BOT_MODE_FULL, libmm.BOT_MODE_HYBRID):
+        if self.mode in (
+            libmm.BOT_MODE_STATIC,
+            libmm.BOT_MODE_SIMPLE,
+            libmm.BOT_MODE_FULL,
+            libmm.BOT_MODE_HYBRID,
+        ):
             self._handle_combat(args, room, **kwargs)
 
         if self.pool:
@@ -393,10 +437,13 @@ def build(args: argparse.Namespace, rec: dict, **kwargs) -> Bot:
         target=rec.get("target"),
         targetedby=rec.get("targetedby"),
         is_alive=rec.get("is_alive", True),
-        mode=state.get("mode", libmm.BOT_MODE_HYBRID) if state else libmm.BOT_MODE_HYBRID,
+        mode=state.get("mode", libmm.BOT_MODE_HYBRID)
+        if state
+        else libmm.BOT_MODE_HYBRID,
         conn=conn,
     )
     return b
+
 
 def get_player_count(args, **kwargs) -> int:
     def _work(conn):
@@ -442,12 +489,11 @@ def get_alive_bots(args, **kwargs) -> list:
 
 def get_all_huntable_entities(args, **kwargs) -> list:
     """Return list of all living players + bots."""
+
     def _work(conn):
         entities = []
         with database.cursor(conn) as cur:
-            cur.execute(
-                f"select moniker from {libmm.SCHEMA}.player where died is null"
-            )
+            cur.execute(f"select moniker from {libmm.SCHEMA}.player where died is null")
             for rec in cur.fetchall():
                 entities.append({"name": rec["moniker"], "type": "player"})
 
@@ -470,6 +516,7 @@ def get_all_huntable_entities(args, **kwargs) -> list:
 
 def generate_bots(args, count: int = None, **kwargs) -> list:
     """Generate bots with dynamic mode distribution."""
+
     def _work(conn):
         nonlocal count
         if count is None:
@@ -509,6 +556,7 @@ def generate_bots(args, count: int = None, **kwargs) -> list:
 
 def assign_targets(args, player_monikers: list, bots: list, **kwargs) -> None:
     """Assign bidirectional targets between players and bots."""
+
     def _work(conn):
         if not player_monikers or not bots:
             return
@@ -521,25 +569,31 @@ def assign_targets(args, player_monikers: list, bots: list, **kwargs) -> None:
                 cur.execute(sql, (moniker,))
                 if cur.rowcount > 0:
                     rec = cur.fetchone()
-                    all_entities.append({
-                        "name": moniker,
-                        "type": "player",
-                        "bodycount": rec.get("bodycount", 0) or 0,
-                        "points": rec.get("points", 0) or 0,
-                        "turn": rec.get("turn", 0) or 0,
-                    })
+                    all_entities.append(
+                        {
+                            "name": moniker,
+                            "type": "player",
+                            "bodycount": rec.get("bodycount", 0) or 0,
+                            "points": rec.get("points", 0) or 0,
+                            "turn": rec.get("turn", 0) or 0,
+                        }
+                    )
 
         for bot in bots:
-            all_entities.append({
-                "name": bot.name,
-                "type": "bot",
-                "bodycount": 0,
-                "points": 0,
-                "turn": 0,
-            })
+            all_entities.append(
+                {
+                    "name": bot.name,
+                    "type": "bot",
+                    "bodycount": 0,
+                    "points": 0,
+                    "turn": 0,
+                }
+            )
 
         for player_moniker in player_monikers:
-            target = weighted_select([e for e in all_entities if e["name"] != player_moniker])
+            target = weighted_select(
+                [e for e in all_entities if e["name"] != player_moniker]
+            )
             if target:
                 with database.cursor(conn) as cur:
                     sql = f"update {libmm.SCHEMA}.player set target=%s where moniker=%s"
@@ -566,6 +620,7 @@ def assign_targets(args, player_monikers: list, bots: list, **kwargs) -> None:
 
 def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
     """Ensure bot has a valid target. Reassign if needed."""
+
     def _work(conn):
         if bot.target is None:
             return True
@@ -576,23 +631,32 @@ def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
             if cur.rowcount == 0 or not cur.fetchone()["is_alive"]:
                 alive_bots = get_alive_bots(args, conn=conn)
                 other_entities = [
-                    {"name": b.name, "type": "bot", "bodycount": 0, "points": 0, "turn": 0}
-                    for b in alive_bots if b.name != bot.name
+                    {
+                        "name": b.name,
+                        "type": "bot",
+                        "bodycount": 0,
+                        "points": 0,
+                        "turn": 0,
+                    }
+                    for b in alive_bots
+                    if b.name != bot.name
                 ]
 
                 with database.cursor(conn) as cur2:
                     cur2.execute(
                         f"select moniker, bodycount, points, turn from {libmm.SCHEMA}.player where died is null and moniker!=%s",
-                        (bot.name,)
+                        (bot.name,),
                     )
                     for rec in cur2.fetchall():
-                        other_entities.append({
-                            "name": rec["moniker"],
-                            "type": "player",
-                            "bodycount": rec.get("bodycount", 0) or 0,
-                            "points": rec.get("points", 0) or 0,
-                            "turn": rec.get("turn", 0) or 0,
-                        })
+                        other_entities.append(
+                            {
+                                "name": rec["moniker"],
+                                "type": "player",
+                                "bodycount": rec.get("bodycount", 0) or 0,
+                                "points": rec.get("points", 0) or 0,
+                                "turn": rec.get("turn", 0) or 0,
+                            }
+                        )
 
                 if other_entities:
                     new_target = weighted_select(other_entities)

@@ -8,6 +8,8 @@ from . import lib as libmm
 
 
 def init(args, **kwargs: dict) -> bool:
+    io.register_emojis({"robot": "\U0001f916"})
+
     screen.init(args)
     return True
 

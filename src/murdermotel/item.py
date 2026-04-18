@@ -2,7 +2,7 @@ from bbsengine6 import database, io
 
 from . import lib as libmm
 
-FIELDS = ("kind", "modulepath", "name", "title", "state")
+FIELDS = ("kind", "modulepath", "name", "serial", "title", "state")
 
 
 def init(args, obj=None, room=None, **kwargs) -> bool:
@@ -27,6 +27,7 @@ class Item(object):
         self.kind = "item"
         self.modulepath = "item"
         self.name = "name"
+        self.serial = kwargs.get("serial", 0)
         self.title = self.name
         self.table = "murdermotel.item"
         self.pool = kwargs.get("pool", None)
@@ -62,25 +63,27 @@ class Item(object):
         return True
 
 
-def load(args, itemname, **kwargs):
+def load(args, itemname, serial: int = 0, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.item where name=%s"
-            dat = (itemname,)
+            sql = f"select * from {libmm.SCHEMA}.item where name=%s and serial=%s"
+            dat = (itemname, serial)
             cur.execute(sql, dat)
             if cur.rowcount == 0:
                 if args.debug is True:
-                    io.echo(f"unable to load item {itemname!r}", level="debug")
+                    io.echo(
+                        f"unable to load item {itemname!r} serial={serial}",
+                        level="debug",
+                    )
                     return False
 
             rec = cur.fetchone()
 
             r = Item(args, **kwargs)
-            # Set whichever fields exist in the row
             for f in FIELDS:
                 if f in rec:
                     setattr(r, f, rec[f])
-            # Also map legacy column names
+            r.serial = serial
             if "type" in rec:
                 r.kind = rec["type"]
             if "module" in rec:

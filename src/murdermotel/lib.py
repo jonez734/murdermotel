@@ -511,6 +511,27 @@ def getitemcount(args, **kwargs):
     return _work(conn)
 
 
+def getdefensecount(args, **kwargs):
+    def _work(conn):
+        with database.cursor(conn) as cur:
+            sql = f"select count(*) from {SCHEMA}.defense"
+            cur.execute(sql)
+            if cur.rowcount == 0:
+                return 0
+            row = cur.fetchone()
+            return row["count"]
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"libmm.getdefensecount.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)
+
+
 def getnpccount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
@@ -627,49 +648,67 @@ def distributeitems(args, **kwargs):
             _clearitemmaps(conn)
 
         with database.cursor(conn) as cur:
-            sql = f"select name from {SCHEMA}.item"
+            sql = f"select name, serial from {SCHEMA}.item where kind in ('component', 'defense')"
             cur.execute(sql)
             if cur.rowcount == 0:
                 io.echo("items not populated")
                 return False
 
-            rows = cur.fetchmany()
-            item_rows = rows  # from your psycopg3 query
-            item_names = [row["name"] for row in item_rows]
-            io.echo(f"{item_names=}", level="debug")
+            rows = cur.fetchall()
+            io.echo(f"distributeitems: distributing {len(rows)} items", level="debug")
 
-            # Eligible room IDs: 10 to 140 inclusive
             roomcount = libroom.getcount(args, conn=conn)
-            eligible_rooms = list(range(10, roomcount - 10))
+            min_room = 11
+            max_room = roomcount - 1
+            eligible_rooms = list(range(min_room, max_room))
 
-            # Prepare result and room count tracking
-            #      assignments = []
             room_counts = {}
+            room_items = {}
 
-            for item_name in item_names:
-                while True:
+            for row in rows:
+                item_name = row["name"]
+                item_serial = row["serial"]
+
+                placed = False
+                for attempt in range(10):
                     roomid = random.choice(eligible_rooms)
                     count = room_counts.get(roomid, 0)
-                    if count < 3:
-                        map = {"roomid": roomid, "itemname": item_name}
-                        database.insert(
-                            args,
-                            f"{SCHEMA}.map_item_room",
-                            map,
-                            conn=conn,
-                            primarykey="itemname",
-                        )
-                        room_counts[roomid] = count + 1
-                        break
+                    if count >= 3:
+                        continue
 
-        #      cur.executemany(f"insert into {SCHEMA}.map_item_room(roomid, itemname) values (%(roomid)s, %(itemname)s)", assignments)
+                    same_item_in_room = room_items.get(roomid, set())
+                    if item_name in same_item_in_room:
+                        continue
 
-        # Now `assignments` is ready for insertion
-        # Example:
-        # [{'roomid': 42, 'itemid': 'item1'}, {'roomid': 57, 'itemid': 'item2'}, ...]
+                    m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
+                    database.insert(
+                        args,
+                        f"{SCHEMA}.map_item_room",
+                        m,
+                        conn=conn,
+                        returnid=False,
+                    )
+                    room_counts[roomid] = count + 1
+                    if roomid not in room_items:
+                        room_items[roomid] = set()
+                    room_items[roomid].add(item_name)
+                    placed = True
+                    break
 
-        # Optionally, insert into the database
-        # cur.executemany("INSERT INTO item_room_map (roomid, itemid) VALUES (%(roomid)s, %(itemid)s)", assignments)
+                if not placed:
+                    roomid = random.choice(eligible_rooms)
+                    m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
+                    database.insert(
+                        args,
+                        f"{SCHEMA}.map_item_room",
+                        m,
+                        conn=conn,
+                        returnid=False,
+                    )
+                    room_counts[roomid] = room_counts.get(roomid, 0) + 1
+                    if roomid not in room_items:
+                        room_items[roomid] = set()
+                    room_items[roomid].add(item_name)
 
         return True
 

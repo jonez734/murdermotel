@@ -73,9 +73,11 @@ def db_conn(test_args, test_pool, test_engine_member):
 # Name generation
 # ---------------------------------------------------------------------------
 
+
 class TestBotNameGeneration:
     def test_bot_name_format(self):
         from murdermotel import bot
+
         name = bot.generate_bot_name()
         assert isinstance(name, str)
         assert len(name) > 0
@@ -83,17 +85,20 @@ class TestBotNameGeneration:
     def test_bot_name_pool_large_enough(self):
         # 25 prefixes * 25 suffixes = 625 possible unique names — well above BOT_MAX_COUNT
         from murdermotel import bot
+
         total = len(bot.BOT_PREFIXES) * len(bot.BOT_SUFFIXES)
         from murdermotel import lib as libmm
+
         assert total >= libmm.BOT_MAX_COUNT * 2
 
     def test_bot_name_is_prefix_plus_suffix(self):
         from murdermotel import bot
+
         # Generate many names and verify each one decomposes into a known prefix + suffix
         for _ in range(50):
             name = bot.generate_bot_name()
             matched = any(
-                name.startswith(p) and name[len(p):] in bot.BOT_SUFFIXES
+                name.startswith(p) and name[len(p) :] in bot.BOT_SUFFIXES
                 for p in bot.BOT_PREFIXES
             )
             assert matched, f"Name {name!r} does not match any prefix+suffix pair"
@@ -103,9 +108,11 @@ class TestBotNameGeneration:
 # Mode distribution
 # ---------------------------------------------------------------------------
 
+
 class TestBotModeDistribution:
     def test_mode_distribution_less_than_5(self):
         from murdermotel import bot
+
         dist = bot.get_mode_distribution(3)
         assert dist["hybrid"] == 0.6
         assert dist["simple"] == 0.2
@@ -114,6 +121,7 @@ class TestBotModeDistribution:
 
     def test_mode_distribution_5_to_10(self):
         from murdermotel import bot
+
         dist = bot.get_mode_distribution(7)
         assert dist["hybrid"] == 0.3
         assert dist["simple"] == 0.3
@@ -122,6 +130,7 @@ class TestBotModeDistribution:
 
     def test_mode_distribution_more_than_10(self):
         from murdermotel import bot
+
         dist = bot.get_mode_distribution(15)
         assert dist["hybrid"] == 0.25
         assert dist["simple"] == 0.25
@@ -130,6 +139,7 @@ class TestBotModeDistribution:
 
     def test_mode_distribution_sums_to_1(self):
         from murdermotel import bot
+
         for count in (1, 5, 10, 20):
             dist = bot.get_mode_distribution(count)
             assert abs(sum(dist.values()) - 1.0) < 1e-9
@@ -138,6 +148,7 @@ class TestBotModeDistribution:
 # ---------------------------------------------------------------------------
 # Experience score
 # ---------------------------------------------------------------------------
+
 
 class TestExperienceScore:
     def test_experience_score_basic(self):
@@ -165,6 +176,7 @@ class TestExperienceScore:
 
     def test_experience_score_missing_attributes(self):
         from murdermotel import bot
+
         # object() has no bodycount/points/turn — should default to 0
         assert bot.get_experience_score(object()) == 0
 
@@ -182,12 +194,15 @@ class TestExperienceScore:
             turn = 0
 
         # 1 kill = 10pts weight vs 9 points = 9pts weight
-        assert bot.get_experience_score(KillHeavy()) > bot.get_experience_score(PointsHeavy())
+        assert bot.get_experience_score(KillHeavy()) > bot.get_experience_score(
+            PointsHeavy()
+        )
 
 
 # ---------------------------------------------------------------------------
 # Weighted selection
 # ---------------------------------------------------------------------------
+
 
 class TestWeightedSelection:
     def test_weighted_select_returns_entity(self):
@@ -217,6 +232,7 @@ class TestWeightedSelection:
 
     def test_weighted_select_empty_returns_none(self):
         from murdermotel import bot
+
         assert bot.weighted_select([]) is None
 
     def test_weighted_select_dominant_score_wins_often(self):
@@ -233,7 +249,9 @@ class TestWeightedSelection:
         dominant = E("dominant", 100, 10000, 1000)
         weak = E("weak", 0, 0, 0)
 
-        wins = sum(1 for _ in range(100) if bot.weighted_select([dominant, weak]) is dominant)
+        wins = sum(
+            1 for _ in range(100) if bot.weighted_select([dominant, weak]) is dominant
+        )
         # With all-zero score for weak, dominant should always win (100%)
         assert wins == 100
 
@@ -242,17 +260,21 @@ class TestWeightedSelection:
 # Constants
 # ---------------------------------------------------------------------------
 
+
 class TestBotConstants:
     def test_bot_kill_points(self):
         from murdermotel import lib as libmm
+
         assert libmm.BOT_KILL_POINTS == 50
 
     def test_bot_max_count(self):
         from murdermotel import lib as libmm
+
         assert libmm.BOT_MAX_COUNT == 20
 
     def test_bot_modes(self):
         from murdermotel import lib as libmm
+
         assert libmm.BOT_MODE_STATIC == "static"
         assert libmm.BOT_MODE_SIMPLE == "simple"
         assert libmm.BOT_MODE_FULL == "full"
@@ -260,6 +282,7 @@ class TestBotConstants:
 
     def test_bot_mode_constants_exported_from_bot(self):
         from murdermotel import bot
+
         assert bot.BOT_MODE_STATIC == "static"
         assert bot.BOT_MODE_SIMPLE == "simple"
         assert bot.BOT_MODE_FULL == "full"
@@ -270,45 +293,66 @@ class TestBotConstants:
 # Bot class (no DB)
 # ---------------------------------------------------------------------------
 
+
 class TestBotClass:
     def test_bot_default_mode(self, test_args):
         from murdermotel import bot, lib as libmm
+
         b = bot.Bot(test_args, register=False)
         assert b.mode == libmm.BOT_MODE_HYBRID
 
     def test_bot_kind(self, test_args):
         from murdermotel import bot
+
         b = bot.Bot(test_args, register=False)
         assert b.kind == "bot"
 
     def test_bot_modulepath(self, test_args):
         from murdermotel import bot
+
         b = bot.Bot(test_args, register=False)
         assert b.modulepath == "bot"
 
     def test_bot_is_alive_default(self, test_args):
         from murdermotel import bot
+
         b = bot.Bot(test_args, register=False)
         assert b.is_alive is True
 
     def test_bot_short(self, test_args):
         from murdermotel import bot
+
         b = bot.Bot(test_args, name="GhostHunter", register=False)
         assert "GhostHunter" in b.short()
 
     def test_bot_all_modes_valid(self, test_args):
         from murdermotel import bot
-        for mode in [bot.BOT_MODE_STATIC, bot.BOT_MODE_SIMPLE,
-                     bot.BOT_MODE_FULL, bot.BOT_MODE_HYBRID]:
+
+        for mode in [
+            bot.BOT_MODE_STATIC,
+            bot.BOT_MODE_SIMPLE,
+            bot.BOT_MODE_FULL,
+            bot.BOT_MODE_HYBRID,
+        ]:
             b = bot.Bot(test_args, mode=mode, register=False)
             assert b.mode == mode
 
     def test_bot_buildrec_keys(self, test_args):
         from murdermotel import bot
+
         b = bot.Bot(test_args, name="TestBot", roomid=10, register=False)
         rec = b.buildrec()
-        for key in ("name", "kind", "modulepath", "roomid", "is_bot",
-                    "target", "targetedby", "is_alive", "state"):
+        for key in (
+            "name",
+            "kind",
+            "modulepath",
+            "roomid",
+            "is_bot",
+            "target",
+            "targetedby",
+            "is_alive",
+            "state",
+        ):
             assert key in rec, f"Missing key {key!r} in buildrec()"
         assert rec["is_bot"] is True
         assert rec["state"]["mode"] == bot.BOT_MODE_HYBRID
@@ -318,11 +362,14 @@ class TestBotClass:
 # DB: persistence
 # ---------------------------------------------------------------------------
 
+
 class TestBotPersistence:
     def test_bot_save_load_core_fields(self, test_args, db_conn):
         from murdermotel import bot
-        b = bot.Bot(test_args, name="SaveLoadBot", roomid=10,
-                    mode="hybrid", register=False)
+
+        b = bot.Bot(
+            test_args, name="SaveLoadBot", roomid=10, mode="hybrid", register=False
+        )
         b.is_alive = True
         b.target = "SomeTarget"
         b.targetedby = "SomeHunter"
@@ -342,6 +389,7 @@ class TestBotPersistence:
     def test_bot_save_idempotent(self, test_args, db_conn):
         # Saving twice should not raise
         from murdermotel import bot
+
         b = bot.Bot(test_args, name="IdempotentBot", roomid=10, register=False)
         assert bot.save(test_args, b, conn=db_conn) is True
         assert bot.save(test_args, b, conn=db_conn) is True
@@ -351,15 +399,18 @@ class TestBotPersistence:
 # DB: existence
 # ---------------------------------------------------------------------------
 
+
 class TestBotExistence:
     def test_bot_exists_true(self, test_args, db_conn):
         from murdermotel import bot
+
         b = bot.Bot(test_args, name="ExistsBot", roomid=10, register=False)
         bot.save(test_args, b, conn=db_conn)
         assert bot.exists(test_args, "ExistsBot", conn=db_conn) is True
 
     def test_bot_exists_false(self, test_args, db_conn):
         from murdermotel import bot
+
         assert bot.exists(test_args, "AbsolutelyNonExistentBot", conn=db_conn) is False
 
 
@@ -367,9 +418,11 @@ class TestBotExistence:
 # DB: items
 # ---------------------------------------------------------------------------
 
+
 class TestBotItems:
     def test_bot_items_save_load(self, test_args, db_conn):
         from murdermotel import bot, item as libitem
+
         b = bot.Bot(test_args, name="ItemBot", roomid=10, register=False)
         bot.save(test_args, b, conn=db_conn)
 
@@ -389,6 +442,7 @@ class TestBotItems:
 
     def test_bot_items_cleared_on_save(self, test_args, db_conn):
         from murdermotel import bot, item as libitem
+
         b = bot.Bot(test_args, name="ItemClearBot", roomid=10, register=False)
         axe_blade = libitem.load(test_args, "axeblade", conn=db_conn)
         b.items = [axe_blade]
@@ -405,6 +459,7 @@ class TestBotItems:
 # ---------------------------------------------------------------------------
 # DB: target assignment
 # ---------------------------------------------------------------------------
+
 
 class TestTargetAssignment:
     def test_assign_targets_bidirectional(self, test_args, db_conn):
@@ -470,9 +525,11 @@ class TestTargetAssignment:
 # DB: ensure_valid_target
 # ---------------------------------------------------------------------------
 
+
 class TestEnsureValidTarget:
     def test_ensure_valid_target_with_alive_target(self, test_args, db_conn):
         from murdermotel import bot
+
         # Create a living bot as the target
         target_bot = bot.Bot(test_args, name="AliveTarget", roomid=10, register=False)
         target_bot.is_alive = True
@@ -489,6 +546,7 @@ class TestEnsureValidTarget:
 
     def test_ensure_valid_target_with_dead_target(self, test_args, db_conn):
         from murdermotel import bot
+
         # Create a dead bot as the target
         dead_bot = bot.Bot(test_args, name="DeadTarget", roomid=10, register=False)
         dead_bot.is_alive = False
@@ -510,6 +568,7 @@ class TestEnsureValidTarget:
 
     def test_ensure_valid_target_no_target(self, test_args, db_conn):
         from murdermotel import bot
+
         b = bot.Bot(test_args, name="NoTargetBot", roomid=10, register=False)
         b.target = None
         bot.save(test_args, b, conn=db_conn)
@@ -522,9 +581,11 @@ class TestEnsureValidTarget:
 # DB: get_alive_bots
 # ---------------------------------------------------------------------------
 
+
 class TestGetAliveBots:
     def test_get_alive_bots_returns_only_alive(self, test_args, db_conn):
         from murdermotel import bot
+
         alive = bot.Bot(test_args, name="AliveBot1", roomid=10, register=False)
         alive.is_alive = True
         bot.save(test_args, alive, conn=db_conn)
@@ -543,7 +604,9 @@ class TestGetAliveBots:
 # Kill points constant
 # ---------------------------------------------------------------------------
 
+
 class TestBotKillPoints:
     def test_bot_kill_points_constant(self):
         from murdermotel import lib as libmm
+
         assert libmm.BOT_KILL_POINTS == 50
