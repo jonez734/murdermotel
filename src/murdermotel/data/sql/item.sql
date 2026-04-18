@@ -6,9 +6,11 @@ create table if not exists murdermotel.item (
     "title" text,
     "modulepath" text,
     "state" jsonb,
-    "usemessages" text[],
-    unique (name, serial)
+    "usemessages" text[]
 );
+
+create index idx_item_name on murdermotel.item(name);
+create unique index idx_item_name_serial on murdermotel.item(name, serial);
 
 --\echo map_item_player
 create table if not exists murdermotel.map_item_player (

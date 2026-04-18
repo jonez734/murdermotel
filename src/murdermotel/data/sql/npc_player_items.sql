@@ -3,6 +3,6 @@
 
 create table murdermotel.npc_player_items (
     npcmoniker citext not null references murdermotel.npc(name) on delete cascade,
-    itemname   citext not null references murdermotel.item(name),
+    itemname   citext not null,
     primary key (npcmoniker, itemname)
 );

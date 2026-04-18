@@ -6,13 +6,14 @@ create table if not exists murdermotel.component (
 
 create table if not exists murdermotel.weapon (
     name citext unique not null,
-    component1 bigint,
+    serial int not null default 0,
+    component1 citext,
     component1_serial int not null default 0,
-    component2 bigint,
+    component2 citext,
     component2_serial int not null default 0,
     constraint fk_weapon_component1 foreign key (component1, component1_serial) references murdermotel.item(name, serial) on update cascade on delete cascade,
     constraint fk_weapon_component2 foreign key (component2, component2_serial) references murdermotel.item(name, serial) on update cascade on delete cascade,
-    constraint fk_weapon_item foreign key (name) references murdermotel.item(name, serial) on update cascade on delete cascade
+    constraint fk_weapon_item foreign key (name, serial) references murdermotel.item(name, serial) on update cascade on delete cascade
 );
 
 create table if not exists murdermotel.map_weaponcomponent_player (

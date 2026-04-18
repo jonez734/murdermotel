@@ -1,6 +1,8 @@
 create table if not exists murdermotel.boobytrap (
-    name citext unique not null,
+    name citext not null,
+    serial int not null default 1,
     running bool,
     timer bigint,
-    constraint fk_boobytrap_item foreign key (name) references murdermotel.item(name) on update cascade on delete cascade
+    constraint fk_boobytrap_item foreign key (name, serial) references murdermotel.item(name, serial) on update cascade on delete cascade,
+    constraint pk_boobytrap primary key (name, serial)
 );

@@ -130,6 +130,7 @@ def main(args, **kwargs) -> bool:
                 args, "item_data.sql", conn=conn, package=_SQL_PACKAGE
             ):
                 io.echo("fail", level="error")
+                conn.rollback()
                 failcount += 1
             else:
                 io.echo(" ok ", level="ok")
@@ -138,11 +139,14 @@ def main(args, **kwargs) -> bool:
 
         # --- defenses ---
         io.echo("{var:labelcolor}populate {var:valuecolor}defenses: ", end="")
-        if (libmm.getdefensecount(args, conn=conn) or 0) == 0:
+        if failcount > 0:
+            io.echo("skip", level="ok")
+        elif (libmm.getdefensecount(args, conn=conn) or 0) == 0:
             if not database.importsql(
                 args, "defense_data.sql", conn=conn, package=_SQL_PACKAGE
             ):
                 io.echo("fail", level="error")
+                conn.rollback()
                 failcount += 1
             else:
                 io.echo(" ok ", level="ok")
@@ -151,22 +155,28 @@ def main(args, **kwargs) -> bool:
 
         # --- distribute items ---
         io.echo("{var:labelcolor}distribute {var:valuecolor}items: ", end="")
-        if (libmm.countdistributeditems(args, conn=conn) or 0) > 0:
+        if failcount > 0:
+            io.echo("skip", level="ok")
+        elif (libmm.countdistributeditems(args, conn=conn) or 0) > 0:
             io.echo("skip", level="ok")
         else:
             if libmm.distributeitems(args, conn=conn):
                 io.echo(" ok ", level="ok")
             else:
                 io.echo("fail", level="error")
+                conn.rollback()
                 failcount += 1
 
         # --- NPCs ---
         io.echo("{var:labelcolor}populate {var:valuecolor}NPCs: ", end="")
-        if (libmm.getnpccount(args, conn=conn) or 0) == 0:
+        if failcount > 0:
+            io.echo("skip", level="ok")
+        elif (libmm.getnpccount(args, conn=conn) or 0) == 0:
             if not database.importsql(
                 args, "npcs.sql", conn=conn, package=_SQL_PACKAGE
             ):
                 io.echo("fail", level="error")
+                conn.rollback()
                 failcount += 1
             else:
                 io.echo(" ok ", level="ok")
