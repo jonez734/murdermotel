@@ -355,10 +355,11 @@ def attack(
             buf.append(f"{chr(ord('1') + key)}) {w}")
             options += chr(ord("1") + key)
             key += 1
-        ch = io.inputchar(
+        ch = io.inputchoice(
             f"{{var:promptcolor}}kill with? {' '.join(buf)} {{var:inputcolor}}",
             options,
             "",
+            **kwargs,
         )
         if ch is None:
             return
@@ -436,12 +437,13 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         if len(weapons) > 0:
             options += "A"
         options = "".join(sorted(options))
-        ch = io.inputchar(
+        ch = io.inputchoice(
             f"{{var:promptcolor}}Make selection {{var:optioncolor}}[{options}]{{var:promptcolor}}: {{var:inputcolor}}",
             options,
             "",
             help=help,
             player=player,
+            **kwargs,
         )
         if ch == "A":
             io.echo(f"Attack {wolf.short()}")

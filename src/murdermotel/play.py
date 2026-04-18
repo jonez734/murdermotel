@@ -45,6 +45,7 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
             "{var:promptcolor}room short name: {var:inputcolor}",
             room.shortname,
             noneok=True,
+            **kwargs,
         )
         if shortname is None:
             return True
@@ -63,6 +64,7 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         dest: Optional[str] = io.inputstring(
             "{var:promptcolor}goto - room id or shortname: {var:inputcolor}",
             noneok=True,
+            **kwargs,
         )
         if dest is None or dest == "":
             return True
@@ -110,6 +112,7 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         "{var:optioncolor}[G]{var:labelcolor}oto {var:optioncolor}[E]{var:labelcolor}dit room {var:optioncolor}[R]{var:labelcolor}eload {var:optioncolor}(Q){var:labelcolor}uit",
         "GERQ",
         "Q",
+        **kwargs,
     )
     if ch == "Q":
         return True
@@ -265,7 +268,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             io.echo("You are out of turns for today")
             if (
                 io.inputboolean(
-                    "{var:promptcolor}reset turns? [Yn]: {var:inputcolor}", "Y"
+                    "{var:promptcolor}reset turns? [Yn]: {var:inputcolor}", "Y", **kwargs
                 )
                 is True
             ):
@@ -279,6 +282,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 io.inputboolean(
                     "{var:promptcolor}reset moves? {var:optioncolor}[Yn]{var:promptcolor}: {var:inputcolor}",
                     "Y",
+                    **kwargs,
                 )
                 is True
             ):
@@ -386,7 +390,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         )
 
         options = "".join(sorted(options))
-        ch: Optional[str] = io.inputchar(
+        ch: Optional[str] = io.inputchoice(
             f"{{var:promptcolor}}playground: [{options}]: {{var:inputcolor}}",
             options + "ZG",
             "Q",
@@ -394,6 +398,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             player=player,
             args=args,
             room=room,
+            **kwargs,
         )
 
         if ch is None:
@@ -537,7 +542,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 player.roomid = room.exits["down"]
         elif ch == "M":
             floor: int = io.inputinteger(
-                "map - {var:promptcolor}floor (1-5): {var:inputcolor}"
+                "map - {var:promptcolor}floor (1-5): {var:inputcolor}", **kwargs
             )
             if floor < 1 or floor > 5:
                 io.echo("invalid floor")
@@ -558,6 +563,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 "Take - {var:promptcolor}item name: {var:inputcolor}",
                 noneok=True,
                 completer=libmm.completeItemName(args, roomid=player.roomid),
+                **kwargs,
             )
             if itemname == "":
                 io.echo("aborted.")
@@ -577,6 +583,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 "Leave - {var:promptcolor}item name: {var:inputcolor}",
                 noneok=True,
                 completer=libmm.completeItemName(args, playername=player.moniker),
+                **kwargs,
             )
             itemindex = player.finditem(itemname)
             if itemindex is None:
@@ -623,6 +630,7 @@ def reload(args: argparse.Namespace, player: Any, **kwargs: Any) -> bool:
         "{var:optioncolor}[T]{var:labelcolor}his object  {var:optioncolor}[P]{var:labelcolor}ath (all same type)  {var:optioncolor}[M]{var:labelcolor}odule (enter name)  {var:optioncolor}[A]{var:labelcolor}ll objects",
         "TPMA",
         "Q",
+        **kwargs,
     )
 
     if ch == "Q" or ch is None:
@@ -643,6 +651,7 @@ def reload(args: argparse.Namespace, player: Any, **kwargs: Any) -> bool:
         modulepath: Optional[str] = io.inputstring(
             "{var:promptcolor}modulepath: {var:inputcolor}",
             noneok=True,
+            **kwargs,
         )
         if modulepath is None or modulepath == "":
             return True

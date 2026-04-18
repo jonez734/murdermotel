@@ -71,6 +71,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
             io.inputboolean(
                 "{var:promptcolor}redistribute weapons, defenses, and specials? [yN]: {var:inputcolor}",
                 "N",
+                **kwargs,
             )
             is False
         ):
@@ -146,6 +147,7 @@ def main(args, **kwargs):
         io.inputboolean(
             "{var:promptcolor}create playground? {var:optioncolor}[{var:currentoptioncolor}Y{var:optioncolor}n]{var:promptcolor}]: {var:inputcolor}",
             "Y",
+            **kwargs,
         )
         is True
     ):
@@ -154,6 +156,7 @@ def main(args, **kwargs):
         io.inputboolean(
             "{var:promptcolor}create weapons? {var:optioncolor}[{var:currentoptioncolor}Y{var:optioncolor}n]{var:promptcolor}: {var:inputcolor}",
             "Y",
+            **kwargs,
         )
         is True
     ):

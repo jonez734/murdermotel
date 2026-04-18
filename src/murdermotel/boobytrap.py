@@ -92,7 +92,7 @@ class BoobyTrap(Item):
             io.echo("There's a boobytrap here. It looks inactive.")
             if (
                 io.inputboolean(
-                    "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N"
+                    "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N", **kwargs
                 )
                 is True
             ):
@@ -362,7 +362,7 @@ def turn(args, **kwargs) -> bool:
         io.echo("There's a boobytrap here. It looks inactive.")
         if (
             io.inputboolean(
-                "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N"
+                "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N", **kwargs
             )
             is True
         ):
