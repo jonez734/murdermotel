@@ -111,14 +111,18 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
             m["roomid"] = random.randint(10, kk - 10)
             m["itemname"] = name
 
-            database.insert(
+            if not database.insert(
                 args,
                 "murdermotel.map_item_room",
                 m,
                 mogrify=True,
                 returnid=False,
                 conn=conn,
-            )
+            ):
+                io.echo(
+                    "mm.maintenance._populate_items.110: insert failed", level="error"
+                )
+                return False
 
     screen.updateprogress(step, total)
     step += 1

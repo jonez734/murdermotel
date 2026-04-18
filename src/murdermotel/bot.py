@@ -5,7 +5,7 @@ import argparse
 import random
 from typing import Any, Optional
 
-from bbsengine6 import database, io, util
+from bbsengine6 import database, io
 
 from . import lib as libmm
 from . import room as libroom
@@ -252,7 +252,7 @@ class Bot(Living):
     def save(self, **kwargs) -> bool:
         def _work(conn):
             rec = self.buildrec()
-            database.upsert(
+            if not database.upsert(
                 self.args,
                 f"{libmm.SCHEMA}.npc",
                 rec,
@@ -260,7 +260,9 @@ class Bot(Living):
                 update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
                 mogrify=True,
                 conn=conn,
-            )
+            ):
+                io.echo("mm.bot.save.110: upsert failed", level="error")
+                return False
 
             with database.cursor(conn) as cur:
                 sql = f"delete from {libmm.SCHEMA}.npc_player_items where npcmoniker=%s"
@@ -268,14 +270,16 @@ class Bot(Living):
                 cur.execute(sql, dat)
                 for i in self.items:
                     m = {"npcmoniker": self.name, "itemname": i.name}
-                    database.insert(
+                    if not database.insert(
                         self.args,
                         f"{libmm.SCHEMA}.npc_player_items",
                         m,
                         returnid=False,
                         mogrify=True,
                         conn=conn,
-                    )
+                    ):
+                        io.echo("mm.bot.save.120: insert failed", level="error")
+                        return False
             return True
 
         conn = kwargs.get("conn", None) or self.conn
@@ -349,7 +353,7 @@ def create(args: argparse.Namespace, moniker: str, mode: str = None, **kwargs) -
         b = Bot(args, name=moniker, mode=mode, **kwargs)
         rec = b.buildrec()
 
-        database.upsert(
+        if not database.upsert(
             args,
             f"{libmm.SCHEMA}.npc",
             rec,
@@ -357,7 +361,9 @@ def create(args: argparse.Namespace, moniker: str, mode: str = None, **kwargs) -
             update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
             mogrify=True,
             conn=conn,
-        )
+        ):
+            io.echo("mm.bot.create.110: upsert failed", level="error")
+            return None
 
         loaded = load(args, moniker, conn=conn)
         return loaded
@@ -426,7 +432,6 @@ def exists(args: argparse.Namespace, moniker: str, **kwargs) -> bool:
 
 def build(args: argparse.Namespace, rec: dict, **kwargs) -> Bot:
     conn = kwargs.get("conn")
-    pool = kwargs.get("pool")
 
     state = kwargs.get("state")
 

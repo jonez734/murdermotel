@@ -36,7 +36,7 @@ class Room(object):
         self.fields = ("shortname", "title", "description", "modulepath")
 
     def on_turn(self, args, room=None, **kwargs):
-        io.echo(f"mm.room.on_turn.100: calling .turn()", level="debug")
+        io.echo("mm.room.on_turn.100: calling .turn()", level="debug")
         if self.modulepath:
             return libmm.runmodule(
                 args, "turn", self.modulepath, obj=self, room=room, **kwargs
@@ -96,13 +96,15 @@ class Room(object):
                     m["itemname"] = i.name
                     m["serial"] = i.serial
                     m["roomid"] = self.id
-                    database.insert(
+                    if not database.insert(
                         self.args,
                         "murdermotel.map_item_room",
                         m,
                         returnid=False,
                         mogrify=mogrify,
-                    )
+                    ):
+                        io.echo("mm.room.save.110: insert failed", level="error")
+                        return False
 
             conn.commit()
         return True

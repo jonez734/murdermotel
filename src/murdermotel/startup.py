@@ -234,14 +234,18 @@ def _populate_rooms(args, **kwargs) -> bool:
                     else:
                         room[direction] = val if val != 0 else None
                 io.echo(f"{room=}", level="debug")
-                database.insert(
+                if not database.insert(
                     args,
                     f"{libmm.SCHEMA}.playground",
                     room,
                     primarykey="id",
                     conn=conn,
                     commit=True,
-                )
+                ):
+                    io.echo(
+                        "mm.startup._populate_rooms.110: insert failed", level="error"
+                    )
+                    return False
                 roomid += 1
         return True
 

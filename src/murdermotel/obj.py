@@ -115,7 +115,7 @@ class Obj(object):
                         f"{self.classname}.save.160: update failed, trying insert. p={p!r}",
                         level="debug",
                     )
-                database.insert(
+                if not database.insert(
                     self.args,
                     self.table,
                     p,
@@ -123,7 +123,9 @@ class Obj(object):
                     returnid=False,
                     mogrify=True,
                     conn=conn,
-                )
+                ):
+                    io.echo(f"{self.classname}.save.170: insert failed", level="error")
+                    return False
             return True
 
         conn = kwargs.get("conn", None)

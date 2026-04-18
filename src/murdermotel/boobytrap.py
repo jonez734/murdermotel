@@ -126,14 +126,16 @@ class BoobyTrap(Item):
                 m["itemname"] = self.name
                 m["serial"] = 0
                 m["roomid"] = self.roomid
-                database.insert(
+                if not database.insert(
                     self.args,
                     f"{libmm.SCHEMA}.map_item_room",
                     m,
                     returnid=False,
                     mogrify=True,
                     conn=conn,
-                )
+                ):
+                    io.echo("mm.BoobyTrap.save.110: insert failed", level="error")
+                    return False
             return True
 
         conn = kwargs.get("conn", None) or self.conn
@@ -222,14 +224,16 @@ def save(args, boobytrap, **kwargs):
             m["itemname"] = BOOBYTRAP_NAME
             m["serial"] = 0
             m["roomid"] = boobytrap.roomid
-            database.insert(
+            if not database.insert(
                 args,
                 f"{libmm.SCHEMA}.map_item_room",
                 m,
                 returnid=False,
                 mogrify=True,
                 conn=conn,
-            )
+            ):
+                io.echo("mm.boobytrap.save.110: insert failed", level="error")
+                return False
         return True
 
     conn = kwargs.get("conn", None)
@@ -259,7 +263,7 @@ def create(args, **kwargs):
         rec = b.buildrec()
         io.echo(f"mm.boobytrap.create.110: {rec=}", level="debug")
 
-        database.upsert(
+        if not database.upsert(
             args,
             f"{libmm.SCHEMA}.boobytrap",
             rec,
@@ -267,7 +271,9 @@ def create(args, **kwargs):
             update_columns=["running", "timer"],
             mogrify=True,
             conn=conn,
-        )
+        ):
+            io.echo("mm.boobytrap.create.115: upsert failed", level="error")
+            return False
 
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.boobytrap where name=%s"

@@ -99,14 +99,16 @@ class Thief(Living):
                     m["itemname"] = i.name
                     m["serial"] = i.serial
                     m["thiefname"] = self.name
-                    database.insert(
+                    if not database.insert(
                         self.args,
                         f"{SCHEMA}.map_item_thief",
                         m,
                         returnid=False,
                         mogrify=True,
                         conn=conn,
-                    )
+                    ):
+                        io.echo("mm.Thief.save.110: insert failed", level="error")
+                        return False
             return True
 
         conn = kwargs.get("conn", None) or self.conn
@@ -199,14 +201,16 @@ def save(args, thief, **kwargs):
                 m = {}
                 m["itemname"] = i.name
                 m["thiefname"] = THIEF_NAME
-                database.insert(
+                if not database.insert(
                     args,
                     f"{libmm.SCHEMA}.map_item_thief",
                     m,
                     returnid=False,
                     mogrify=True,
                     conn=conn,
-                )
+                ):
+                    io.echo("mm.thief.save.110: insert failed", level="error")
+                    return False
         return True
 
     conn = kwargs.get("conn", None)
@@ -238,7 +242,7 @@ def create(args, **kwargs):
         rec = t.buildrec()
         io.echo(f"mm.thief.create.110: {rec=}", level="debug")
 
-        database.upsert(
+        if not database.upsert(
             args,
             f"{libmm.SCHEMA}.thief",
             rec,
@@ -246,7 +250,9 @@ def create(args, **kwargs):
             update_columns=["bag", "roomid", "healthpoints"],
             mogrify=True,
             conn=conn,
-        )
+        ):
+            io.echo("mm.thief.create.115: upsert failed", level="error")
+            return False
 
         with database.cursor(conn) as cur:
             sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, modulepath, title)

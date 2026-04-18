@@ -202,7 +202,9 @@ class Player(Living):
                 pool=self.pool,
             )
         else:
-            database.insert(
+            if self.args.debug is True:
+                io.echo(f"{self.classname}.save.140: insert", level="debug")
+            if not database.insert(
                 self.args,
                 "murdermotel.player",
                 p,
@@ -210,7 +212,9 @@ class Player(Living):
                 returnid=False,
                 mogrify=mogrify,
                 pool=self.pool,
-            )
+            ):
+                io.echo("mm.player.save.150: insert failed", level="error")
+                return False
 
         with database.connect(self.args, pool=self.pool) as conn:
             with database.cursor(conn) as cur:
@@ -221,14 +225,16 @@ class Player(Living):
                     m = {}
                     m["itemname"] = i.name
                     m["playermoniker"] = self.moniker
-                    database.insert(
+                    if not database.insert(
                         self.args,
                         "murdermotel.map_item_player",
                         m,
                         returnid=False,
                         mogrify=True,
                         conn=conn,
-                    )
+                    ):
+                        io.echo("mm.player.save.160: insert failed", level="error")
+                        return False
 
             conn.commit()
         return True
@@ -681,13 +687,15 @@ def distributeitems(args, **kwargs):
                         continue
 
                     m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
-                    database.insert(
+                    if not database.insert(
                         args,
                         f"{SCHEMA}.map_item_room",
                         m,
                         conn=conn,
                         returnid=False,
-                    )
+                    ):
+                        io.echo("mm.populate_items.110: insert failed", level="error")
+                        return False
                     room_counts[roomid] = count + 1
                     if roomid not in room_items:
                         room_items[roomid] = set()
@@ -698,13 +706,15 @@ def distributeitems(args, **kwargs):
                 if not placed:
                     roomid = random.choice(eligible_rooms)
                     m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
-                    database.insert(
+                    if not database.insert(
                         args,
                         f"{SCHEMA}.map_item_room",
                         m,
                         conn=conn,
                         returnid=False,
-                    )
+                    ):
+                        io.echo("mm.populate_items.120: insert failed", level="error")
+                        return False
                     room_counts[roomid] = room_counts.get(roomid, 0) + 1
                     if roomid not in room_items:
                         room_items[roomid] = set()

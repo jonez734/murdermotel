@@ -190,7 +190,7 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
         rec = w.buildrec()
         io.echo(f"mm.rabidwolf.create.110: {rec=}", level="debug")
 
-        database.upsert(
+        if not database.upsert(
             args,
             f"{libmm.SCHEMA}.rabidwolf",
             rec,
@@ -198,7 +198,9 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
             update_columns=["roomid", "healthpoints"],
             mogrify=True,
             conn=conn,
-        )
+        ):
+            io.echo("mm.rabidwolf.create.115: upsert failed", level="error")
+            return False
 
         with database.cursor(conn) as cur:
             sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, modulepath, title)

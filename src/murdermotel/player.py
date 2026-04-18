@@ -172,14 +172,16 @@ class Player(object):
                     m["itemname"] = i.name
                     m["serial"] = i.serial
                     m["playermoniker"] = self.moniker
-                    database.insert(
+                    if not database.insert(
                         self.args,
                         f"{libmm.SCHEMA}.map_item_player",
                         m,
                         returnid=False,
                         mogrify=True,
                         conn=conn,
-                    )
+                    ):
+                        io.echo("mm.player.save.130: insert failed", level="error")
+                        return False
             return True
 
         conn = kwargs.get("conn", None)
@@ -477,7 +479,7 @@ def create(args, playermoniker, **kwargs):
         rec["datecreated"] = datetime.datetime.now(datetime.timezone.utc)
         io.echo(f"mm.player.create.110: {rec=}", level="debug")
 
-        database.upsert(
+        if not database.upsert(
             args,
             f"{libmm.SCHEMA}.player",
             rec,
@@ -496,7 +498,9 @@ def create(args, playermoniker, **kwargs):
             ],
             mogrify=True,
             conn=conn,
-        )
+        ):
+            io.echo("mm.player.create.115: upsert failed", level="error")
+            return None
 
         with database.cursor(conn) as cur:
             sql = f"select * from {libmm.SCHEMA}.player where moniker=%s"
