@@ -163,7 +163,10 @@ class Player(Living):
         for x in range(0, len(self.items)):
             if self.args.debug is True:
                 io.echo(f"room.finditem.120: name={self.items[x].name}", level="debug")
-            if self.items[x].name == shortname:
+            if (
+                self.items[x].name.lower() == shortname.lower()
+                or self.items[x].title.lower() == shortname.lower()
+            ):
                 return x
         return None
 
@@ -488,7 +491,7 @@ def buildargs(args=None, **kwargs):
         "databaseport": 5432,
         "databasepassword": None,
     }
-    database.buildargdatabasegroup(parser, defaults, suppress=True)
+    database.buildargdatabasegroup(parser, defaults, suppress=False)
     return parser
 
 

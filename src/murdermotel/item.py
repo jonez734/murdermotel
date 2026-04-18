@@ -78,7 +78,7 @@ def load(args, itemname, serial: int = 0, **kwargs):
                         f"unable to load item {itemname!r} serial={serial}",
                         level="debug",
                     )
-                    return False
+                    return None
 
             rec = cur.fetchone()
 
@@ -99,7 +99,7 @@ def load(args, itemname, serial: int = 0, **kwargs):
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"mm.room.load.100: {pool=}", level="error")
-            return False
+            return None
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)

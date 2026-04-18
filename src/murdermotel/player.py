@@ -140,7 +140,10 @@ class Player(object):
         )
         for x in range(0, len(self.items)):
             io.echo(f"room.finditem.120: name={self.items[x].name}", level="debug")
-            if self.items[x].name == shortname:
+            if (
+                self.items[x].name.lower() == shortname.lower()
+                or self.items[x].title.lower() == shortname.lower()
+            ):
                 return x
         return None
 

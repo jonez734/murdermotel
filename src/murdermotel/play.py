@@ -403,7 +403,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             if (
                 io.inputboolean(
                     ":door: Quit - {var:promptcolor}are you sure? {var:optioncolor}[yN]{var:promptcolor}: {var:inputcolor}",
-                    "N",
+                    "N", **kwargs,
                 )
                 is True
             ):
@@ -565,7 +565,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             itemindex: Optional[int] = room.finditem(itemname)
             if itemindex is None:
                 io.echo(f"The {itemname!r} is not here.", level="error")
-                return False
+                continue
 
             item = room.items[itemindex]
             del room.items[itemindex]
@@ -609,6 +609,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
 
         player.on_turn(args, room=room, **kwargs)
 
+    io.echo("exiting play loop", level="debug")
     return True
 
 
