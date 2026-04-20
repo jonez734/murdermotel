@@ -44,26 +44,35 @@ class Item(object):
             rec[f] = getattr(self, f)
         return rec
 
-    def save(self, mogrify=False):
-        if self.pool is None:
-            io.echo(f"mm.item.save.180: {self.pool=}", level="error")
-            return False
+    def save(self, mogrify=False, **kwargs):
+        def _work(conn):
+            i = {}
+            for f in FIELDS:
+                i[f] = getattr(self, f)
 
-        i = {}
-        for f in FIELDS:
-            i[f] = getattr(self, f)
-
-        with database.connect(self.args, pool=self.pool) as conn:
-            database.update(
+            if not database.upsert(
                 self.args,
                 f"{libmm.SCHEMA}.item",
-                self.name,
                 i,
-                primarykey="name",
+                conflict_columns=["name"],
+                mogrify=mogrify,
                 conn=conn,
-            )
-            conn.commit()
-        return True
+            ):
+                io.echo("mm.item.save.105: item upsert failed", level="error")
+                return False
+            return True
+
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.item.save.180: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                result = _work(conn)
+                conn.commit()
+                return result
+        else:
+            return _work(conn)
 
 
 def load(args, itemname, serial: int = 0, **kwargs):

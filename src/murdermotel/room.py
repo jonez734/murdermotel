@@ -68,28 +68,25 @@ class Room(object):
                 return x
         return None
 
-    def save(self, mogrify=False):
-        if self.pool is None:
-            io.echo(f"mm.room.save.180: {self.pool=}", level="error")
-            return False
+    def save(self, mogrify=False, **kwargs):
+        def _work(conn):
+            r = {}
+            for f in FIELDS:
+                r[f] = getattr(self, f)
+            for e in EXITS:
+                r[e] = self.exits[e]
 
-        r = {}
-        for f in FIELDS:
-            r[f] = getattr(self, f)
-
-        for e in EXITS:
-            r[e] = self.exits[e]
-
-        with database.connect(self.args, pool=self.pool) as conn:
-            database.update(
+            if not database.upsert(
                 self.args,
                 f"{libmm.SCHEMA}.playground",
-                self.id,
                 r,
-                primarykey="id",
+                conflict_columns=["id"],
                 mogrify=mogrify,
-                pool=self.pool,
-            )
+                conn=conn,
+            ):
+                io.echo("mm.room.save.105: room upsert failed", level="error")
+                return False
+
             with database.cursor(conn) as cur:
                 sql = "delete from murdermotel.map_item_room where roomid=%s"
                 dat = (self.id,)
@@ -99,18 +96,29 @@ class Room(object):
                     m["itemname"] = i.name
                     m["serial"] = i.serial
                     m["roomid"] = self.id
-                    if not database.insert(
+                    if not database.upsert(
                         self.args,
                         "murdermotel.map_item_room",
                         m,
-                        returnid=False,
+                        conflict_columns=["itemname", "serial", "roomid"],
                         mogrify=mogrify,
+                        conn=conn,
                     ):
-                        io.echo("mm.room.save.110: insert failed", level="error")
+                        io.echo("mm.room.save.110: item upsert failed", level="error")
                         return False
+            return True
 
-            conn.commit()
-        return True
+        conn = kwargs.get("conn", None)
+        if conn is None:
+            if self.pool is None:
+                io.echo(f"mm.room.save.180: {self.pool=}", level="error")
+                return False
+            with database.connect(self.args, pool=self.pool) as conn:
+                result = _work(conn)
+                conn.commit()
+                return result
+        else:
+            return _work(conn)
 
 
 def load(args, roomid, **kwargs):
