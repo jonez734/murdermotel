@@ -172,10 +172,9 @@ class Player(Living):
 
     def load(self, moniker) -> bool:
         def _work(conn):
-            sql = "select * from murdermotel.player where moniker=%s"
-            dat = (moniker,)
+            q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
             with database.cursor(conn) as cur:
-                cur.execute(sql, dat)
+                cur.execute(q, {"moniker": moniker})
                 if cur.rowcount == 0:
                     if self.args.debug is True:
                         io.echo(f"unable to load player {moniker!r}", level="debug")
@@ -339,14 +338,14 @@ class completeItemName(object):
             )
 
         if self.roomid is not None:
-            sql = "select name from murdermotel.item as i, murdermotel.map_item_room as m where i.name = m.itemname and m.roomid=%s"
-            dat = (self.roomid,)
+            q = database.query("SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON i.name = m.itemname WHERE m.roomid = :roomid", roomid=self.roomid)
+            dat = {"roomid": self.roomid}
         elif self.playermoniker is not None:
-            sql = "select name from murdermotel.item as i, murdermotel.map_item_player as m where i.name = m.itemname and m.playermoniker=%s"
-            dat = (self.playermoniker,)
+            q = database.query("SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_player m ON i.name = m.itemname WHERE m.playermoniker = :playermoniker", playermoniker=self.playermoniker)
+            dat = {"playermoniker": self.playermoniker}
         else:
-            sql = "select name from murdermotel.item as i"
-            dat = ()
+            q = database.query("SELECT name FROM $murdermotel.item")
+            dat = {}
 
         if self.pool is None:
             io.echo("completeItemName.120: pool is None", level="error")
@@ -355,7 +354,7 @@ class completeItemName(object):
         with database.connect(self.args, pool=self.pool) as conn:
             with database.cursor(conn) as cur:
                 if self.args.debug is True:
-                    io.echo(f"completeItemName.120: mogrify={cur.mogrify(sql, dat)!r}")
+                    io.echo(f"completeItemName.120: mogrify={cur.mogrify(q, dat)!r}")
                 cur.execute(sql, dat)
 
                 vocab = []
@@ -502,8 +501,8 @@ def main(args, **kwargs) -> bool:
 def getitemcount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {SCHEMA}.item"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.item")
+            cur.execute(q)
             if cur.rowcount == 0:
                 return 0
             row = cur.fetchone()
@@ -523,8 +522,8 @@ def getitemcount(args, **kwargs):
 def getdefensecount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {SCHEMA}.defense"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.defense")
+            cur.execute(q)
             if cur.rowcount == 0:
                 return 0
             row = cur.fetchone()
@@ -544,8 +543,8 @@ def getdefensecount(args, **kwargs):
 def getnpccount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {SCHEMA}.npc"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.npc")
+            cur.execute(q)
             if cur.rowcount == 0:
                 return 0
             row = cur.fetchone()
@@ -565,9 +564,8 @@ def getnpccount(args, **kwargs):
 def getitem(args, name, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = "select * from murdermotel.item as i where name=%s"
-            dat = (name,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.item WHERE name = :name", name=name)
+            cur.execute(q, {"name": name})
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()
@@ -590,9 +588,8 @@ def getitem(args, name, **kwargs):
 def getroomplayers(args, roomid, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = "select moniker from murdermotel.player as p where p.roomid=%s"
-            dat = (roomid,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT moniker FROM $murdermotel.player WHERE roomid = :roomid", roomid=roomid)
+            cur.execute(q, {"roomid": roomid})
             players = []
             if cur.rowcount > 0:
                 for rec in database.resultiter(cur):
@@ -616,13 +613,13 @@ def countdistributeditems(args, **kwargs):
     def _work(conn):
         count = 0
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {SCHEMA}.map_item_player"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.map_item_player")
+            cur.execute(q)
             if cur.rowcount > 0:
                 res = cur.fetchone()
                 count += res["count"]
-            sql = f"select count(*) from {SCHEMA}.map_item_room"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.map_item_room")
+            cur.execute(q)
             if cur.rowcount > 0:
                 res = cur.fetchone()
                 count += res["count"]
@@ -657,8 +654,8 @@ def distributeitems(args, **kwargs):
             _clearitemmaps(conn)
 
         with database.cursor(conn) as cur:
-            sql = f"select name, serial from {SCHEMA}.item where kind in ('component', 'defense')"
-            cur.execute(sql)
+            q = database.query("SELECT name, serial FROM $murdermotel.item WHERE kind IN ('component', 'defense')")
+            cur.execute(q)
             if cur.rowcount == 0:
                 io.echo("items not populated")
                 return False
