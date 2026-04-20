@@ -39,10 +39,6 @@ class TestBotQueries:
 
     def test_get_alive_bots(self, test_args, test_pool):
         from murdermotel import bot
-        import psycopg
 
-        try:
-            bots = bot.get_alive_bots(test_args, pool=test_pool)
-        except psycopg.errors.UndefinedColumn:
-            pytest.skip("item table missing serial column")
+        bots = bot.get_alive_bots(test_args, pool=test_pool)
         assert isinstance(bots, list)

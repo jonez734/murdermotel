@@ -39,12 +39,8 @@ class TestLibQueries:
 
     def test_getdefensecount(self, test_args, test_pool):
         from murdermotel import lib as libmm
-        import psycopg
 
-        try:
-            count = libmm.getdefensecount(test_args, pool=test_pool)
-        except psycopg.errors.UndefinedTable:
-            pytest.skip("murdermotel.defense table does not exist")
+        count = libmm.getdefensecount(test_args, pool=test_pool)
         assert isinstance(count, int)
         assert count >= 0
 
