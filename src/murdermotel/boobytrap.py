@@ -92,7 +92,9 @@ class BoobyTrap(Item):
             io.echo("There's a boobytrap here. It looks inactive.")
             if (
                 io.inputboolean(
-                    "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N", **kwargs
+                    "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}",
+                    "N",
+                    **kwargs,
                 )
                 is True
             ):
@@ -107,6 +109,25 @@ class BoobyTrap(Item):
 
     def save(self, **kwargs) -> bool:
         def _work(conn):
+            item_rec = {
+                "name": self.name,
+                "serial": 1,
+                "kind": "boobytrap",
+                "modulepath": "boobytrap",
+                "title": "Booby Trap",
+            }
+            if not database.upsert(
+                self.args,
+                f"{libmm.SCHEMA}.item",
+                item_rec,
+                conflict_columns=["name", "serial"],
+                update_columns=["kind", "modulepath", "title"],
+                mogrify=True,
+                conn=conn,
+            ):
+                io.echo("mm.BoobyTrap.save.105: item upsert failed", level="error")
+                return False
+
             rec = self.buildrec()
             database.update(
                 self.args,
@@ -153,9 +174,8 @@ class BoobyTrap(Item):
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.boobytrap where name=%s"
-            dat = (BOOBYTRAP_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.boobytrap WHERE name = :name", name=BOOBYTRAP_NAME)
+            cur.execute(q, {"name": BOOBYTRAP_NAME})
             if cur.rowcount == 0:
                 io.echo(
                     "mm.boobytrap.load.100: no boobytrap found, creating one",
@@ -184,9 +204,8 @@ def load(args, **kwargs):
 def get_room_for_boobytrap(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select roomid from {libmm.SCHEMA}.map_item_room where itemname=%s"
-            dat = (BOOBYTRAP_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT roomid FROM $murdermotel.map_item_room WHERE itemname = :name", name=BOOBYTRAP_NAME)
+            cur.execute(q, {"name": BOOBYTRAP_NAME})
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()
@@ -205,6 +224,25 @@ def get_room_for_boobytrap(args, **kwargs):
 
 def save(args, boobytrap, **kwargs):
     def _work(conn):
+        item_rec = {
+            "name": BOOBYTRAP_NAME,
+            "serial": 1,
+            "kind": "boobytrap",
+            "modulepath": "boobytrap",
+            "title": "Booby Trap",
+        }
+        if not database.upsert(
+            args,
+            f"{libmm.SCHEMA}.item",
+            item_rec,
+            conflict_columns=["name", "serial"],
+            update_columns=["kind", "modulepath", "title"],
+            mogrify=True,
+            conn=conn,
+        ):
+            io.echo("mm.boobytrap.save.105: item upsert failed", level="error")
+            return False
+
         rec = boobytrap.buildrec()
         database.update(
             args,
@@ -260,6 +298,25 @@ def create(args, **kwargs):
             args, {"name": BOOBYTRAP_NAME, "running": False, "timer": 0}, **kwargs
         )
 
+        item_rec = {
+            "name": BOOBYTRAP_NAME,
+            "serial": 1,
+            "kind": "boobytrap",
+            "modulepath": "boobytrap",
+            "title": "Booby Trap",
+        }
+        if not database.upsert(
+            args,
+            f"{libmm.SCHEMA}.item",
+            item_rec,
+            conflict_columns=["name", "serial"],
+            update_columns=["kind", "modulepath", "title"],
+            mogrify=True,
+            conn=conn,
+        ):
+            io.echo("mm.boobytrap.create.105: item upsert failed", level="error")
+            return False
+
         rec = b.buildrec()
         io.echo(f"mm.boobytrap.create.110: {rec=}", level="debug")
 
@@ -276,8 +333,8 @@ def create(args, **kwargs):
             return False
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.boobytrap where name=%s"
-            cur.execute(sql, (BOOBYTRAP_NAME,))
+            q = database.query("SELECT * FROM $murdermotel.boobytrap WHERE name = :name", name=BOOBYTRAP_NAME)
+            cur.execute(q, {"name": BOOBYTRAP_NAME})
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 b = build(args, rec, **kwargs)
@@ -305,9 +362,8 @@ def create(args, **kwargs):
 def exists(args, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.boobytrap where name=%s"
-            dat = (BOOBYTRAP_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT name FROM $murdermotel.boobytrap WHERE name = :name", name=BOOBYTRAP_NAME)
+            cur.execute(q, {"name": BOOBYTRAP_NAME})
             if cur.rowcount == 0:
                 return False
             return True

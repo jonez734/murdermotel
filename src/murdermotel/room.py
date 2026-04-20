@@ -116,9 +116,8 @@ class Room(object):
 def load(args, roomid, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.playground where id=%s or shortname=%s::text"
-            dat = (roomid, roomid)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.playground WHERE id = :roomid OR shortname = :roomid::text", roomid=roomid)
+            cur.execute(q, {"roomid": roomid})
             if cur.rowcount == 0:
                 if args.debug is True:
                     io.echo(f"unable to load room {roomid=}", level="error")
@@ -157,15 +156,14 @@ def getitems(args, roomid, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = "select m.itemname, m.serial, i.title, i.kind, i.usemessages from murdermotel.item as i, murdermotel.map_item_room as m where m.roomid=%s and m.itemname=i.name and m.serial=i.serial"
-            dat = (roomid,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT m.itemname, m.serial, i.title, i.kind, i.usemessages FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON m.itemname = i.name WHERE m.roomid = :roomid", roomid=roomid)
+            cur.execute(q, {"roomid": roomid})
 
             if cur.rowcount == 0:
                 return []
 
             for rec in database.resultiter(cur):
-                i = libitem.Item(args, serial=rec["serial"])
+                i = libitem.Item(args, serial=rec.get("serial"))
                 i.name = rec["itemname"]
                 i.title = rec["title"]
                 i.kind = rec["kind"]
@@ -187,8 +185,8 @@ def getitems(args, roomid, **kwargs):
 def getcount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {libmm.SCHEMA}.playground"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.playground")
+            cur.execute(q)
             if cur.rowcount == 0:
                 return 0
             row = cur.fetchone()

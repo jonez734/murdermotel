@@ -142,17 +142,15 @@ def main(args, **kwargs) -> bool:
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
-            dat = (THIEF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :name", name=THIEF_NAME)
+            cur.execute(q, {"name": THIEF_NAME})
             npc_exists = cur.rowcount > 0
             if npc_exists:
                 io.echo("mm.thief.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
-            dat = (THIEF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            cur.execute(q, {"name": THIEF_NAME})
             if cur.rowcount == 0:
                 if npc_exists:
                     io.echo(
@@ -262,8 +260,8 @@ def create(args, **kwargs):
             cur.execute(sql, dat)
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.thief where name=%s"
-            cur.execute(sql, (THIEF_NAME,))
+            q = database.query("SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            cur.execute(q, {"name": THIEF_NAME})
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 t = build(args, rec, **kwargs)
@@ -293,16 +291,15 @@ def getitems(args, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = f"select itemname, serial from {libmm.SCHEMA}.map_item_thief where thiefname=%s"
-            dat = (THIEF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT itemname, serial FROM $murdermotel.map_item_thief WHERE thiefname = :name", name=THIEF_NAME)
+            cur.execute(q, {"name": THIEF_NAME})
             if cur.rowcount == 0:
                 return items
             res = cur.fetchmany()
             for rec in res:
                 from . import item as libitem
 
-                item = libitem.load(args, rec["itemname"], serial=rec["serial"])
+                item = libitem.load(args, rec["itemname"], serial=rec.get("serial"))
                 if item is None:
                     io.echo(f"mm.thief.getitems: {item=}", level="error")
                     break
@@ -323,9 +320,8 @@ def getitems(args, **kwargs):
 def exists(args, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.thief where name=%s"
-            dat = (THIEF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT name FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            cur.execute(q, {"name": THIEF_NAME})
             if cur.rowcount == 0:
                 return False
             return True

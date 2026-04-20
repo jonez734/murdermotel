@@ -135,17 +135,15 @@ def buildargs(args, obj=None, room=None, **kwargs):
 def load(args: argparse.Namespace, **kwargs) -> Optional[RabidWolf]:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.npc where name=%s"
-            dat = (WOLF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :name", name=WOLF_NAME)
+            cur.execute(q, {"name": WOLF_NAME})
             npc_exists = cur.rowcount > 0
             if npc_exists:
                 io.echo("mm.rabidwolf.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
-            dat = (WOLF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
+            cur.execute(q, {"name": WOLF_NAME})
             if cur.rowcount == 0:
                 if npc_exists:
                     io.echo(
@@ -210,8 +208,8 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
             cur.execute(sql, dat)
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.rabidwolf where name=%s"
-            cur.execute(sql, (WOLF_NAME,))
+            q = database.query("SELECT * FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
+            cur.execute(q, {"name": WOLF_NAME})
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 w = build(args, rec, **kwargs)
@@ -239,9 +237,8 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
 def exists(args: argparse.Namespace, **kwargs: Any) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select name from {libmm.SCHEMA}.rabidwolf where name=%s"
-            dat = (WOLF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT name FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
+            cur.execute(q, {"name": WOLF_NAME})
             if cur.rowcount == 0:
                 return False
             return True

@@ -69,13 +69,12 @@ class Item(object):
 def load(args, itemname, serial: int = 0, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.item where name=%s and serial=%s"
-            dat = (itemname, serial)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.item WHERE name = :name", name=itemname)
+            cur.execute(q, {"name": itemname})
             if cur.rowcount == 0:
                 if args.debug is True:
                     io.echo(
-                        f"unable to load item {itemname!r} serial={serial}",
+                        f"unable to load item {itemname!r}",
                         level="debug",
                     )
                     return None
@@ -108,8 +107,8 @@ def load(args, itemname, serial: int = 0, **kwargs):
 def getcount(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select count(*) from {libmm.SCHEMA}.item"
-            cur.execute(sql)
+            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.item")
+            cur.execute(q)
             if cur.rowcount == 0:
                 return 0
             row = cur.fetchone()
