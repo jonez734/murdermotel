@@ -61,6 +61,7 @@ class Player(object):
         self.bodycount = 0
         self.membermoniker = None
         self.pool = kwargs.get("pool", None)
+        self.conn = kwargs.get("conn", None)
         self.exits = {}
         self.datecreated = None
         self.target = None
@@ -255,9 +256,8 @@ class Player(object):
 def load(args, moniker, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.player where moniker=%s"
-            dat = (moniker,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+            cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 io.echo(
                     f"mm.player.load.120: unable to load player. {moniker=}",
@@ -287,9 +287,8 @@ def load(args, moniker, **kwargs):
 def exists(args, moniker, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            sql = f"select moniker from {libmm.SCHEMA}.player where moniker=%s"
-            dat = (moniker,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT moniker FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+            cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return False
             return True
@@ -307,12 +306,9 @@ def exists(args, moniker, **kwargs) -> bool:
 
 def count(args, membermoniker: str, **kwargs) -> int:
     def _work(conn):
-        sql: str = (
-            "select count(moniker) from murdermotel.player where membermoniker=%s"
-        )
-        dat: tuple = (membermoniker,)
+        q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.player WHERE membermoniker = :membermoniker", membermoniker=membermoniker)
         with database.cursor(conn) as cur:
-            cur.execute(sql, dat)
+            cur.execute(q, {"membermoniker": membermoniker})
             if cur.rowcount == 0:
                 io.echo("murdermotel.player.count.160: returning None", level="debug")
                 return None
@@ -337,14 +333,14 @@ def getitems(args, playermoniker, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = f"select itemname, serial from {libmm.SCHEMA}.map_item_player where playermoniker=%s"
-            dat = (playermoniker,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT * FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker", playermoniker=playermoniker)
+            cur.execute(q, {"playermoniker": playermoniker})
             if cur.rowcount == 0:
                 return items
             res = cur.fetchmany()
             for rec in res:
-                item = libitem.load(args, rec["itemname"], serial=rec["serial"])
+                serial = rec.get("serial")
+                item = libitem.load(args, rec["itemname"], serial=serial)
                 if item is None:
                     io.echo(f"mm.player.getitems: {item=}", level="error")
                     break
@@ -379,10 +375,9 @@ class completePlayerName(object):
         with database.connect(self.args, pool=self.pool) as conn:
             with database.cursor(conn) as cur:
                 vocab = []
-                sql: str = f"select name from {libmm.SCHEMA}.player"
-                dat: tuple = ()
+                q = database.query("SELECT name FROM $murdermotel.player")
                 cur = conn.cursor()
-                cur.execute(sql, dat)
+                cur.execute(q)
                 for rec in database.resultiter(cur):
                     vocab.append(rec["name"])
                 results = [x for x in vocab if x.startswith(text)] + [None]
@@ -395,12 +390,11 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
     args = kwargs.get("args", argparse.Namespace())
 
     def _work(conn):
-        sql: str = f"select 1 from {libmm.SCHEMA}.player where moniker=%s"
-        dat: tuple = (moniker,)
+        q = database.query("SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
         with database.cursor(conn) as cur:
-            cur.execute(sql, dat)
+            cur.execute(q, {"moniker": moniker})
             io.echo(
-                f"verifyPlayerNameNotFound.100: mogrify={database.mogrifysql(cur, sql, dat)}",
+                f"verifyPlayerNameNotFound.100: mogrify={database.mogrifysql(cur, str(q), (moniker,))}",
                 level="debug",
             )
             if cur.rowcount == 0:
@@ -420,12 +414,11 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
 def verifyPlayerNameNotFound(args, moniker: str, **kwargs: dict) -> bool:
 
     def _work(conn):
-        sql: str = f"select 1 from {libmm.SCHEMA}.player where moniker=%s"
-        dat: tuple = (moniker,)
+        q = database.query("SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
         with database.cursor(conn) as cur:
-            cur.execute(sql, dat)
+            cur.execute(q, {"moniker": moniker})
             io.echo(
-                f"verifyPlayerNameNotFound.100: mogrify={database.mogrifysql(cur, sql, dat)}",
+                f"verifyPlayerNameNotFound.100: mogrify={database.mogrifysql(cur, str(q), (moniker,))}",
                 level="debug",
             )
             if cur.rowcount == 0:
@@ -506,8 +499,8 @@ def create(args, playermoniker, **kwargs):
             return None
 
         with database.cursor(conn) as cur:
-            sql = f"select * from {libmm.SCHEMA}.player where moniker=%s"
-            cur.execute(sql, (playermoniker,))
+            q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=playermoniker)
+            cur.execute(q, {"moniker": playermoniker})
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 p = load(args, playermoniker, **kwargs)
