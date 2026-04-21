@@ -265,7 +265,10 @@ class Bot(Living):
                 return False
 
             with database.cursor(conn) as cur:
-                q = database.query("DELETE FROM $murdermotel.npc_player_items WHERE npcmoniker = :npcmoniker", npcmoniker=self.name)
+                q = database.query(
+                    "DELETE FROM $murdermotel.npc_player_items WHERE npcmoniker = :npcmoniker",
+                    npcmoniker=self.name,
+                )
                 cur.execute(q, {"npcmoniker": self.name})
                 for i in self.items:
                     m = {"npcmoniker": self.name, "itemname": i.name}
@@ -320,7 +323,10 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
 def load(args: argparse.Namespace, moniker: str, **kwargs) -> Optional[Bot]:
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true", moniker=moniker)
+            q = database.query(
+                "SELECT * FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true",
+                moniker=moniker,
+            )
             cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return None
@@ -385,7 +391,10 @@ def getitems(args: argparse.Namespace, moniker: str, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.npc_player_items WHERE npcmoniker = :moniker", moniker=moniker)
+            q = database.query(
+                "SELECT * FROM $murdermotel.npc_player_items WHERE npcmoniker = :moniker",
+                moniker=moniker,
+            )
             cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return items
@@ -411,7 +420,10 @@ def getitems(args: argparse.Namespace, moniker: str, **kwargs):
 def exists(args: argparse.Namespace, moniker: str, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true", moniker=moniker)
+            q = database.query(
+                "SELECT name FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true",
+                moniker=moniker,
+            )
             cur.execute(q, {"moniker": moniker})
             return cur.rowcount > 0
 
@@ -449,7 +461,9 @@ def build(args: argparse.Namespace, rec: dict, **kwargs) -> Bot:
 def get_player_count(args, **kwargs) -> int:
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.player WHERE died IS NULL")
+            q = database.query(
+                "SELECT COUNT(*) AS count FROM $murdermotel.player WHERE died IS NULL"
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 return 0
@@ -469,7 +483,9 @@ def get_alive_bots(args, **kwargs) -> list:
     def _work(conn):
         bots = []
         with database.cursor(conn) as cur:
-            q = database.query("SELECT name FROM $murdermotel.npc WHERE is_bot = true AND is_alive = true")
+            q = database.query(
+                "SELECT name FROM $murdermotel.npc WHERE is_bot = true AND is_alive = true"
+            )
             cur.execute(q)
             for rec in cur.fetchall():
                 b = load(args, rec["name"], conn=conn)
@@ -494,7 +510,9 @@ def get_all_huntable_entities(args, **kwargs) -> list:
     def _work(conn):
         entities = []
         with database.cursor(conn) as cur:
-            q = database.query("SELECT moniker FROM $murdermotel.player WHERE died IS NULL")
+            q = database.query(
+                "SELECT moniker FROM $murdermotel.player WHERE died IS NULL"
+            )
             cur.execute(q)
             for rec in cur.fetchall():
                 entities.append({"name": rec["moniker"], "type": "player"})
@@ -567,7 +585,10 @@ def assign_targets(args, player_monikers: list, bots: list, **kwargs) -> None:
 
         for moniker in player_monikers:
             with database.cursor(conn) as cur:
-                q = database.query("SELECT bodycount, points, turn FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+                q = database.query(
+                    "SELECT bodycount, points, turn FROM $murdermotel.player WHERE moniker = :moniker",
+                    moniker=moniker,
+                )
                 cur.execute(q, {"moniker": moniker})
                 if cur.rowcount > 0:
                     rec = cur.fetchone()
@@ -628,7 +649,10 @@ def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
             return True
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT is_alive FROM $murdermotel.npc WHERE name = :target AND is_bot = true", target=bot.target)
+            q = database.query(
+                "SELECT is_alive FROM $murdermotel.npc WHERE name = :target AND is_bot = true",
+                target=bot.target,
+            )
             cur.execute(q)
             if cur.rowcount == 0 or not cur.fetchone()["is_alive"]:
                 alive_bots = get_alive_bots(args, conn=conn)
@@ -645,7 +669,10 @@ def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
                 ]
 
                 with database.cursor(conn) as cur2:
-                    q = database.query("SELECT moniker, bodycount, points, turn FROM $murdermotel.player WHERE died IS NULL AND moniker != :botname", botname=bot.name)
+                    q = database.query(
+                        "SELECT moniker, bodycount, points, turn FROM $murdermotel.player WHERE died IS NULL AND moniker != :botname",
+                        botname=bot.name,
+                    )
                     cur2.execute(q)
                     for rec in cur2.fetchall():
                         other_entities.append(

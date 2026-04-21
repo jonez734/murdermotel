@@ -6,3 +6,5 @@ create table if not exists murdermotel.boobytrap (
     constraint fk_boobytrap_item foreign key (name, serial) references murdermotel.item(name, serial) on update cascade on delete cascade,
     constraint pk_boobytrap primary key (name, serial)
 );
+
+create unique index idx_boobytrap_name on murdermotel.boobytrap(name);

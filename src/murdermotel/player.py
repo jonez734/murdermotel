@@ -162,7 +162,10 @@ class Player(object):
             )
 
             with database.cursor(conn) as cur:
-                q = database.query("DELETE FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker", playermoniker=self.moniker)
+                q = database.query(
+                    "DELETE FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker",
+                    playermoniker=self.moniker,
+                )
                 cur.execute(q, {"playermoniker": self.moniker})
                 io.echo(f"Player.save.220: {self.items=}", level="debug")
                 for i in self.items:
@@ -253,7 +256,10 @@ class Player(object):
 def load(args, moniker, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+            q = database.query(
+                "SELECT * FROM $murdermotel.player WHERE moniker = :moniker",
+                moniker=moniker,
+            )
             cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 io.echo(
@@ -285,7 +291,10 @@ def load(args, moniker, **kwargs):
 def exists(args, moniker, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT moniker FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+            q = database.query(
+                "SELECT moniker FROM $murdermotel.player WHERE moniker = :moniker",
+                moniker=moniker,
+            )
             cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return False
@@ -304,7 +313,10 @@ def exists(args, moniker, **kwargs) -> bool:
 
 def count(args, membermoniker: str, **kwargs) -> int:
     def _work(conn):
-        q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.player WHERE membermoniker = :membermoniker", membermoniker=membermoniker)
+        q = database.query(
+            "SELECT COUNT(*) AS count FROM $murdermotel.player WHERE membermoniker = :membermoniker",
+            membermoniker=membermoniker,
+        )
         with database.cursor(conn) as cur:
             cur.execute(q, {"membermoniker": membermoniker})
             if cur.rowcount == 0:
@@ -331,7 +343,10 @@ def getitems(args, playermoniker, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker", playermoniker=playermoniker)
+            q = database.query(
+                "SELECT * FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker",
+                playermoniker=playermoniker,
+            )
             cur.execute(q, {"playermoniker": playermoniker})
             if cur.rowcount == 0:
                 return items
@@ -386,7 +401,10 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
     args = kwargs.get("args", argparse.Namespace())
 
     def _work(conn):
-        q = database.query("SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+        q = database.query(
+            "SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker",
+            moniker=moniker,
+        )
         with database.cursor(conn) as cur:
             cur.execute(q, {"moniker": moniker})
             io.echo(
@@ -410,7 +428,10 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
 def verifyPlayerNameNotFound(args, moniker: str, **kwargs: dict) -> bool:
 
     def _work(conn):
-        q = database.query("SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
+        q = database.query(
+            "SELECT 1 FROM $murdermotel.player WHERE moniker = :moniker",
+            moniker=moniker,
+        )
         with database.cursor(conn) as cur:
             cur.execute(q, {"moniker": moniker})
             io.echo(
@@ -495,7 +516,10 @@ def create(args, playermoniker, **kwargs):
             return None
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=playermoniker)
+            q = database.query(
+                "SELECT * FROM $murdermotel.player WHERE moniker = :moniker",
+                moniker=playermoniker,
+            )
             cur.execute(q, {"moniker": playermoniker})
             if cur.rowcount > 0:
                 rec = cur.fetchone()

@@ -90,7 +90,10 @@ class Thief(Living):
             )
 
             with database.cursor(conn) as cur:
-                q = database.query("DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname", thiefname=self.name)
+                q = database.query(
+                    "DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname",
+                    thiefname=self.name,
+                )
                 cur.execute(q)
 
                 for i in self.items:
@@ -141,14 +144,18 @@ def main(args, **kwargs) -> bool:
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :name", name=THIEF_NAME)
+            q = database.query(
+                "SELECT name FROM $murdermotel.npc WHERE name = :name", name=THIEF_NAME
+            )
             cur.execute(q)
             npc_exists = cur.rowcount > 0
             if npc_exists:
                 io.echo("mm.thief.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            q = database.query(
+                "SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 if npc_exists:
@@ -190,7 +197,10 @@ def save(args, thief, **kwargs):
         )
 
         with database.cursor(conn) as cur:
-            q = database.query("DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname", thiefname=THIEF_NAME)
+            q = database.query(
+                "DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname",
+                thiefname=THIEF_NAME,
+            )
             cur.execute(q)
 
             for i in thief.items:
@@ -251,15 +261,23 @@ def create(args, **kwargs):
             return False
 
         with database.cursor(conn) as cur:
-            q = database.query("""
+            q = database.query(
+                """
                 INSERT INTO $murdermotel.npc (name, kind, modulepath, title)
                 VALUES (:name, :kind, :modulepath, :title)
                 ON CONFLICT (name) DO NOTHING
-            """, name=THIEF_NAME, kind="thief", modulepath="thief", title="The Thief")
+            """,
+                name=THIEF_NAME,
+                kind="thief",
+                modulepath="thief",
+                title="The Thief",
+            )
             cur.execute(q)
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            q = database.query(
+                "SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME
+            )
             cur.execute(q)
             if cur.rowcount > 0:
                 rec = cur.fetchone()
@@ -290,7 +308,10 @@ def getitems(args, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            q = database.query("SELECT itemname, serial FROM $murdermotel.map_item_thief WHERE thiefname = :name", name=THIEF_NAME)
+            q = database.query(
+                "SELECT itemname, serial FROM $murdermotel.map_item_thief WHERE thiefname = :name",
+                name=THIEF_NAME,
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 return items
@@ -319,7 +340,10 @@ def getitems(args, **kwargs):
 def exists(args, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT name FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
+            q = database.query(
+                "SELECT name FROM $murdermotel.thief WHERE name = :name",
+                name=THIEF_NAME,
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 return False
