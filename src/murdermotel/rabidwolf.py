@@ -201,11 +201,12 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
             return False
 
         with database.cursor(conn) as cur:
-            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, modulepath, title)
-                      VALUES (%s, %s, %s, %s)
-                      ON CONFLICT (name) DO NOTHING"""
-            dat = (WOLF_NAME, "rabidwolf", "rabidwolf", "The Rabid Wolf")
-            cur.execute(sql, dat)
+            q = database.query("""
+                INSERT INTO $murdermotel.npc (name, kind, modulepath, title)
+                VALUES (:name, :kind, :modulepath, :title)
+                ON CONFLICT (name) DO NOTHING
+            """)
+            cur.execute(q, {"name": WOLF_NAME, "kind": "rabidwolf", "modulepath": "rabidwolf", "title": "The Rabid Wolf"})
 
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
