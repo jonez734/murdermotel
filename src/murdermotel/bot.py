@@ -265,9 +265,8 @@ class Bot(Living):
                 return False
 
             with database.cursor(conn) as cur:
-                sql = f"delete from {libmm.SCHEMA}.npc_player_items where npcmoniker=%s"
-                dat = (self.name,)
-                cur.execute(sql, dat)
+                q = database.query("DELETE FROM $murdermotel.npc_player_items WHERE npcmoniker = :npcmoniker")
+                cur.execute(q, {"npcmoniker": self.name})
                 for i in self.items:
                     m = {"npcmoniker": self.name, "itemname": i.name}
                     if not database.insert(
