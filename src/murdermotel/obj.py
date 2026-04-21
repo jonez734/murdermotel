@@ -6,7 +6,6 @@ from __future__ import annotations
 from typing import Optional
 
 from bbsengine6 import database, io
-from psycopg import sql
 
 
 class ObjectRegistry:
@@ -68,10 +67,11 @@ class Obj(object):
         def _work(conn):
             if self.args.debug is True:
                 io.echo(f"{name}.load({self.classname})", level="debug")
-            parts = [sql.SQL("SELECT * FROM "), database._table_identifier(self.table), sql.SQL(" WHERE moniker = "), sql.SQL("%(name)s")]
-            q = sql.Composed(parts)
             with database.cursor(conn) as cur:
-                cur.execute(q, {"name": name})
+                q = database.query(
+                    "SELECT * FROM $murdermotel.player WHERE moniker = :name", name=name
+                )
+                cur.execute(q)
                 if cur.rowcount == 0:
                     io.echo(f"unable to load record {name!r}", level="error")
                     return False

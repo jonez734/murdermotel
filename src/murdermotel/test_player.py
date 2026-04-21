@@ -44,14 +44,15 @@ class TestPlayerQueries:
         moniker_str = test_player
         with database.connect(test_args, pool=test_pool) as conn:
             with database.cursor(conn) as cur:
+                moniker_str = test_player
                 q = database.query("""
                     INSERT INTO $engine.__member (moniker, email, loginid, tz, datecreated, credits)
                     VALUES (:moniker, :email, :loginid, :tz, now(), 100)
                     ON CONFLICT (moniker) DO UPDATE SET email = excluded.email
                 """, moniker=moniker_str, email="test@test.local", loginid=moniker_str, tz="UTC")
-                cur.execute(q)
+                cur.execute(q, {"moniker": moniker_str, "email": "test@test.local", "loginid": moniker_str, "tz": "UTC"})
                 q = database.query("UPDATE $murdermotel.player SET membermoniker = :membermoniker WHERE moniker = :moniker", membermoniker=moniker_str, moniker=moniker_str)
-                cur.execute(q)
+                cur.execute(q, {"membermoniker": moniker_str, "moniker": moniker_str})
             conn.commit()
         count = player.count(test_args, moniker_str, pool=test_pool)
         assert count >= 1
@@ -61,7 +62,7 @@ class TestPlayerQueries:
             with database.cursor(conn) as cur:
                 moniker_str = test_player
                 q = database.query("SELECT * FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker_str)
-                cur.execute(q)
+                cur.execute(q, {"moniker": moniker_str})
                 rec = cur.fetchone()
                 assert rec is not None
                 assert rec["moniker"] == moniker_str
@@ -71,7 +72,7 @@ class TestPlayerQueries:
             with database.cursor(conn) as cur:
                 moniker_str = test_player
                 q = database.query("SELECT moniker FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker_str)
-                cur.execute(q)
+                cur.execute(q, {"moniker": moniker_str})
                 rec = cur.fetchone()
                 assert rec is not None
                 assert rec["moniker"] == moniker_str
@@ -81,6 +82,6 @@ class TestPlayerQueries:
             with database.cursor(conn) as cur:
                 moniker_str = test_player
                 q = database.query("SELECT moniker FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker_str)
-                cur.execute(q)
+                cur.execute(q, {"moniker": moniker_str})
                 rec = cur.fetchone()
                 assert rec is not None

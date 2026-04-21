@@ -266,7 +266,7 @@ class Bot(Living):
 
             with database.cursor(conn) as cur:
                 q = database.query("DELETE FROM $murdermotel.npc_player_items WHERE npcmoniker = :npcmoniker", npcmoniker=self.name)
-                cur.execute(q)
+                cur.execute(q, {"npcmoniker": self.name})
                 for i in self.items:
                     m = {"npcmoniker": self.name, "itemname": i.name}
                     if not database.insert(
@@ -321,7 +321,7 @@ def load(args: argparse.Namespace, moniker: str, **kwargs) -> Optional[Bot]:
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true", moniker=moniker)
-            cur.execute(q)
+            cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return None
 
@@ -386,7 +386,7 @@ def getitems(args: argparse.Namespace, moniker: str, **kwargs):
         items = []
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.npc_player_items WHERE npcmoniker = :moniker", moniker=moniker)
-            cur.execute(q)
+            cur.execute(q, {"moniker": moniker})
             if cur.rowcount == 0:
                 return items
             for rec in cur.fetchall():
@@ -412,7 +412,7 @@ def exists(args: argparse.Namespace, moniker: str, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :moniker AND is_bot = true", moniker=moniker)
-            cur.execute(q)
+            cur.execute(q, {"moniker": moniker})
             return cur.rowcount > 0
 
     conn = kwargs.get("conn")
@@ -568,7 +568,7 @@ def assign_targets(args, player_monikers: list, bots: list, **kwargs) -> None:
         for moniker in player_monikers:
             with database.cursor(conn) as cur:
                 q = database.query("SELECT bodycount, points, turn FROM $murdermotel.player WHERE moniker = :moniker", moniker=moniker)
-                cur.execute(q)
+                cur.execute(q, {"moniker": moniker})
                 if cur.rowcount > 0:
                     rec = cur.fetchone()
                     all_entities.append(

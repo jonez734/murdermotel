@@ -34,18 +34,24 @@ def test_player(test_args, test_pool):
     TEST_PLAYER_MONIKER = "test_player_murdermotel"
     with database.connect(test_args, pool=test_pool) as conn:
         with database.cursor(conn) as cur:
-            q = database.query("""
+            q = database.query(
+                """
                 INSERT INTO $murdermotel.player (moniker, roomid, turn, moves, points, bodycount)
                 VALUES (:moniker, 1, 1, 10, 0, 0)
                 ON CONFLICT (moniker) DO UPDATE SET turn = excluded.turn
-            """, moniker=TEST_PLAYER_MONIKER)
-            cur.execute(q)
+            """,
+                moniker=TEST_PLAYER_MONIKER,
+            )
+            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
         conn.commit()
 
     yield TEST_PLAYER_MONIKER
 
     with database.connect(test_args, pool=test_pool) as conn:
         with database.cursor(conn) as cur:
-            q = database.query("DELETE FROM $murdermotel.player WHERE moniker = :moniker", moniker=TEST_PLAYER_MONIKER)
-            cur.execute(q)
+            q = database.query(
+                "DELETE FROM $murdermotel.player WHERE moniker = :moniker",
+                moniker=TEST_PLAYER_MONIKER,
+            )
+            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
         conn.commit()

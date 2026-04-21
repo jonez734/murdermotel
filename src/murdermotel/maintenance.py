@@ -59,14 +59,19 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
 
     screen.updateprogress(step, total)
 
-    sql = "select count(name) from murdermotel.item"
     with database.cursor(conn) as cur:
-        cur.execute(sql)
+        q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.item")
+        cur.execute(q)
+        if cur.rowcount == 0:
+            count = 0
+        else:
+            row = cur.fetchone()
+            count = row["count"]
 
     screen.updateprogress(step, total)
     step += 1
 
-    if cur.rowcount > 0:
+    if count > 0:
         if (
             io.inputboolean(
                 "{var:promptcolor}redistribute weapons, defenses, and specials? [yN]: {var:inputcolor}",
@@ -78,18 +83,18 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
             return False
 
     with database.cursor(conn) as cur:
-        sql = "delete from murdermotel.item"
-        cur.execute(sql)
+        q = database.query("DELETE FROM $murdermotel.item")
+        cur.execute(q)
         screen.updateprogress(step, total)
         step += 1
 
-        sql = "delete from murdermotel.map_item_player"
-        cur.execute(sql)
+        q = database.query("DELETE FROM $murdermotel.map_item_player")
+        cur.execute(q)
         screen.updateprogress(step, total)
         step += 1
 
-        sql = "delete from murdermotel.map_item_room"
-        cur.execute(sql)
+        q = database.query("DELETE FROM $murdermotel.map_item_room")
+        cur.execute(q)
         screen.updateprogress(step, total)
         step += 1
 
@@ -104,6 +109,30 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         step += 1
         screen.updateprogress(step, total)
 
+    step += 1
+
+    boobytrap_item = {
+        "name": "boobytrap",
+        "serial": 1,
+        "kind": "boobytrap",
+        "modulepath": "boobytrap",
+        "title": "Booby Trap",
+    }
+    if not database.upsert(
+        args,
+        "murdermotel.item",
+        boobytrap_item,
+        conflict_columns=["name", "serial"],
+        update_columns=["kind", "modulepath", "title"],
+        mogrify=True,
+        conn=conn,
+    ):
+        io.echo(
+            "mm.maintenance._populate_items.105: boobytrap item upsert failed",
+            level="error",
+        )
+        return False
+    screen.updateprogress(step, total)
     step += 1
 
     for x in range(0, 6):
