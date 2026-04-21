@@ -88,9 +88,8 @@ class Room(object):
                 return False
 
             with database.cursor(conn) as cur:
-                sql = "delete from murdermotel.map_item_room where roomid=%s"
-                dat = (self.id,)
-                cur.execute(sql, dat)
+                q = database.query("DELETE FROM $murdermotel.map_item_room WHERE roomid = :roomid")
+                cur.execute(q, {"roomid": self.id})
                 for i in self.items:
                     m = {}
                     m["itemname"] = i.name
