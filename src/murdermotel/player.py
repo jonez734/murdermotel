@@ -162,11 +162,8 @@ class Player(object):
             )
 
             with database.cursor(conn) as cur:
-                sql = (
-                    f"delete from {libmm.SCHEMA}.map_item_player where playermoniker=%s"
-                )
-                dat = (self.moniker,)
-                cur.execute(sql, dat)
+                q = database.query("DELETE FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker")
+                cur.execute(q, {"playermoniker": self.moniker})
                 io.echo(f"Player.save.220: {self.items=}", level="debug")
                 for i in self.items:
                     io.echo(
@@ -273,6 +270,7 @@ def load(args, moniker, **kwargs):
             p.items = getitems(args, moniker, **kwargs)
             return p
 
+    io.echo(f"mm.player.load.120: {kwargs=}", level="debug")
     conn = kwargs.get("conn", None)
     if conn is None:
         pool = kwargs.get("pool", None)
@@ -349,10 +347,9 @@ def getitems(args, playermoniker, **kwargs):
 
     conn = kwargs.get("conn", None)
     if conn is None:
-        io.echo(f"mm.player.getitems.140: {conn=}", level="error")
         pool = kwargs.get("pool", None)
         if pool is None:
-            io.echo(f"murdermotel.player.count.160: {pool=}")
+            io.echo(f"murdermotel.player.count.160: {pool=}", level="error")
             return None
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
@@ -375,11 +372,10 @@ class completePlayerName(object):
         with database.connect(self.args, pool=self.pool) as conn:
             with database.cursor(conn) as cur:
                 vocab = []
-                q = database.query("SELECT name FROM $murdermotel.player")
-                cur = conn.cursor()
+                q = database.query("SELECT moniker FROM $murdermotel.player")
                 cur.execute(q)
                 for rec in database.resultiter(cur):
-                    vocab.append(rec["name"])
+                    vocab.append(rec["moniker"])
                 results = [x for x in vocab if x.startswith(text)] + [None]
                 return results[state]
 
