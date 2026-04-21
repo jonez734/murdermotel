@@ -323,10 +323,11 @@ def getnpccount(args, **kwargs):
 def getitem(args, name, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": name}
             q = database.query(
-                "SELECT * FROM $murdermotel.item WHERE name = :name", name=name
+                "SELECT * FROM $murdermotel.item WHERE name = :name", **params
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()

@@ -88,11 +88,12 @@ class Room(object):
                 return False
 
             with database.cursor(conn) as cur:
+                params = {"roomid": self.id}
                 q = database.query(
                     "DELETE FROM $murdermotel.map_item_room WHERE roomid = :roomid",
-                    roomid=self.id,
+                    **params,
                 )
-                cur.execute(q)
+                cur.execute(q, params)
                 for i in self.items:
                     m = {}
                     m["itemname"] = i.name
@@ -126,11 +127,12 @@ class Room(object):
 def load(args, roomid, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"roomid": roomid}
             q = database.query(
                 "SELECT * FROM $murdermotel.playground WHERE id = :roomid OR shortname = :roomid::text",
-                roomid=roomid,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 if args.debug is True:
                     io.echo(f"unable to load room {roomid=}", level="error")
@@ -169,11 +171,12 @@ def getitems(args, roomid, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
+            params = {"roomid": roomid}
             q = database.query(
                 "SELECT m.itemname, m.serial, i.title, i.kind, i.usemessages FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON m.itemname = i.name WHERE m.roomid = :roomid",
-                roomid=roomid,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
 
             if cur.rowcount == 0:
                 return []

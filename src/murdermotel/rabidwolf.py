@@ -135,20 +135,22 @@ def buildargs(args, obj=None, room=None, **kwargs):
 def load(args: argparse.Namespace, **kwargs) -> Optional[RabidWolf]:
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": WOLF_NAME}
             q = database.query(
-                "SELECT name FROM $murdermotel.npc WHERE name = :name", name=WOLF_NAME
+                "SELECT name FROM $murdermotel.npc WHERE name = :name", **params
             )
-            cur.execute(q)
+            cur.execute(q, params)
             npc_exists = cur.rowcount > 0
             if npc_exists:
                 io.echo("mm.rabidwolf.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
+            params = {"name": WOLF_NAME}
             q = database.query(
                 "SELECT * FROM $murdermotel.rabidwolf WHERE name = :name",
-                name=WOLF_NAME,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 if npc_exists:
                     io.echo(
@@ -206,25 +208,29 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
             return False
 
         with database.cursor(conn) as cur:
+            params = {
+                "name": WOLF_NAME,
+                "kind": "rabidwolf",
+                "modulepath": "rabidwolf",
+                "title": "The Rabid Wolf",
+            }
             q = database.query(
                 """
                 INSERT INTO $murdermotel.npc (name, kind, modulepath, title)
                 VALUES (:name, :kind, :modulepath, :title)
                 ON CONFLICT (name) DO NOTHING
             """,
-                name=WOLF_NAME,
-                kind="rabidwolf",
-                modulepath="rabidwolf",
-                title="The Rabid Wolf",
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
 
         with database.cursor(conn) as cur:
+            params = {"name": WOLF_NAME}
             q = database.query(
                 "SELECT * FROM $murdermotel.rabidwolf WHERE name = :name",
-                name=WOLF_NAME,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 w = build(args, rec, **kwargs)
@@ -256,7 +262,7 @@ def exists(args: argparse.Namespace, **kwargs: Any) -> bool:
                 "SELECT name FROM $murdermotel.rabidwolf WHERE name = :name",
                 name=WOLF_NAME,
             )
-            cur.execute(q)
+            cur.execute(q, {"name": WOLF_NAME})
             if cur.rowcount == 0:
                 return False
             return True

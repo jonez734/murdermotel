@@ -78,10 +78,11 @@ class Item(object):
 def load(args, itemname, serial: int = 0, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": itemname}
             q = database.query(
-                "SELECT * FROM $murdermotel.item WHERE name = :name", name=itemname
+                "SELECT * FROM $murdermotel.item WHERE name = :name", **params
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 if args.debug is True:
                     io.echo(

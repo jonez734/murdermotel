@@ -649,11 +649,12 @@ def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
             return True
 
         with database.cursor(conn) as cur:
+            params = {"target": bot.target}
             q = database.query(
                 "SELECT is_alive FROM $murdermotel.npc WHERE name = :target AND is_bot = true",
-                target=bot.target,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0 or not cur.fetchone()["is_alive"]:
                 alive_bots = get_alive_bots(args, conn=conn)
                 other_entities = [
@@ -669,11 +670,12 @@ def ensure_valid_target(args, bot: Bot, **kwargs) -> bool:
                 ]
 
                 with database.cursor(conn) as cur2:
+                    params = {"botname": bot.name}
                     q = database.query(
                         "SELECT moniker, bodycount, points, turn FROM $murdermotel.player WHERE died IS NULL AND moniker != :botname",
-                        botname=bot.name,
+                        **params,
                     )
-                    cur2.execute(q)
+                    cur2.execute(q, params)
                     for rec in cur2.fetchall():
                         other_entities.append(
                             {

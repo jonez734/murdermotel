@@ -139,11 +139,12 @@ class BoobyTrap(Item):
             )
 
             with database.cursor(conn) as cur:
+                params = {"itemname": self.name}
                 q = database.query(
                     "DELETE FROM $murdermotel.map_item_room WHERE itemname = :itemname AND serial = 0",
-                    itemname=self.name,
+                    **params,
                 )
-                cur.execute(q)
+                cur.execute(q, params)
 
                 m = {}
                 m["itemname"] = self.name
@@ -176,11 +177,12 @@ class BoobyTrap(Item):
 def load(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": BOOBYTRAP_NAME}
             q = database.query(
                 "SELECT * FROM $murdermotel.boobytrap WHERE name = :name",
-                name=BOOBYTRAP_NAME,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 io.echo(
                     "mm.boobytrap.load.100: no boobytrap found, creating one",
@@ -209,11 +211,12 @@ def load(args, **kwargs):
 def get_room_for_boobytrap(args, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": BOOBYTRAP_NAME}
             q = database.query(
-                "SELECT roomid FROM $murdermotel.map_item_room WHERE itemname = :name",
-                name=BOOBYTRAP_NAME,
+                "SELECT * FROM $murdermotel.boobytrap WHERE name = :name",
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()
@@ -266,7 +269,7 @@ def save(args, boobytrap, **kwargs):
                 "DELETE FROM $murdermotel.map_item_room WHERE itemname = :itemname",
                 itemname=BOOBYTRAP_NAME,
             )
-            cur.execute(q)
+            cur.execute(q, {"itemname": BOOBYTRAP_NAME})
 
             m = {}
             m["itemname"] = BOOBYTRAP_NAME
@@ -343,11 +346,12 @@ def create(args, **kwargs):
             return False
 
         with database.cursor(conn) as cur:
+            params = {"name": BOOBYTRAP_NAME}
             q = database.query(
                 "SELECT * FROM $murdermotel.boobytrap WHERE name = :name",
-                name=BOOBYTRAP_NAME,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 b = build(args, rec, **kwargs)
@@ -375,11 +379,12 @@ def create(args, **kwargs):
 def exists(args, **kwargs) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
+            params = {"name": BOOBYTRAP_NAME}
             q = database.query(
                 "SELECT name FROM $murdermotel.boobytrap WHERE name = :name",
-                name=BOOBYTRAP_NAME,
+                **params,
             )
-            cur.execute(q)
+            cur.execute(q, params)
             if cur.rowcount == 0:
                 return False
             return True
