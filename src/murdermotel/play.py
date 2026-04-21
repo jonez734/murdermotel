@@ -3,7 +3,7 @@ import copy
 import random
 from typing import Any, Optional
 
-from bbsengine6 import io, util, database, member
+from bbsengine6 import io, util, database, member, module as bbsmodule
 
 from . import (
     lib as libmm,
@@ -13,6 +13,7 @@ from . import (
     thief as libthief,
     rabidwolf as libwolf,
     boobytrap as libboobytrap,
+    bot as libbot,
 )
 
 
@@ -90,9 +91,8 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.save()
 
         with database.cursor(conn) as cur:
-            sql = "select id from murdermotel.playground where shortname=%s"
-            dat = (dest,)
-            cur.execute(sql, dat)
+            q = database.query("SELECT id FROM $murdermotel.playground WHERE shortname = :shortname")
+            cur.execute(q, {"shortname": dest})
             if cur.rowcount == 0:
                 io.echo("room not found")
                 return False
@@ -175,7 +175,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         return False
 
     currentmembermoniker: str = member.getcurrentmoniker(args, **kwargs)
+    io.echo("starting call to libplayer.load", level="debug")
     player: Any = libplayer.load(args, currentmembermoniker, **kwargs)
+    io.echo("ended call", level="debug")
 
     if not player:
         playermoniker: str = libplayer.inputmoniker(
@@ -200,9 +202,10 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.roomid = random.randint(10, room_count - 10 + 1)
         player.save()
 
-    from . import bot as libbot
 
+    io.echo("starting call to libbot.get_alive_bots", level="debug")
     bots = libbot.get_alive_bots(args, **kwargs)
+    io.echo("ended call", level="debug")
     player_monikers = [currentmembermoniker]
     if not player.target:
         libbot.assign_targets(args, player_monikers, bots, **kwargs)
@@ -211,7 +214,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player.datelastplayed = datetime.now(tzlocal)
     player.module = "player"
 
+    io.echo("starting call to player.info()", level="debug")
     player.info()
+    io.echo("ending call to player.info()", level="debug")
 
     if player.target:
         io.echo(f"{{var:labelcolor}}You are hunting: {{var:valuecolor}}{player.target}")
@@ -237,14 +242,12 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     if libmm.registry.get_by_name("rabidwolf") is None:
         libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
-    from . import bot as libbot
+##    from . import bot as libbot
 
     bots = libbot.get_alive_bots(args, **kwargs)
     for b in bots:
         if libmm.registry.get_by_name(b.name) is None:
             libmm.registry.register(b)
-
-    from bbsengine6 import module as bbsmodule
 
     for obj in libmm.registry.all():
         if hasattr(obj, "module") and obj.module:
@@ -290,8 +293,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 if player.turn > 0:
                     player.turn += 1
 
+        io.echo(f"playloop.100: about to save player", level="debug")
         player.save()
-
+        io.echo(f"playloop.120: ended player save", level="debug")
         libmm.setarea(args, player, "playground", help=True, **kwargs)
         room: Any = libroom.load(args, player.roomid, **kwargs)
         if not room:
@@ -365,7 +369,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             )
         )
 
-        from . import bot as libbot
+##        from . import bot as libbot
 
         bots_in_room = [
             b
