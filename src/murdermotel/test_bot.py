@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestBotQueries:
     def test_get_player_count(self, test_args, test_pool):
         from murdermotel import bot

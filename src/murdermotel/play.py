@@ -91,7 +91,10 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.save()
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT id FROM $murdermotel.playground WHERE shortname = :shortname", shortname=dest)
+            q = database.query(
+                "SELECT id FROM $murdermotel.playground WHERE shortname = :shortname",
+                shortname=dest,
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 io.echo("room not found")
@@ -202,7 +205,6 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.roomid = random.randint(10, room_count - 10 + 1)
         player.save()
 
-
     io.echo("starting call to libbot.get_alive_bots", level="debug")
     bots = libbot.get_alive_bots(args, **kwargs)
     io.echo("ended call", level="debug")
@@ -242,7 +244,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     if libmm.registry.get_by_name("rabidwolf") is None:
         libwolf.RabidWolf(args, loaded_wolf=loaded_wolf, **kwargs)
 
-##    from . import bot as libbot
+    ##    from . import bot as libbot
 
     bots = libbot.get_alive_bots(args, **kwargs)
     for b in bots:
@@ -271,7 +273,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             io.echo("You are out of turns for today")
             if (
                 io.inputboolean(
-                    "{var:promptcolor}reset turns? [Yn]: {var:inputcolor}", "Y", **kwargs
+                    "{var:promptcolor}reset turns? [Yn]: {var:inputcolor}",
+                    "Y",
+                    **kwargs,
                 )
                 is True
             ):
@@ -293,9 +297,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 if player.turn > 0:
                     player.turn += 1
 
-        io.echo(f"playloop.100: about to save player", level="debug")
+        io.echo("playloop.100: about to save player", level="debug")
         player.save()
-        io.echo(f"playloop.120: ended player save", level="debug")
+        io.echo("playloop.120: ended player save", level="debug")
         libmm.setarea(args, player, "playground", help=True, **kwargs)
         room: Any = libroom.load(args, player.roomid, **kwargs)
         if not room:
@@ -369,7 +373,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             )
         )
 
-##        from . import bot as libbot
+        ##        from . import bot as libbot
 
         bots_in_room = [
             b
@@ -412,7 +416,8 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             if (
                 io.inputboolean(
                     ":door: Quit - {var:promptcolor}are you sure? {var:optioncolor}[yN]{var:promptcolor}: {var:inputcolor}",
-                    "N", **kwargs,
+                    "N",
+                    **kwargs,
                 )
                 is True
             ):

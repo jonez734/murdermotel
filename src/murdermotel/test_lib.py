@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestLibQueries:
     def test_getitemcount(self, test_args, test_pool):
         from murdermotel import lib as libmm

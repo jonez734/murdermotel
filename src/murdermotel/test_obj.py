@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestObj:
     def test_registry_register(self):
         from murdermotel.obj import ObjectRegistry

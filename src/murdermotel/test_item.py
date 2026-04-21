@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestItem:
     def test_init(self, test_args):
         from murdermotel import item as libitem

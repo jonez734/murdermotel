@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestPlay:
     def test_init(self, test_args):
         from murdermotel import play as libplay

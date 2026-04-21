@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestRabidWolf:
     def test_access(self, test_args):
         from murdermotel import rabidwolf as librw

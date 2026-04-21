@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestRoom:
     def test_init(self, test_args):
         from murdermotel import room as libroom

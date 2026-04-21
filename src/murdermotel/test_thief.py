@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestThief:
     def test_access(self, test_args):
         from murdermotel import thief as libthief

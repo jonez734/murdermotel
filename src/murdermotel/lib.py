@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import argparse
-from typing import Optional
 
-from bbsengine6 import io, database, util, member, screen, module
+from bbsengine6 import database, io, screen, util, module as bbsmodule
 from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 from . import obj as libobj
 from . import item as libitem
@@ -60,11 +59,11 @@ OP_TO_STUB = {
 
 def get_op(module_ref: str, op: str, args) -> callable | None:
     """Get an optional operation function from murdermotel's op map."""
-    m = module.get(module_ref, args)
+    m = bbsmodule.get(module_ref, args)
     stub = OP_TO_STUB.get(op)
     if stub is None:
         return None
-    if module.check_func(m, op, stub, silent=True):
+    if bbsmodule.check_func(m, op, stub, silent=True):
         return getattr(m, op)
     return None
 
@@ -92,10 +91,16 @@ class completeItemName(object):
             )
 
         if self.roomid is not None:
-            q = database.query("SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON i.name = m.itemname WHERE m.roomid = :roomid", roomid=self.roomid)
+            q = database.query(
+                "SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON i.name = m.itemname WHERE m.roomid = :roomid",
+                roomid=self.roomid,
+            )
             dat = {"roomid": self.roomid}
         elif self.playermoniker is not None:
-            q = database.query("SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_player m ON i.name = m.itemname WHERE m.playermoniker = :playermoniker", playermoniker=self.playermoniker)
+            q = database.query(
+                "SELECT i.name FROM $murdermotel.item i JOIN $murdermotel.map_item_player m ON i.name = m.itemname WHERE m.playermoniker = :playermoniker",
+                playermoniker=self.playermoniker,
+            )
             dat = {"playermoniker": self.playermoniker}
         else:
             q = database.query("SELECT name FROM $murdermotel.item")
@@ -109,7 +114,7 @@ class completeItemName(object):
             with database.cursor(conn) as cur:
                 if self.args.debug is True:
                     io.echo(f"completeItemName.120: mogrify={cur.mogrify(q, dat)!r}")
-                cur.execute(sql, dat)
+                cur.execute(q, dat)
 
                 vocab = []
                 for rec in util.resultiter(cur):
@@ -180,7 +185,7 @@ def runsubmodule(args, submodule, **kwargs):
     x = f"{PACKAGENAME}.{submodule}"
     if args.debug is True:
         io.echo("lib.runsubmodule.100: x=%r" % (x), level="debug")
-    return module.runmodule(args, x, **kwargs)
+    return bbsmodule.runmodule(args, x, **kwargs)
 
 
 # @since 20260410
@@ -216,12 +221,12 @@ def runmodule(args, op: str, modulename: str, **kwargs: dict):
             if debug:
                 io.echo(f"{fullname} has no {op}()", level="debug")
             return True
-        return module.runcallback(args, func, **kwargs)
+        return bbsmodule.runcallback(args, func, **kwargs)
 
-    if not module.check(args, fullname, **kwargs):
+    if not bbsmodule.check(args, fullname, **kwargs):
         return False
 
-    return module.runmodule(args, fullname, **kwargs)
+    return bbsmodule.runmodule(args, fullname, **kwargs)
 
 
 def buildargs(args=None, **kwargs):
@@ -318,7 +323,9 @@ def getnpccount(args, **kwargs):
 def getitem(args, name, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT * FROM $murdermotel.item WHERE name = :name", name=name)
+            q = database.query(
+                "SELECT * FROM $murdermotel.item WHERE name = :name", name=name
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 return None
@@ -342,7 +349,10 @@ def getitem(args, name, **kwargs):
 def getroomplayers(args, roomid, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            q = database.query("SELECT moniker FROM $murdermotel.player WHERE roomid = :roomid", roomid=roomid)
+            q = database.query(
+                "SELECT moniker FROM $murdermotel.player WHERE roomid = :roomid",
+                roomid=roomid,
+            )
             cur.execute(q)
             players = []
             if cur.rowcount > 0:
@@ -367,12 +377,16 @@ def countdistributeditems(args, **kwargs):
     def _work(conn):
         count = 0
         with database.cursor(conn) as cur:
-            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.map_item_player")
+            q = database.query(
+                "SELECT COUNT(*) AS count FROM $murdermotel.map_item_player"
+            )
             cur.execute(q)
             if cur.rowcount > 0:
                 res = cur.fetchone()
                 count += res["count"]
-            q = database.query("SELECT COUNT(*) AS count FROM $murdermotel.map_item_room")
+            q = database.query(
+                "SELECT COUNT(*) AS count FROM $murdermotel.map_item_room"
+            )
             cur.execute(q)
             if cur.rowcount > 0:
                 res = cur.fetchone()
@@ -408,7 +422,9 @@ def distributeitems(args, **kwargs):
             _clearitemmaps(conn)
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT name, serial FROM $murdermotel.item WHERE kind IN ('component', 'defense')")
+            q = database.query(
+                "SELECT name, serial FROM $murdermotel.item WHERE kind IN ('component', 'defense')"
+            )
             cur.execute(q)
             if cur.rowcount == 0:
                 io.echo("items not populated")

@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestWeaponlist:
     def test_init(self):
         from murdermotel import weaponlist as wl

@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestBoobyTrap:
     def test_access(self, test_args):
         from murdermotel import boobytrap as libbt
