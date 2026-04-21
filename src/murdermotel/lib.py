@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
+from psycopg import sql as pgsql
 from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 from . import obj as libobj
 from . import item as libitem
@@ -418,8 +419,7 @@ def distributeitems(args, **kwargs):
             return True
 
     def _work(conn):
-
-        if clear is True:
+        if kwargs.get("clear", False):
             _clearitemmaps(conn)
 
         with database.cursor(conn) as cur:
@@ -435,65 +435,58 @@ def distributeitems(args, **kwargs):
             io.echo(f"distributeitems: distributing {len(rows)} items", level="debug")
 
             roomcount = libroom.getcount(args, conn=conn)
-            min_room = 11
-            max_room = roomcount - 1
-            eligible_rooms = list(range(min_room, max_room))
+            eligible_rooms = list(range(11, roomcount - 1))
 
-            room_counts = {}
-            room_items = {}
+        if not eligible_rooms:
+            io.echo("distributeitems: no eligible rooms", level="error")
+            return False
 
-            for row in rows:
-                item_name = row["name"]
-                item_serial = row["serial"]
+        random.shuffle(rows)
 
-                placed = False
-                for attempt in range(10):
-                    roomid = random.choice(eligible_rooms)
-                    count = room_counts.get(roomid, 0)
-                    if count >= 3:
-                        continue
+        room_state: dict[int, set[str]] = {r: set() for r in eligible_rooms}
+        placements = []
 
-                    same_item_in_room = room_items.get(roomid, set())
-                    if item_name in same_item_in_room:
-                        continue
+        for row in rows:
+            item_name = row["name"]
+            item_serial = row["serial"]
 
-                    m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
-                    if not database.insert(
-                        args,
-                        f"{SCHEMA}.map_item_room",
-                        m,
-                        conn=conn,
-                        returnid=False,
-                    ):
-                        io.echo("mm.populate_items.110: insert failed", level="error")
-                        return False
-                    room_counts[roomid] = count + 1
-                    if roomid not in room_items:
-                        room_items[roomid] = set()
-                    room_items[roomid].add(item_name)
-                    placed = True
-                    break
+            placed = False
+            for roomid in eligible_rooms:
+                if len(room_state[roomid]) >= 3:
+                    continue
+                if item_name in room_state[roomid]:
+                    continue
+                room_state[roomid].add(item_name)
+                placements.append((roomid, item_name, item_serial))
+                placed = True
+                break
 
-                if not placed:
-                    roomid = random.choice(eligible_rooms)
-                    m = {"roomid": roomid, "itemname": item_name, "serial": item_serial}
-                    if not database.insert(
-                        args,
-                        f"{SCHEMA}.map_item_room",
-                        m,
-                        conn=conn,
-                        returnid=False,
-                    ):
-                        io.echo("mm.populate_items.120: insert failed", level="error")
-                        return False
-                    room_counts[roomid] = room_counts.get(roomid, 0) + 1
-                    if roomid not in room_items:
-                        room_items[roomid] = set()
-                    room_items[roomid].add(item_name)
+            if not placed:
+                roomid = random.choice(eligible_rooms)
+                room_state[roomid].add(item_name)
+                placements.append((roomid, item_name, item_serial))
 
+        if not placements:
+            io.echo("distributeitems: no placements determined", level="error")
+            return False
+
+        columns = ["roomid", "itemname", "serial"]
+        query = (
+            pgsql.SQL("INSERT INTO ")
+            + pgsql.Identifier(SCHEMA, "map_item_room")
+            + pgsql.SQL(" (")
+            + pgsql.SQL(", ").join([pgsql.Identifier(c) for c in columns])
+            + pgsql.SQL(") VALUES (")
+            + pgsql.SQL(", ").join([pgsql.SQL("%s") for _ in columns])
+            + pgsql.SQL(")")
+        )
+
+        with database.cursor(conn) as cur:
+            cur.executemany(query.as_string(cur._connection), placements)
+
+        conn.commit()
         return True
 
-    clear = kwargs.get("clear", False)
     conn = kwargs.get("conn", None)
     if conn is None:
         pool = kwargs.get("pool", None)
