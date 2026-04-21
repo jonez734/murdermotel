@@ -39,7 +39,7 @@ def test_player(test_args, test_pool):
                 VALUES (:moniker, 1, 1, 10, 0, 0)
                 ON CONFLICT (moniker) DO UPDATE SET turn = excluded.turn
             """, moniker=TEST_PLAYER_MONIKER)
-            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
+            cur.execute(q)
         conn.commit()
 
     yield TEST_PLAYER_MONIKER
@@ -47,5 +47,5 @@ def test_player(test_args, test_pool):
     with database.connect(test_args, pool=test_pool) as conn:
         with database.cursor(conn) as cur:
             q = database.query("DELETE FROM $murdermotel.player WHERE moniker = :moniker", moniker=TEST_PLAYER_MONIKER)
-            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
+            cur.execute(q)
         conn.commit()

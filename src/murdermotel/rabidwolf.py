@@ -136,14 +136,14 @@ def load(args: argparse.Namespace, **kwargs) -> Optional[RabidWolf]:
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT name FROM $murdermotel.npc WHERE name = :name", name=WOLF_NAME)
-            cur.execute(q, {"name": WOLF_NAME})
+            cur.execute(q)
             npc_exists = cur.rowcount > 0
             if npc_exists:
                 io.echo("mm.rabidwolf.load.090: npc record exists", level="debug")
 
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
-            cur.execute(q, {"name": WOLF_NAME})
+            cur.execute(q)
             if cur.rowcount == 0:
                 if npc_exists:
                     io.echo(
@@ -205,12 +205,12 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
                 INSERT INTO $murdermotel.npc (name, kind, modulepath, title)
                 VALUES (:name, :kind, :modulepath, :title)
                 ON CONFLICT (name) DO NOTHING
-            """)
-            cur.execute(q, {"name": WOLF_NAME, "kind": "rabidwolf", "modulepath": "rabidwolf", "title": "The Rabid Wolf"})
+            """, name=WOLF_NAME, kind="rabidwolf", modulepath="rabidwolf", title="The Rabid Wolf")
+            cur.execute(q)
 
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
-            cur.execute(q, {"name": WOLF_NAME})
+            cur.execute(q)
             if cur.rowcount > 0:
                 rec = cur.fetchone()
                 w = build(args, rec, **kwargs)
@@ -239,7 +239,7 @@ def exists(args: argparse.Namespace, **kwargs: Any) -> bool:
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT name FROM $murdermotel.rabidwolf WHERE name = :name", name=WOLF_NAME)
-            cur.execute(q, {"name": WOLF_NAME})
+            cur.execute(q)
             if cur.rowcount == 0:
                 return False
             return True

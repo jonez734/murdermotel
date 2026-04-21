@@ -319,7 +319,7 @@ def getitem(args, name, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.item WHERE name = :name", name=name)
-            cur.execute(q, {"name": name})
+            cur.execute(q)
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()
@@ -343,7 +343,7 @@ def getroomplayers(args, roomid, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT moniker FROM $murdermotel.player WHERE roomid = :roomid", roomid=roomid)
-            cur.execute(q, {"roomid": roomid})
+            cur.execute(q)
             players = []
             if cur.rowcount > 0:
                 for rec in database.resultiter(cur):

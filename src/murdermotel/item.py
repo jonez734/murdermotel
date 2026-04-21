@@ -79,7 +79,7 @@ def load(args, itemname, serial: int = 0, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.item WHERE name = :name", name=itemname)
-            cur.execute(q, {"name": itemname})
+            cur.execute(q)
             if cur.rowcount == 0:
                 if args.debug is True:
                     io.echo(

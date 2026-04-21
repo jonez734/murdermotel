@@ -91,8 +91,8 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.save()
 
         with database.cursor(conn) as cur:
-            q = database.query("SELECT id FROM $murdermotel.playground WHERE shortname = :shortname")
-            cur.execute(q, {"shortname": dest})
+            q = database.query("SELECT id FROM $murdermotel.playground WHERE shortname = :shortname", shortname=dest)
+            cur.execute(q)
             if cur.rowcount == 0:
                 io.echo("room not found")
                 return False
