@@ -90,9 +90,8 @@ class Thief(Living):
             )
 
             with database.cursor(conn) as cur:
-                sql = f"delete from {SCHEMA}.map_item_thief where thiefname=%s"
-                dat = (self.name,)
-                cur.execute(sql, dat)
+                q = database.query("DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname")
+                cur.execute(q, {"thiefname": self.name})
 
                 for i in self.items:
                     m = {}
@@ -191,9 +190,8 @@ def save(args, thief, **kwargs):
         )
 
         with database.cursor(conn) as cur:
-            sql = f"delete from {libmm.SCHEMA}.map_item_thief where thiefname=%s"
-            dat = (THIEF_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("DELETE FROM $murdermotel.map_item_thief WHERE thiefname = :thiefname")
+            cur.execute(q, {"thiefname": THIEF_NAME})
 
             for i in thief.items:
                 m = {}
@@ -253,11 +251,12 @@ def create(args, **kwargs):
             return False
 
         with database.cursor(conn) as cur:
-            sql = f"""INSERT INTO {libmm.SCHEMA}.npc (name, kind, modulepath, title)
-                      VALUES (%s, %s, %s, %s)
-                      ON CONFLICT (name) DO NOTHING"""
-            dat = (THIEF_NAME, "thief", "thief", "The Thief")
-            cur.execute(sql, dat)
+            q = database.query("""
+                INSERT INTO $murdermotel.npc (name, kind, modulepath, title)
+                VALUES (:name, :kind, :modulepath, :title)
+                ON CONFLICT (name) DO NOTHING
+            """)
+            cur.execute(q, {"name": THIEF_NAME, "kind": "thief", "modulepath": "thief", "title": "The Thief"})
 
         with database.cursor(conn) as cur:
             q = database.query("SELECT * FROM $murdermotel.thief WHERE name = :name", name=THIEF_NAME)
