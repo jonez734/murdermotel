@@ -139,9 +139,8 @@ class BoobyTrap(Item):
             )
 
             with database.cursor(conn) as cur:
-                sql = f"delete from {libmm.SCHEMA}.map_item_room where itemname=%s and serial=0"
-                dat = (self.name,)
-                cur.execute(sql, dat)
+                q = database.query("DELETE FROM $murdermotel.map_item_room WHERE itemname = :itemname AND serial = 0")
+                cur.execute(q, {"itemname": self.name})
 
                 m = {}
                 m["itemname"] = self.name
@@ -254,9 +253,8 @@ def save(args, boobytrap, **kwargs):
         )
 
         with database.cursor(conn) as cur:
-            sql = f"delete from {libmm.SCHEMA}.map_item_room where itemname=%s"
-            dat = (BOOBYTRAP_NAME,)
-            cur.execute(sql, dat)
+            q = database.query("DELETE FROM $murdermotel.map_item_room WHERE itemname = :itemname")
+            cur.execute(q, {"itemname": BOOBYTRAP_NAME})
 
             m = {}
             m["itemname"] = BOOBYTRAP_NAME
