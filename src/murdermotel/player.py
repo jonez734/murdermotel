@@ -350,14 +350,12 @@ def count(args, membermoniker: str, **kwargs) -> int:
 
     conn = kwargs.get("conn", None)
     if conn is None:
-        io.echo(f"murdermotel.player.count.140: {conn=}", level="error")
         pool = kwargs.get("pool", None)
         if pool is None:
-            io.echo(f"murdermotel.player.count.160: {pool=}")
+            io.echo(f"murdermotel.player.count.160: {pool=}", level="error")
             return 0
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
-    return _work(conn)
     return _work(conn)
 
 
@@ -386,7 +384,7 @@ def getitems(args, playermoniker, **kwargs) -> list:
     if conn is None:
         pool = kwargs.get("pool", None)
         if pool is None:
-            io.echo(f"murdermotel.player.count.160: {pool=}", level="error")
+            io.echo(f"murdermotel.player.getitems.100: {pool=}", level="error")
             return []
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
@@ -445,7 +443,7 @@ def verifyPlayerNameFound(args, moniker: str, **kwargs: dict) -> bool:
     io.echo(f"verifyPlayerNameNotFound.120: {args=} {moniker=}", level="debug")
     pool = kwargs.get("pool", None)
     if pool is None:
-        io.echo(f"empyre.player.verifyPlayerNameNotFound.160: {pool=}", level="error")
+        io.echo(f"empyre.player.verifyPlayerNameFound.160: {pool=}", level="error")
         return False
 
     with database.connect(args, pool=pool) as conn:

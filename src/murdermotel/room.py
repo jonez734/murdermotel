@@ -139,10 +139,11 @@ class Room(object):
 
         conn = kwargs.get("conn", None)
         if conn is None:
-            if self.pool is None:
-                io.echo(f"mm.room.save.180: {self.pool=}", level="error")
+            pool = kwargs.get("pool") or self.pool
+            if pool is None:
+                io.echo(f"mm.room.save.180: {pool=}", level="error")
                 return False
-            with database.connect(self.args, pool=self.pool) as conn:
+            with database.connect(self.args, pool=pool) as conn:
                 result = _work(conn)
                 conn.commit()
                 return result
@@ -222,7 +223,6 @@ def getitems(args, roomid, **kwargs) -> list:
         if pool is None:
             io.echo(f"mm.room.getitems.100: {pool=}", level="error")
             return []
-            return False
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
@@ -245,7 +245,7 @@ def getcount(args, **kwargs):
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"libmm.room.getcount.100: {pool=}", level="error")
-            return False
+            return 0
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
