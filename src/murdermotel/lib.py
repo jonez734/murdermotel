@@ -153,8 +153,9 @@ def setarea(args, player, left, **kwargs):
 
             if player.roomid is not None:
                 room = f" | room #{player.roomid}"
+                conn = kwargs.get("conn", None)
                 pool = kwargs.get("pool", None)
-                if pool is None:
+                if conn is None and pool is None:
                     io.echo(f"libmm.setarea.100: {pool=}", level="error")
                     return False
                 currentroom = libroom.load(args, player.roomid, **kwargs)

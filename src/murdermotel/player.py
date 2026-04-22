@@ -388,7 +388,8 @@ def getitems(args, playermoniker, **kwargs) -> list:
             return []
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
-    return _work(conn)
+    else:
+        return _work(conn)
 
 
 class completePlayerName:

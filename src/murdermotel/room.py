@@ -225,7 +225,8 @@ def getitems(args, roomid, **kwargs) -> list:
             return []
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
-    return _work(conn)
+    else:
+        return _work(conn)
 
 
 def getcount(args, **kwargs):
@@ -248,7 +249,8 @@ def getcount(args, **kwargs):
             return 0
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
-    return _work(conn)
+    else:
+        return _work(conn)
 
 
 def build(args, rec: dict, **kwargs) -> Room:
