@@ -1,0 +1,5 @@
+{
+  "extraPaths": ["/home/opencode/data/work/bbsengine6/py/src"],
+  "pythonVersion": "3.12",
+  "exclude": ["build", "tk", "test_*.py", "conftest.py"]
+}

@@ -4,6 +4,7 @@
 import re
 
 from bbsengine6 import database, io
+from psycopg import sql as pgsql
 
 from . import lib as libmm, room as libroom
 
@@ -209,6 +210,7 @@ def _populate_rooms(args, **kwargs) -> bool:
     def _work(conn):
         from . import data
 
+        rooms = []
         with data.get("playground.txt") as p:
             roomid = 1
             for line in p:
@@ -234,19 +236,43 @@ def _populate_rooms(args, **kwargs) -> bool:
                     else:
                         room[direction] = val if val != 0 else None
                 io.echo(f"{room=}", level="debug")
-                if not database.insert(
-                    args,
-                    f"{libmm.SCHEMA}.playground",
-                    room,
-                    primarykey="id",
-                    conn=conn,
-                    commit=True,
-                ):
-                    io.echo(
-                        "mm.startup._populate_rooms.110: insert failed", level="error"
-                    )
-                    return False
+                rooms.append(room)
                 roomid += 1
+
+        if not rooms:
+            io.echo("mm.startup._populate_rooms: no rooms parsed", level="error")
+            return False
+
+        columns = [
+            "id",
+            "title",
+            "modulepath",
+            "north",
+            "south",
+            "east",
+            "west",
+            "up",
+            "down",
+        ]
+        query = (
+            pgsql.SQL("INSERT INTO ")
+            + pgsql.Identifier(libmm.SCHEMA, "playground")
+            + pgsql.SQL(" (")
+            + pgsql.SQL(", ").join([pgsql.Identifier(c) for c in columns])
+            + pgsql.SQL(") VALUES (")
+            + pgsql.SQL(", ").join([pgsql.SQL("%s") for _ in columns])
+            + pgsql.SQL(")")
+        )
+
+        params_list = []
+        for room in rooms:
+            params = [room.get(c) for c in columns]
+            params_list.append(params)
+
+        with database.cursor(conn) as cur:
+            cur.executemany(query.as_string(cur._connection), params_list)
+
+        conn.commit()
         return True
 
     conn = kwargs.get("conn", None)

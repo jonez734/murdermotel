@@ -12,7 +12,7 @@ def access(args, op: str, **kw: dict) -> bool:
 
 
 def buildargs(args, **kw: dict) -> bool:
-    return None
+    return True
 
 
 def main(args, **kw: dict):

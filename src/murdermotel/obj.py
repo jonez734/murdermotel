@@ -148,5 +148,5 @@ class Living(Obj):
         super().__init__(args)
         self.roomid = None
 
-    def short(self):
+    def short(self) -> str:
         return "NEEDINFO.living"

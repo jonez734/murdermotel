@@ -1,4 +1,5 @@
 import random as randomlib
+from typing import Optional
 
 from bbsengine6 import database, io, util
 
@@ -26,7 +27,7 @@ def main(args, **kwargs):
 
 
 class Item:
-    module: str = None
+    module: Optional[str] = None
 
     def __init__(self, args):
         super().__init__()
@@ -35,7 +36,7 @@ class Item:
     def on_turn(self, args, room=None, **kwargs) -> bool:
         return True
 
-    def short(self):
+    def short(self) -> str:
         return "NEEDINFO.item"
 
 
@@ -213,7 +214,7 @@ def get_room_for_boobytrap(args, **kwargs):
         with database.cursor(conn) as cur:
             params = {"name": BOOBYTRAP_NAME}
             q = database.query(
-                "SELECT * FROM $murdermotel.boobytrap WHERE name = :name",
+                "SELECT roomid FROM $murdermotel.map_item_room WHERE itemname = :name",
                 **params,
             )
             cur.execute(q, params)

@@ -3,7 +3,7 @@
 
 import argparse
 import random
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 from bbsengine6 import database, io
 
@@ -130,12 +130,14 @@ def weighted_select(entities: list) -> Any:
 
 
 class Bot(Living):
+    roomid: int = 0
+
     def __init__(self, args, **kwargs):
         super().__init__(args)
         self.name = kwargs.get("name", "bot")
         self.kind = "bot"
         self.modulepath = "bot"
-        self.roomid = kwargs.get("roomid", None)
+        self.roomid = cast(int, kwargs.get("roomid", 0))
         if self.roomid is None:
             room_count = libroom.getcount(args, **kwargs)
             self.roomid = random.randint(10, room_count - 10) if room_count > 20 else 10
@@ -347,7 +349,9 @@ def load(args: argparse.Namespace, moniker: str, **kwargs) -> Optional[Bot]:
     return _work(conn)
 
 
-def create(args: argparse.Namespace, moniker: str, mode: str = None, **kwargs) -> Bot:
+def create(
+    args: argparse.Namespace, moniker: str, mode: Optional[str] = None, **kwargs
+) -> Optional[Bot]:
     def _work(conn):
         nonlocal mode
         if mode is None:
@@ -534,7 +538,7 @@ def get_all_huntable_entities(args, **kwargs) -> list:
     return _work(conn)
 
 
-def generate_bots(args, count: int = None, **kwargs) -> list:
+def generate_bots(args, count: Optional[int] = None, **kwargs) -> list:
     """Generate bots with dynamic mode distribution."""
 
     def _work(conn):

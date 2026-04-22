@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
-from psycopg import sql as pgsql
 from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 from . import obj as libobj
 from . import item as libitem
@@ -470,19 +469,12 @@ def distributeitems(args, **kwargs):
             io.echo("distributeitems: no placements determined", level="error")
             return False
 
-        columns = ["roomid", "itemname", "serial"]
-        query = (
-            pgsql.SQL("INSERT INTO ")
-            + pgsql.Identifier(SCHEMA, "map_item_room")
-            + pgsql.SQL(" (")
-            + pgsql.SQL(", ").join([pgsql.Identifier(c) for c in columns])
-            + pgsql.SQL(") VALUES (")
-            + pgsql.SQL(", ").join([pgsql.SQL("%s") for _ in columns])
-            + pgsql.SQL(")")
+        q = database.query(
+            "INSERT INTO $murdermotel.map_item_room (roomid, itemname, serial) VALUES ($1, $2, $3)"
         )
 
         with database.cursor(conn) as cur:
-            cur.executemany(query.as_string(cur._connection), placements)
+            cur.executemany(q, placements)
 
         conn.commit()
         return True

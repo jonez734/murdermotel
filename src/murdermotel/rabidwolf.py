@@ -35,7 +35,7 @@ class RabidWolf(Living):
         self.modulepath = None
         registry.register(self)
 
-    def short(self):
+    def short(self) -> str:
         return ":wolf: rabid wolf"
 
     def buildrec(self, **kwargs):
@@ -91,7 +91,7 @@ class RabidWolf(Living):
         if pool:
             self.save()
 
-            return True
+        return True
 
     def save(self, **kwargs) -> bool:
         def _work(conn):

@@ -35,7 +35,7 @@ class Thief(Living):
         self.modulepath = None
         registry.register(self)
 
-    def short(self):
+    def short(self) -> str:
         return ":supervillian: Thief"
 
     def buildrec(self, **kwargs):
