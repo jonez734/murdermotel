@@ -93,9 +93,9 @@ class Item(object):
 def load(args, itemname, serial: int = 0, **kwargs):
     def _work(conn):
         with database.cursor(conn) as cur:
-            params = {"name": itemname}
+            params = {"name": itemname, "serial": serial}
             q = database.query(
-                "SELECT * FROM $murdermotel.item WHERE name = :name", **params
+                "SELECT * FROM $murdermotel.item WHERE name = :name AND serial = :serial", **params
             )
             cur.execute(q, params)
             if cur.rowcount == 0:
