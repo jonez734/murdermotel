@@ -22,6 +22,18 @@ def main(args, **kwargs) -> bool:
 
 
 class Item(object):
+    args: object
+    kind: str
+    modulepath: str
+    name: str
+    serial: int
+    title: str | None
+    type: str
+    usemessages: list
+    table: str
+    pool: object
+    state: dict | str | None
+
     def __init__(self, args, **kwargs):
         self.args = args
         self.kind = "item"
@@ -31,6 +43,7 @@ class Item(object):
         self.title = self.name
         self.type = self.kind
         self.usemessages: list = []
+        self.state = None
         self.table = "murdermotel.item"
         self.pool = kwargs.get("pool", None)
 

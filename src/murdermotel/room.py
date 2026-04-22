@@ -30,10 +30,17 @@ class Room(object):
     shortname: str | None
     id: int | None
     title: str | None
+    description: str | None
     items: list
     exits: dict
     table: str
     pool: object
+    north: int | None
+    south: int | None
+    east: int | None
+    west: int | None
+    up: int | None
+    down: int | None
 
     def __init__(self, args, **kwargs):
         self.args = args
@@ -41,8 +48,15 @@ class Room(object):
         self.shortname = None
         self.id = None
         self.title = None
+        self.description = None
         self.items = []
         self.exits = {}
+        self.north = None
+        self.south = None
+        self.east = None
+        self.west = None
+        self.up = None
+        self.down = None
         self.table = "murdermotel.playground"
         self.pool = kwargs.get("pool", None)
         self.fields = ("shortname", "title", "description", "modulepath")
