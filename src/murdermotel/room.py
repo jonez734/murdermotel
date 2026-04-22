@@ -199,7 +199,7 @@ def getitems(args, roomid, **kwargs) -> list:
         with database.cursor(conn) as cur:
             params = {"roomid": roomid}
             q = database.query(
-                "SELECT m.itemname, m.serial, i.title, i.kind, i.usemessages FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON m.itemname = i.name WHERE m.roomid = :roomid",
+                "SELECT m.itemname, m.serial, i.title, i.kind, i.usemessages FROM $murdermotel.item i JOIN $murdermotel.map_item_room m ON m.itemname = i.name AND m.serial = i.serial WHERE m.roomid = :roomid",
                 **params,
             )
             cur.execute(q, params)

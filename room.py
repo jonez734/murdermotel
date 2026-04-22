@@ -1,6 +1,7 @@
 from bbsengine6 import database, io
 
 from . import lib as libmm
+from .item import Item
 
 FIELDS = ("id", "module", "description", "title", "shortname")
 EXITS = ("north", "south", "east", "west", "up", "down")
@@ -42,7 +43,7 @@ class Room(object):
 
     def save(self, mogrify=False):
         if self.pool is None:
-            io.echo(f"mm.room.save.180: {pool=}", level="error")
+            io.echo(f"mm.room.save.180: {self.pool=}", level="error")
             return False
 
         r = {}
@@ -71,7 +72,7 @@ class Room(object):
                     m["itemname"] = i.name
                     m["roomid"] = self.id
                     database.insert(
-                        args,
+                        self.args,
                         "murdermotel.map_item_room",
                         m,
                         returnid=False,
@@ -120,7 +121,7 @@ def getitems(args, roomid, **kwargs):
     def _work(conn):
         items = []
         with database.cursor(conn) as cur:
-            sql = "select * from murdermotel.item as i, murdermotel.map_item_room as m where (m.roomid=%s) and m.itemname=i.name"
+            sql = "select * from murdermotel.item as i, murdermotel.map_item_room as m where (m.roomid=%s) and m.itemname=i.name and m.serial=i.serial"
             dat = (roomid,)
             cur.execute(sql, dat)
 
