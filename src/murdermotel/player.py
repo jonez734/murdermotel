@@ -47,11 +47,30 @@ def turn(args, **kwargs) -> bool:
 
 
 class Player(object):
+    args: argparse.Namespace
+    roomid: int | None
+    modulepath: str | None
+    moniker: str
+    turn: int
+    moves: int
+    datelastplayed: datetime.datetime
+    items: list
+    isdirty: bool
+    points: int
+    bodycount: int
+    membermoniker: str | None
+    pool: object
+    conn: object
+    exits: dict
+    datecreated: datetime.datetime | None
+    target: str | None
+    targetedby: str | None
+
     def __init__(self, args, **kwargs):
         self.args = args
         self.roomid = None
         self.modulepath = None
-        self.moniker = member.getcurrentmoniker(args)
+        self.moniker = member.getcurrentmoniker(args) or ""
         self.turn = 1
         self.moves = libmm.DEFAULTMOVESPERTURN
         self.datelastplayed = datetime.datetime.now(datetime.timezone.utc)
@@ -63,7 +82,7 @@ class Player(object):
         self.pool = kwargs.get("pool", None)
         self.conn = kwargs.get("conn", None)
         self.exits = {}
-        self.datecreated = None
+        self.datecreated = datetime.datetime.now(datetime.timezone.utc)
         self.target = None
         self.targetedby = None
 
@@ -155,7 +174,7 @@ class Player(object):
             database.update(
                 self.args,
                 f"{libmm.SCHEMA}.player",
-                self.moniker,
+                self.moniker,  # type: ignore[arg-type]
                 rec,
                 primarykey="moniker",
                 conn=conn,
@@ -282,7 +301,7 @@ def load(args, moniker, **kwargs):
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"mm.player.load.100: {pool=}", level="error")
-            return False
+            return None
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
@@ -312,18 +331,18 @@ def exists(args, moniker, **kwargs) -> bool:
 
 
 def count(args, membermoniker: str, **kwargs) -> int:
-    def _work(conn):
-        q = database.query(
-            "SELECT COUNT(*) AS count FROM $murdermotel.player WHERE membermoniker = :membermoniker",
-            membermoniker=membermoniker,
-        )
+    def _work(conn) -> int:
         with database.cursor(conn) as cur:
+            q = database.query(
+                "SELECT COUNT(*) as count FROM $murdermotel.player WHERE membermoniker = :membermoniker",
+                membermoniker=membermoniker,
+            )
             cur.execute(q, {"membermoniker": membermoniker})
             if cur.rowcount == 0:
-                io.echo("murdermotel.player.count.160: returning None", level="debug")
-                return None
+                io.echo("murdermotel.player.count.160: returning 0", level="debug")
+                return 0
             rec = cur.fetchone()
-            count = rec["count"] if rec["count"] > 0 else None
+            count = rec["count"] if rec["count"] > 0 else 0
             io.echo(f"murdermotel.player.count.120: {count=}", level="error")
             return count
 
@@ -333,15 +352,16 @@ def count(args, membermoniker: str, **kwargs) -> int:
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"murdermotel.player.count.160: {pool=}")
-            return None
+            return 0
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
+    return _work(conn)
 
 
-def getitems(args, playermoniker, **kwargs):
-    def _work(conn):
-        items = []
+def getitems(args, playermoniker, **kwargs) -> list:
+    def _work(conn) -> list:
+        items: list = []
         with database.cursor(conn) as cur:
             q = database.query(
                 "SELECT * FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker",
@@ -358,27 +378,32 @@ def getitems(args, playermoniker, **kwargs):
                     io.echo(f"mm.player.getitems: {item=}", level="error")
                     break
                 items.append(item)
-            return items
+        return items
 
     conn = kwargs.get("conn", None)
     if conn is None:
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"murdermotel.player.count.160: {pool=}", level="error")
-            return None
+            return []
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
 
 
-class completePlayerName(object):
-    def __init__(self, args, **kwargs):
+class completePlayerName:
+    args: argparse.Namespace
+    matches: list
+    debug: bool
+    pool: object
+
+    def __init__(self, args: argparse.Namespace, **kwargs):
         self.args = args
         self.matches = []
-        self.debug = args.debug if "debug" in args else False
+        self.debug = getattr(args, "debug", False)
         self.pool = kwargs.get("pool", None)
 
-    def complete(self: object, text: str, state: int):
+    def complete(self, text: str, state: int):
         if self.pool is None:
             io.echo(f"mm.player.completePlayerName.100: {self.pool=}", level="error")
             return [
@@ -389,7 +414,7 @@ class completePlayerName(object):
                 vocab = []
                 q = database.query("SELECT moniker FROM $murdermotel.player")
                 cur.execute(q)
-                for rec in database.resultiter(cur):
+                for rec in cur.fetchall():
                     vocab.append(rec["moniker"])
                 results = [x for x in vocab if x.startswith(text)] + [None]
                 return results[state]
@@ -459,8 +484,20 @@ def build(args, rec: dict, **kwargs) -> Player:
     return p
 
 
-def inputmoniker(prompt: str = "player moniker: ", oldvalue: str = "", **kwargs: dict):
-    args = kwargs.pop("args", argparse.Namespace())
+def inputmoniker(
+    prompt: str = "player moniker: ",
+    oldvalue: str = "",
+    args: argparse.Namespace | None = None,
+    **kwargs: dict,
+):
+    if args is None:
+        args_from_kw = kwargs.get("args")
+        if isinstance(args_from_kw, argparse.Namespace):
+            args = args_from_kw
+        else:
+            args = argparse.Namespace()
+    elif not isinstance(args, argparse.Namespace):
+        args = argparse.Namespace()
     verify = kwargs.pop("verify", verifyPlayerNameFound)
     moniker = io.inputstring(
         prompt,
@@ -480,7 +517,7 @@ def create(args, playermoniker, **kwargs):
         io.echo(f"mm.player.create.140: {pool=}", level="error")
         return False
 
-    def _work(conn, playermoniker) -> str:
+    def _work(conn, playermoniker) -> "Player | None":
         p = Player(args, pool=pool)
         p.moniker = playermoniker
         p.membermoniker = member.getcurrentmoniker(args, **kwargs)
@@ -522,12 +559,11 @@ def create(args, playermoniker, **kwargs):
             )
             cur.execute(q, {"moniker": playermoniker})
             if cur.rowcount > 0:
-                rec = cur.fetchone()
                 p = load(args, playermoniker, **kwargs)
                 return p
 
         io.echo("mm.player.create.120: player table corrupted", level="error")
-        return False
+        return None
 
     #    io.echo(f"player.new.100: {currentmembermoniker=}", level="debug")
 

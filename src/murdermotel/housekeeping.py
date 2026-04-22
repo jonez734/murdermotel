@@ -44,13 +44,13 @@ def main(args: argparse.Namespace, **kw: dict) -> bool | None:
         )
         if ch == "S":
             io.echo("Setup Game")
-            lib.runsubmodule(args, player, "setup")
+            lib.runsubmodule(args, "setup", player=player)
         elif ch == "E":
             io.echo("Edit")
-            lib.runsubmodule(args, player, "edit")
+            lib.runsubmodule(args, "edit", player=player)
         elif ch == "W":
             io.echo("Weapon list")
-            lib.runsubmodule(args, player, "weaponlist")
+            lib.runsubmodule(args, "weaponlist", player=player)
         elif ch == "Q":
             io.echo("Q - Quit")
             done = True

@@ -102,7 +102,7 @@ class Obj(object):
             res = database.update(
                 self.args,
                 self.table,
-                self.name,
+                self.name,  # type: ignore[arg-type]
                 p,
                 primarykey="moniker",
                 mogrify=True,

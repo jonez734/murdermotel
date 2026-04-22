@@ -3,6 +3,7 @@ import locale
 import argparse
 
 from bbsengine6 import io, screen, database
+from bbsengine6.io import terminal
 
 from . import lib as libmm
 
@@ -41,5 +42,5 @@ if __name__ == "__main__":
             io.echo("{/all}*EOF*")
         finally:
             io.echo(
-                f"{{decsc}}{{curpos:{io.terminal.height()},0}}{{el}}{{reset}}{{decrc}}"
+                f"{{decsc}}{{curpos:{terminal.height()},0}}{{el}}{{reset}}{{decrc}}"
             )

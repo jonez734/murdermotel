@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from typing import Any
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
+from bbsengine6.io import terminal
 from . import room as libroom, boobytrap as libboobytrap, player as libplayer
 from . import obj as libobj
 from . import item as libitem
@@ -57,7 +59,7 @@ OP_TO_STUB = {
 }
 
 
-def get_op(module_ref: str, op: str, args) -> callable | None:
+def get_op(module_ref: str, op: str, args) -> callable | None:  # type: ignore[no-untyped-def]
     """Get an optional operation function from murdermotel's op map."""
     m = bbsmodule.get(module_ref, args)
     stub = OP_TO_STUB.get(op)
@@ -68,8 +70,13 @@ def get_op(module_ref: str, op: str, args) -> callable | None:
     return None
 
 
-class completeItemName(object):
-    def __init__(self, args, **kwargs):
+class completeItemName:
+    args: argparse.Namespace
+    roomid: int | None
+    playermoniker: str | None
+    pool: object
+
+    def __init__(self, args: argparse.Namespace, **kwargs: Any):
         self.roomid = kwargs["roomid"] if "roomid" in kwargs else None
         self.playermoniker = (
             kwargs["playermoniker"] if "playermoniker" in kwargs else None
@@ -77,14 +84,16 @@ class completeItemName(object):
         self.pool = kwargs.get("pool", None)
         self.args = args
 
-        if self.args.debug is True:
+        debug = getattr(self.args, "debug", False)
+        if debug is True:
             io.echo(f"completeItemName.100: kwargs={kwargs}", level="debug")
 
-    def complete(self: object, text: str, state: int):
-        if self.args.debug is True:
+    def complete(self, text: str, state: int):
+        debug = getattr(self.args, "debug", False)
+        if debug is True:
             io.echo("completeItemName.140: complete called", level="debug")
 
-        if self.args.debug is True:
+        if debug is True:
             io.echo(
                 f"completeItemName.160: building vocab. self.roomid={self.roomid!r}, self.playermoniker={self.playermoniker!r}",
                 level="debug",
@@ -112,12 +121,12 @@ class completeItemName(object):
 
         with database.connect(self.args, pool=self.pool) as conn:
             with database.cursor(conn) as cur:
-                if self.args.debug is True:
+                if debug is True:
                     io.echo(f"completeItemName.120: mogrify={cur.mogrify(q, dat)!r}")
                 cur.execute(q, dat)
 
                 vocab = []
-                for rec in util.resultiter(cur):
+                for rec in cur.fetchall():
                     vocab.append(rec["name"])
 
         results = [x for x in vocab if x.startswith(text)] + [None]
@@ -189,7 +198,7 @@ def runsubmodule(args, submodule, **kwargs):
 
 
 # @since 20260410
-def runmodule(args, op: str, modulename: str, **kwargs: dict):
+def runmodule(args, op: str, modulename: str, **kwargs: Any):
     """
     Run an external module by name, delegating to bbsengine6.module.
 
@@ -213,7 +222,7 @@ def runmodule(args, op: str, modulename: str, **kwargs: dict):
     if debug:
         io.echo(f"lib.runmodule.100: {op=} {fullname=}", level="debug")
 
-    kwargs["operation"] = op
+    kwargs["operation"] = op  # type: ignore[index]
 
     if op in ("turn", "escape"):
         func = get_op(fullname, op, args)
@@ -238,7 +247,7 @@ def buildargs(args=None, **kwargs):
         "--terminalwidth",
         action="store",
         dest="terminalwidth",
-        default=io.terminal.width(),
+        default=terminal.width(),
     )
     # parser.add_argument("--node", action="store", dest="node", default="cyclops")
 

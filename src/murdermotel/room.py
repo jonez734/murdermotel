@@ -1,3 +1,5 @@
+import argparse
+
 from bbsengine6 import database, io
 
 from . import item as libitem, lib as libmm
@@ -23,6 +25,16 @@ def main(args, **kwargs) -> bool:
 
 
 class Room(object):
+    args: argparse.Namespace
+    modulepath: str | None
+    shortname: str | None
+    id: int | None
+    title: str | None
+    items: list
+    exits: dict
+    table: str
+    pool: object
+
     def __init__(self, args, **kwargs):
         self.args = args
         self.modulepath = None
@@ -167,9 +179,9 @@ def load(args, roomid, **kwargs):
 
 
 # @since 20220921
-def getitems(args, roomid, **kwargs):
-    def _work(conn):
-        items = []
+def getitems(args, roomid, **kwargs) -> list:
+    def _work(conn) -> list:
+        items: list = []
         with database.cursor(conn) as cur:
             params = {"roomid": roomid}
             q = database.query(
@@ -181,7 +193,7 @@ def getitems(args, roomid, **kwargs):
             if cur.rowcount == 0:
                 return []
 
-            for rec in database.resultiter(cur):
+            for rec in cur.fetchall():
                 i = libitem.Item(args, serial=rec.get("serial"))
                 i.name = rec["itemname"]
                 i.title = rec["title"]
@@ -195,6 +207,7 @@ def getitems(args, roomid, **kwargs):
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"mm.room.getitems.100: {pool=}", level="error")
+            return []
             return False
         with database.connect(args, pool=pool) as conn:
             return _work(conn)

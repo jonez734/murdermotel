@@ -29,6 +29,8 @@ class Item(object):
         self.name = "name"
         self.serial = kwargs.get("serial", 0)
         self.title = self.name
+        self.type = self.kind
+        self.usemessages: list = []
         self.table = "murdermotel.item"
         self.pool = kwargs.get("pool", None)
 

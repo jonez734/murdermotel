@@ -177,7 +177,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         io.echo("{f6}the playground is not set up properly.{f6}")
         return False
 
-    currentmembermoniker: str = member.getcurrentmoniker(args, **kwargs)
+    currentmembermoniker: str = member.getcurrentmoniker(args, **kwargs) or ""
     io.echo("starting call to libplayer.load", level="debug")
     player: Any = libplayer.load(args, currentmembermoniker, **kwargs)
     io.echo("ended call", level="debug")
@@ -319,14 +319,14 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             label: str = util.pluralize(
                 len(room.items), "item", "items", quantity=False
             )
-            value: str = util.oxfordcomma(room.items)
+            value: str = util.oxfordcomma(room.items) or ""
             io.echo(f"{{var:labelcolor}}room {label}: {{var:valuecolor}}{value}")
 
         if len(player.items) > 0:
             label = util.pluralize(len(player.items), "item", "items", quantity=False)
             items: list = copy.deepcopy(player.items)
             items = player.weapons(items) + items
-            value = util.oxfordcomma(items)
+            value = util.oxfordcomma(items) or ""
             io.echo(f"{{var:labelcolor}}player {label}: {{var:valuecolor}}{value}")
 
         for obj in libmm.registry.get_by_room(player.roomid):
@@ -550,9 +550,10 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             else:
                 player.roomid = room.exits["down"]
         elif ch == "M":
-            floor: int = io.inputinteger(
+            floor_input = io.inputinteger(
                 "map - {var:promptcolor}floor (1-5): {var:inputcolor}", **kwargs
             )
+            floor: int = floor_input if isinstance(floor_input, int) else 1
             if floor < 1 or floor > 5:
                 io.echo("invalid floor")
                 continue
@@ -630,7 +631,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
 
 
 def reload(args: argparse.Namespace, player: Any, **kwargs: Any) -> bool:
-    if member.issysop(args) is False:
+    if not member.checkflag(args, "SYSOP"):
         io.echo("Sysop access required.", level="error")
         return False
 
