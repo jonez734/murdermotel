@@ -55,3 +55,110 @@ def test_player(test_args, test_pool):
             )
             cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
         conn.commit()
+
+
+@pytest.fixture(scope="function")
+def test_room(test_args, test_pool):
+    """Create a test room, yield roomid, then cleanup."""
+    room_id = 9999
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                """
+                INSERT INTO $murdermotel.playground 
+                (id, shortname, title, description, north, south, east, west, up, down)
+                VALUES (:id, 'test', 'Test Room', 'A test room', 0, 0, 0, 0, 0, 0)
+                ON CONFLICT (id) DO NOTHING
+            """,
+                id=room_id,
+            )
+            cur.execute(q, {"id": room_id})
+        conn.commit()
+
+    yield room_id
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                "DELETE FROM $murdermotel.map_item_room WHERE roomid = :roomid",
+                roomid=room_id,
+            )
+            cur.execute(q, {"roomid": room_id})
+            q = database.query(
+                "DELETE FROM $murdermotel.playground WHERE id = :id",
+                id=room_id,
+            )
+            cur.execute(q, {"id": room_id})
+        conn.commit()
+
+
+@pytest.fixture(scope="function")
+def test_item_in_room(test_args, test_pool, test_room):
+    """Create a test item in a room, yield item dict, then cleanup."""
+    item_name = "knife"
+    item_serial = 1
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                """
+                INSERT INTO $murdermotel.map_item_room 
+                (roomid, itemname, serial)
+                VALUES (:roomid, :itemname, :serial)
+                ON CONFLICT DO NOTHING
+            """,
+                roomid=test_room,
+                itemname=item_name,
+                serial=item_serial,
+            )
+            cur.execute(q, {"roomid": test_room, "itemname": item_name, "serial": item_serial})
+        conn.commit()
+
+    yield {"roomid": test_room, "itemname": item_name, "serial": item_serial}
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                "DELETE FROM $murdermotel.map_item_room WHERE roomid = :roomid AND itemname = :itemname AND serial = :serial",
+                roomid=test_room,
+                itemname=item_name,
+                serial=item_serial,
+            )
+            cur.execute(q, {"roomid": test_room, "itemname": item_name, "serial": item_serial})
+        conn.commit()
+
+
+@pytest.fixture(scope="function")
+def test_item_on_player(test_args, test_pool, test_player):
+    """Create a test item on a player, yield item dict, then cleanup."""
+    item_name = "knife"
+    item_serial = 1
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                """
+                INSERT INTO $murdermotel.map_item_player 
+                (playermoniker, itemname, serial)
+                VALUES (:playermoniker, :itemname, :serial)
+                ON CONFLICT DO NOTHING
+            """,
+                playermoniker=test_player,
+                itemname=item_name,
+                serial=item_serial,
+            )
+            cur.execute(q, {"playermoniker": test_player, "itemname": item_name, "serial": item_serial})
+        conn.commit()
+
+    yield {"playermoniker": test_player, "itemname": item_name, "serial": item_serial}
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            q = database.query(
+                "DELETE FROM $murdermotel.map_item_player WHERE playermoniker = :playermoniker AND itemname = :itemname AND serial = :serial",
+                playermoniker=test_player,
+                itemname=item_name,
+                serial=item_serial,
+            )
+            cur.execute(q, {"playermoniker": test_player, "itemname": item_name, "serial": item_serial})
+        conn.commit()

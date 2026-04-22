@@ -107,6 +107,10 @@ def load(args, itemname, serial: int = 0, **kwargs):
                     return None
 
             rec = cur.fetchone()
+            if rec is None:
+                if args.debug is True:
+                    io.echo(f"unable to load item {itemname!r}", level="debug")
+                return None
 
             r = Item(args, **kwargs)
             for f in FIELDS:

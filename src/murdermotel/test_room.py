@@ -95,7 +95,7 @@ class TestRoom:
         from murdermotel import room as libroom
 
         result = libroom.getcount(test_args, pool=None)
-        assert result is False
+        assert result == 0
 
     def test_getcount(self, test_args, test_pool):
         from murdermotel import room as libroom
