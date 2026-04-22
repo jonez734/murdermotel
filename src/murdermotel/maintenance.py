@@ -1,5 +1,3 @@
-# import ttyio5 as ttyio
-# import bbsengine5 as bbsengine
 from bbsengine6 import database, io
 
 from . import room as libroom, item as libitem
