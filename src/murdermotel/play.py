@@ -586,8 +586,17 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             item = room.items[itemindex]
             del room.items[itemindex]
             player.items.append(item)
-            player.save()
-            room.save()
+            conn = kwargs.get("conn", None)
+            pool = kwargs.get("pool", None)
+            if conn is None and pool is not None:
+                conn = pool.getconn()
+                player.save(conn=conn)
+                room.save(conn=conn)
+                conn.commit()
+                pool.putconn(conn)
+            else:
+                player.save(conn=conn) if conn else player.save()
+                room.save(conn=conn) if conn else room.save()
         elif ch == "L":
             itemname = io.inputstring(
                 "Leave - {var:promptcolor}item name: {var:inputcolor}",
@@ -605,8 +614,17 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             io.echo(f"mm.play.120: {item=}", level="debug")
             room.items.append(item)
 
-            player.save()
-            room.save()
+            conn = kwargs.get("conn", None)
+            pool = kwargs.get("pool", None)
+            if conn is None and pool is not None:
+                conn = pool.getconn()
+                player.save(conn=conn)
+                room.save(conn=conn)
+                conn.commit()
+                pool.putconn(conn)
+            else:
+                player.save(conn=conn) if conn else player.save()
+                room.save(conn=conn) if conn else room.save()
         elif ch == "I":
             io.echo("Info")
             player.info()

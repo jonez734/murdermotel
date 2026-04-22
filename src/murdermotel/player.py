@@ -213,9 +213,11 @@ class Player(object):
                 io.echo(f"mm.player.save.120: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                _work(conn)
+                result = _work(conn)
+                conn.commit()
+                return result
         else:
-            _work(conn)
+            return _work(conn)
 
     def info(self):
         io.echo(f"{{var:labelcolor}}Moves: {{var:valuecolor}}{self.moves}")
