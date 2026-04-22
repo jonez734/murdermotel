@@ -3,7 +3,7 @@ import copy
 import random
 from typing import Any, Optional
 
-from bbsengine6 import io, util, database, member, module as bbsmodule
+from bbsengine6 import io, util, member, module as bbsmodule
 
 from . import (
     lib as libmm,
@@ -55,12 +55,10 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         return True
 
     def goto() -> bool:
-        conn = kwargs.get("conn", None)
-        if conn is None:
-            pool = kwargs.get("pool", None)
-            if pool is None:
-                io.echo(f"mm.play.maint.goto.100: {pool=}", level="error")
-                return False
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"mm.play.maint.goto.100: {pool=}", level="error")
+            return False
 
         dest: Optional[str] = io.inputstring(
             "{var:promptcolor}goto - room id or shortname: {var:inputcolor}",
@@ -89,24 +87,6 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         player.roomid = room_obj.id
         player.moves -= 2
         player.save()
-
-        with database.cursor(conn) as cur:
-            q = database.query(
-                "SELECT id FROM $murdermotel.playground WHERE shortname = :shortname",
-                shortname=dest,
-            )
-            cur.execute(q)
-            if cur.rowcount == 0:
-                io.echo("room not found")
-                return False
-            rec = cur.fetchone()
-            if rec is None:
-                io.echo("room not found")
-                return False
-            if player.roomid == rec["id"]:
-                io.echo("You twitch briefly.")
-                return True
-            player.roomid = rec["id"]
 
         return True
 
@@ -300,6 +280,10 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         io.echo("playloop.100: about to save player", level="debug")
         player.save()
         io.echo("playloop.120: ended player save", level="debug")
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"mm.play.playloop.100: {pool=}", level="error")
+            return False
         libmm.setarea(args, player, "playground", help=True, **kwargs)
         room: Any = libroom.load(args, player.roomid, **kwargs)
         if not room:
