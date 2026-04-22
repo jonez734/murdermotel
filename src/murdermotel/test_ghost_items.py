@@ -26,8 +26,8 @@ class TestGhostItems:
 
         assert len(ghosts) == 0, f"Found {len(ghosts)} ghost items: {ghosts}"
 
-    def test_item_serial_consistency(self, test_args, test_pool):
-        """Verify all items in map tables have matching serial in mm.item."""
+    def test_item_serial_consistency_room(self, test_args, test_pool):
+        """Verify all room map items have matching serial in mm.item."""
         with database.connect(test_args, pool=test_pool) as conn:
             with database.cursor(conn) as cur:
                 q = database.query(
@@ -35,7 +35,19 @@ class TestGhostItems:
                     SELECT m.itemname, m.serial, m.roomid as location
                     FROM $murdermotel.map_item_room m
                     WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i WHERE i.name = m.itemname AND i.serial = m.serial)
-                    UNION ALL
+                """
+                )
+                cur.execute(q)
+                orphans = cur.fetchall()
+
+        assert len(orphans) == 0, f"Found {len(orphans)} orphaned room map entries: {orphans}"
+
+    def test_item_serial_consistency_player(self, test_args, test_pool):
+        """Verify all player map items have matching serial in mm.item."""
+        with database.connect(test_args, pool=test_pool) as conn:
+            with database.cursor(conn) as cur:
+                q = database.query(
+                    """
                     SELECT m.itemname, m.serial, m.playermoniker as location
                     FROM $murdermotel.map_item_player m
                     WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i WHERE i.name = m.itemname AND i.serial = m.serial)
@@ -44,7 +56,7 @@ class TestGhostItems:
                 cur.execute(q)
                 orphans = cur.fetchall()
 
-        assert len(orphans) == 0, f"Found {len(orphans)} orphaned map entries: {orphans}"
+        assert len(orphans) == 0, f"Found {len(orphans)} orphaned player map entries: {orphans}"
 
     def test_all_axe_blades_accounted_for(self, test_args, test_pool):
         """Verify all 6 axe blades are accounted for."""

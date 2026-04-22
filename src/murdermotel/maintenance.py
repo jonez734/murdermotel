@@ -134,10 +134,11 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
     step += 1
 
     for x in range(0, 6):
-        for name in items.keys():
+        for name, data in items.items():
             m = {}
             m["roomid"] = random.randint(10, kk - 10)
             m["itemname"] = name
+            m["serial"] = x + 1
 
             if not database.insert(
                 args,
