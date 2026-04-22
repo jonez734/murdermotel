@@ -71,10 +71,17 @@ class Thief(Living):
             if stolen:
                 io.echo(f"The thief stole {stolen.name} from you!")
 
-        if self.pool:
-            self.save()
-
-        player.save()
+        pool = kwargs.get("pool", None)
+        conn = kwargs.get("conn", None)
+        if conn is None and pool is not None:
+            with database.connect(self.args, pool=pool) as conn:
+                self.save(conn=conn)
+                player.save(conn=conn)
+                conn.commit()
+        else:
+            if self.pool:
+                self.save(conn=conn) if conn else self.save()
+            player.save(conn=conn) if conn else player.save()
         return True
 
     def save(self, **kwargs) -> bool:
@@ -119,10 +126,11 @@ class Thief(Living):
                 io.echo(f"mm.Thief.save.100: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                _work(conn)
+                result = _work(conn)
+                conn.commit()
+                return result
         else:
-            _work(conn)
-        return True
+            return _work(conn)
 
 
 def access(args, op, **kwargs) -> bool:
@@ -398,10 +406,16 @@ def turn(args, **kwargs) -> bool:
             io.echo(f"The thief stole {stolen.name} from you!")
 
     pool = kwargs.get("pool", None)
-    if pool:
-        obj.save()
-
-    player.save()
+    conn = kwargs.get("conn", None)
+    if conn is None and pool is not None:
+        with database.connect(args, pool=pool) as conn:
+            obj.save(conn=conn)
+            player.save(conn=conn)
+            conn.commit()
+    else:
+        if pool:
+            obj.save(conn=conn) if conn else obj.save()
+        player.save(conn=conn) if conn else player.save()
     return True
 
 
@@ -415,8 +429,15 @@ def steal_from_player(player, thief, **kwargs):
 
     args = kwargs.get("args", None)
     pool = kwargs.get("pool", None)
-    if pool and args:
-        player.save()
-        thief.save()
+    conn = kwargs.get("conn", None)
+    if conn is None and pool is not None:
+        with database.connect(args, pool=pool) as conn:
+            player.save(conn=conn)
+            thief.save(conn=conn)
+            conn.commit()
+    else:
+        if pool and args:
+            player.save(conn=conn) if conn else player.save()
+            thief.save(conn=conn) if conn else thief.save()
 
     return item

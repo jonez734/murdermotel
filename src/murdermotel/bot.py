@@ -187,8 +187,16 @@ class Bot(Living):
         ):
             self._handle_combat(args, room, **kwargs)
 
-        if self.pool:
-            self.save()
+        pool = kwargs.get("pool", None)
+        conn = kwargs.get("conn", None)
+        if conn is None and pool is not None:
+            with database.connect(self.args, pool=pool) as conn:
+                room.save(conn=conn)
+                self.save(conn=conn)
+                conn.commit()
+        else:
+            if self.pool:
+                self.save(conn=conn) if conn else self.save()
         return True
 
     def _move_randomly(self, room) -> bool:
