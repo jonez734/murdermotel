@@ -55,8 +55,9 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         return True
 
     def goto() -> bool:
+        conn = kwargs.get("conn", None)
         pool = kwargs.get("pool", None)
-        if pool is None:
+        if conn is None and pool is None:
             io.echo(f"mm.play.maint.goto.100: {pool=}", level="error")
             return False
 
@@ -280,8 +281,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         io.echo("playloop.100: about to save player", level="debug")
         player.save()
         io.echo("playloop.120: ended player save", level="debug")
+        conn = kwargs.get("conn", None)
         pool = kwargs.get("pool", None)
-        if pool is None:
+        if conn is None and pool is None:
             io.echo(f"mm.play.playloop.100: {pool=}", level="error")
             return False
         libmm.setarea(args, player, "playground", help=True, **kwargs)
