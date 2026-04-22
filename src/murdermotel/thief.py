@@ -249,7 +249,7 @@ def create(args, **kwargs):
     def _work(conn):
         t = build(
             args,
-            {"name": THIEF_NAME, "bag": [], "roomid": 10, "healthpoints": THIEF_HEALTH},
+            {"name": THIEF_NAME, "bag": [], "healthpoints": THIEF_HEALTH},
             **kwargs,
         )
 
@@ -373,7 +373,8 @@ def build(args, rec, **kwargs):
     t = Thief(args, pool=pool)
     t.name = rec.get("name", THIEF_NAME)
     t.bag = rec.get("bag", [])
-    t.roomid = rec.get("roomid", 10)
+    if "roomid" in rec:
+        t.roomid = rec["roomid"]
     t.healthpoints = rec.get("healthpoints", THIEF_HEALTH)
     return t
 

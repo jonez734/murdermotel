@@ -188,7 +188,7 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
     def _work(conn):
         w = build(
             args,
-            {"name": WOLF_NAME, "roomid": 10, "healthpoints": WOLF_HEALTH},
+            {"name": WOLF_NAME, "healthpoints": WOLF_HEALTH},
             **kwargs,
         )
 
@@ -282,7 +282,8 @@ def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> RabidWolf:
     pool = kwargs.get("pool", None)
     w = RabidWolf(args, pool=pool)
     w.name = rec.get("name", WOLF_NAME)
-    w.roomid = rec.get("roomid", 10)
+    if "roomid" in rec:
+        w.roomid = rec["roomid"]
     w.healthpoints = rec.get("healthpoints", WOLF_HEALTH)
     return w
 

@@ -3,7 +3,7 @@
 
 import argparse
 import random
-from typing import Any, Optional, cast
+from typing import Any, Optional
 
 from bbsengine6 import database, io
 
@@ -130,14 +130,14 @@ def weighted_select(entities: list) -> Any:
 
 
 class Bot(Living):
-    roomid: int = 0
+    roomid: Optional[int] = None
 
     def __init__(self, args, **kwargs):
         super().__init__(args)
         self.name = kwargs.get("name", "bot")
         self.kind = "bot"
         self.modulepath = "bot"
-        self.roomid = cast(int, kwargs.get("roomid", 0))
+        self.roomid = kwargs.get("roomid")
         if self.roomid is None:
             room_count = libroom.getcount(args, **kwargs)
             self.roomid = random.randint(10, room_count - 10) if room_count > 20 else 10
@@ -248,7 +248,7 @@ class Bot(Living):
                     in_room = True
                     break
 
-        if not in_room:
+        if not in_room and self.roomid is not None:
             for obj in registry.get_by_room(self.roomid):
                 if isinstance(obj, Bot) and obj.name == target_name:
                     in_room = True
