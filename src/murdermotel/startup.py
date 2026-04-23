@@ -113,6 +113,17 @@ def main(args, **kwargs) -> bool:
 
         io.echo(" ok ", level="ok")
 
+        # --- orphan items ---
+        io.echo("{var:labelcolor}check {var:valuecolor}orphan items: ", end="")
+        orphan_count, ghost_count = _check_orphan_items(args, conn=conn)
+        if orphan_count > 0 or ghost_count > 0:
+            io.echo(
+                f" fixed ({orphan_count} orphaned map entries, {ghost_count} ghosts redistributed)",
+                level="ok",
+            )
+        else:
+            io.echo(" ok ", level="ok")
+
         # --- rooms ---
         io.echo("{var:labelcolor}populate {var:valuecolor}rooms: ", end="")
         if (libroom.getcount(args, conn=conn) or 0) == 0:
@@ -270,7 +281,7 @@ def _populate_rooms(args, **kwargs) -> bool:
             params_list.append(params)
 
         with database.cursor(conn) as cur:
-            cur.executemany(query.as_string(cur._connection), params_list)
+            cur.executemany(query.as_string(conn), params_list)
 
         conn.commit()
         return True
@@ -284,3 +295,64 @@ def _populate_rooms(args, **kwargs) -> bool:
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
     return _work(conn)
+
+
+def _check_orphan_items(args, conn) -> tuple[int, int]:
+    """Check for orphan items and fix them. Returns (orphan_count, ghost_count)."""
+    import random
+
+    orphan_count = 0
+    ghost_count = 0
+
+    with database.cursor(conn) as cur:
+        q = database.query(
+            """
+            DELETE FROM $murdermotel.map_item_room
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i 
+                           WHERE i.name = map_item_room.itemname AND i.serial = map_item_room.serial)
+        """
+        )
+        cur.execute(q)
+        orphan_count += cur.rowcount
+
+        q = database.query(
+            """
+            DELETE FROM $murdermotel.map_item_player
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i 
+                           WHERE i.name = map_item_player.itemname AND i.serial = map_item_player.serial)
+        """
+        )
+        cur.execute(q)
+        orphan_count += cur.rowcount
+
+        q = database.query(
+            """
+            SELECT i.name, i.serial FROM $murdermotel.item i
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_room m 
+                            WHERE m.itemname = i.name AND m.serial = i.serial)
+            AND NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_player m 
+                          WHERE m.itemname = i.name AND m.serial = i.serial)
+            AND i.kind IN ('component', 'defense')
+        """
+        )
+        cur.execute(q)
+        ghosts = cur.fetchall()
+        ghost_count = len(ghosts)
+
+        if ghosts:
+            roomcount = libroom.getcount(args, conn=conn)
+            eligible_rooms = list(range(11, roomcount - 1))
+            if eligible_rooms:
+                random.shuffle(eligible_rooms)
+                placements = [
+                    (eligible_rooms[i % len(eligible_rooms)], ghost["name"], ghost["serial"])
+                    for i, ghost in enumerate(ghosts)
+                ]
+                with database.cursor(conn) as insert_cur:
+                    insert_cur.executemany(
+                        "INSERT INTO murdermotel.map_item_room (roomid, itemname, serial) VALUES (%s, %s, %s)",
+                        placements,
+                    )
+
+    conn.commit()
+    return orphan_count, ghost_count

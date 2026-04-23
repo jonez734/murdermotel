@@ -488,7 +488,7 @@ def distributeitems(args, **kwargs):
         )
 
         with database.cursor(conn) as cur:
-            cur.executemany(q, placements)
+            cur.executemany(q.as_string(conn), placements)
 
         conn.commit()
         return True
