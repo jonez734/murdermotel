@@ -9,6 +9,10 @@ from . import lib as libmm
 BOOBYTRAP_NAME = "boobytrap"
 BOOBYTRAP_HEALTH = 20
 
+# The boobytrap CAN attack! When its timer hits zero, SNAP - there goes 10 moves.
+# But can YOU attack the boobytrap? That's a TODO for another day.
+# For now, the boobytrap is an unstoppable force meeting a very movable object.
+
 
 def access(args, op, **kwargs) -> bool:
     return op in ("init", "run", "turn")
