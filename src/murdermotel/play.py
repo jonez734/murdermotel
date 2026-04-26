@@ -49,9 +49,12 @@ def _handle_trap(args, room, player, direction, **kwargs):
         io.echo("play._handle_trap: no modulepath")
         return None
 
-    io.echo(f"play._handle_trap: calling on_turn() for {module}")
-    result = room.on_turn(args, room=room, player=player, **kwargs)
-    io.echo(f"play._handle_trap: on_turn returned {result}")
+    # Only call attempt when player specifically tries to escape
+    # Skip room.on_turn() here - it's called elsewhere in the game loop
+    func = libtraproom.turn
+    io.echo(f"play._handle_trap: calling attempt() for {module}")
+    result = func(args, room=room, player=player, **kwargs)
+    io.echo(f"play._handle_trap: attempt returned {result}")
 
     if result is False:
         trap_msg = getattr(room, "TRAP_MESSAGE", libtraproom.TRAP_MESSAGE)
