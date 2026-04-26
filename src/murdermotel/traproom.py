@@ -101,7 +101,6 @@ def attempt(args, **kwargs) -> bool:
     """Standalone attempt() - uses default config."""
     player = kwargs.get("player")
     if not player:
-        io.echo("traproom.attempt: no player, returning True")
         return True
 
     moniker = player.moniker
@@ -114,13 +113,11 @@ def attempt(args, **kwargs) -> bool:
     attempts = _counter[moniker]
     allowed = ATTEMPTS_ALLOWED
 
-    io.echo(f"traproom.attempt: {moniker} attempt {attempts}/{allowed}")
+    io.echo(f"attempt {attempts}/{allowed}")
 
     if attempts >= allowed:
-        io.echo(f"traproom.attempt: {moniker} CAN ESCAPE!")
         return True
 
-    io.echo(f"traproom.attempt: {moniker} still trapped")
     return False
 
 
