@@ -29,6 +29,55 @@ def buildargs(args: argparse.Namespace, **kwargs: Any) -> Optional[str]:
     return None
 
 
+def _handle_trap(args, room, player, direction, **kwargs):
+    """Handle trap room movement. Returns new room ID or None if no escape."""
+    from . import traproom as libtraproom
+
+    io.echo(
+        f"play._handle_trap: direction={direction} roomid={room.id} modulepath={room.modulepath}"
+    )
+
+    trap_exits = getattr(room, "TRAP_EXITS", None)
+    if trap_exits is not None and direction not in trap_exits:
+        io.echo(
+            f"play._handle_trap: direction {direction} not in TRAP_EXITS, using normal exit"
+        )
+        return None
+
+    module = room.modulepath
+    if not module:
+        io.echo("play._handle_trap: no modulepath")
+        return None
+
+    io.echo(f"play._handle_trap: calling on_turn() for {module}")
+    result = room.on_turn(args, room=room, player=player, **kwargs)
+    io.echo(f"play._handle_trap: on_turn returned {result}")
+
+    if result is False:
+        trap_msg = getattr(room, "TRAP_MESSAGE", libtraproom.TRAP_MESSAGE)
+        io.echo(f"play._handle_trap: {trap_msg}")
+        return None
+
+    for op in ("success", "solved", "win"):
+        io.echo(f"play._handle_trap: trying op={op}")
+        new_room = libmm.runmodule(
+            args,
+            op,
+            module,
+            obj=room,
+            room=room,
+            player=player,
+            **kwargs,
+        )
+        io.echo(f"play._handle_trap: {op} returned {new_room}")
+        if new_room:
+            io.echo(f"play._handle_trap: escaping to room {new_room}")
+            return new_room
+
+    io.echo("play._handle_trap: no escape found, staying")
+    return player.roomid
+
+
 def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
     player: Any = kwargs.get("player", None)
     if player is None:
@@ -410,129 +459,39 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
                 done = True
                 continue
         elif ch == "N":
-            io.echo("north")
-            if room.exits["north"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "N", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["north"]
         elif ch == "S":
-            io.echo("south")
-            if room.exits["south"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "S", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["south"]
         elif ch == "E":
-            io.echo("east")
-            if room.exits["east"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "E", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["east"]
         elif ch == "W":
-            io.echo("west")
-            if room.exits["west"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "W", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["west"]
         elif ch == "U":
-            io.echo("up")
-            if room.exits["up"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "U", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["up"]
         elif ch == "D":
-            io.echo("down")
-            if room.exits["down"] == player.roomid:
-                result = room.on_turn(args, room=room, player=player, **kwargs)
-                if result is False:
-                    io.echo("You are trapped in the glowing sphere! Try again...")
-                    continue
-                player.roomid = (
-                    libmm.runmodule(
-                        args,
-                        "escape",
-                        room.modulepath,
-                        obj=room,
-                        room=room,
-                        player=player,
-                        **kwargs,
-                    )
-                    or player.roomid
-                )
+            new_room = _handle_trap(args, room, player, "D", **kwargs)
+            if new_room is not None:
+                player.roomid = new_room
             else:
                 player.roomid = room.exits["down"]
         elif ch == "M":

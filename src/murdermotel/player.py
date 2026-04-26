@@ -49,6 +49,7 @@ def turn(args, **kwargs) -> bool:
 class Player(object):
     args: argparse.Namespace
     roomid: int | None
+    died: int | None
     modulepath: str | None
     moniker: str
     turn: int
@@ -69,6 +70,7 @@ class Player(object):
     def __init__(self, args, **kwargs):
         self.args = args
         self.roomid = None
+        self.died = None
         self.modulepath = None
         self.moniker = member.getcurrentmoniker(args) or ""
         self.turn = 1

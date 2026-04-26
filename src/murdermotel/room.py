@@ -65,7 +65,7 @@ class Room(object):
         io.echo("mm.room.on_turn.100: calling .turn()", level="debug")
         if self.modulepath:
             return libmm.runmodule(
-                args, "turn", self.modulepath, obj=self, room=room, **kwargs
+                args, "attempt", self.modulepath, obj=self, room=room, **kwargs
             )
         return True
 

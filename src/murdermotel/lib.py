@@ -53,20 +53,53 @@ def _stub_escape(args: argparse.Namespace, /, **kwargs: dict) -> int | None:
     pass
 
 
+def _stub_attempt(args: argparse.Namespace, /, **kwargs: dict) -> bool:
+    return False
+
+
+def _stub_success(args: argparse.Namespace, /, **kwargs: dict) -> int:
+    return 0
+
+
 OP_TO_STUB = {
     "turn": _stub_turn,
     "escape": _stub_escape,
+    "attempt": _stub_attempt,
+    "success": _stub_success,
+    "solved": _stub_success,
+    "win": _stub_success,
 }
 
 
 def get_op(module_ref: str, op: str, args) -> callable | None:  # type: ignore[no-untyped-def]
     """Get an optional operation function from murdermotel's op map."""
+    io.echo(f"get_op: looking for {op} in {module_ref}")
     m = bbsmodule.get(module_ref, args)
     stub = OP_TO_STUB.get(op)
     if stub is None:
+        io.echo(f"get_op: no stub for {op}")
         return None
-    if bbsmodule.check_func(m, op, stub, silent=True):
+
+    # For trap operations, just check if function exists and is callable
+    # Skip strict signature validation since we alias functions from traproom
+    if op in ("attempt", "success", "solved", "win"):
+        if hasattr(m, op) and callable(getattr(m, op)):
+            io.echo(f"get_op: found {op}")
+            return getattr(m, op)
+        io.echo(f"get_op: {op} not found or not callable")
+        return None
+
+    has_func = bbsmodule.check_func(m, op, stub, silent=False)
+    io.echo(f"get_op: check_func({op})={has_func}")
+    if has_func:
         return getattr(m, op)
+    io.echo(f"get_op: returning None for {op}")
+    return None
+    has_func = bbsmodule.check_func(m, op, stub, silent=False)
+    io.echo(f"get_op: check_func({op})={has_func}")
+    if has_func:
+        return getattr(m, op)
+    io.echo(f"get_op: returning None for {op}")
     return None
 
 
@@ -229,7 +262,43 @@ def runmodule(args, op: str, modulename: str, **kwargs: Any):
 
     kwargs["operation"] = op  # type: ignore[index]
 
-    if op in ("turn", "escape"):
+    if op == "attempt":
+        func = get_op(fullname, op, args)
+        if func is None:
+            io.echo(f"lib.runmodule: {fullname} has no {op}()")
+            return False
+        io.echo(f"lib.runmodule: calling {op}() from {fullname}")
+        result = bbsmodule.runcallback(args, func, **kwargs)
+        io.echo(f"lib.runmodule: {op}() returned {result}")
+        return result
+
+    if op == "success":
+        func = get_op(fullname, op, args)
+        if func is None:
+            io.echo(f"lib.runmodule: {fullname} has no {op}()")
+            return False
+        io.echo(f"lib.runmodule: calling {op}() from {fullname}")
+        result = bbsmodule.runcallback(args, func, **kwargs)
+        io.echo(f"lib.runmodule: {op}() returned {result}")
+        return result
+
+    if op == "solved":
+        func = get_op(fullname, op, args)
+        if func is None:
+            if debug:
+                io.echo(f"{fullname} has no {op}()", level="debug")
+            return False
+        return bbsmodule.runcallback(args, func, **kwargs)
+
+    if op == "win":
+        func = get_op(fullname, op, args)
+        if func is None:
+            if debug:
+                io.echo(f"{fullname} has no {op}()", level="debug")
+            return False
+        return bbsmodule.runcallback(args, func, **kwargs)
+
+    if op == "turn":
         func = get_op(fullname, op, args)
         if func is None:
             if debug:
