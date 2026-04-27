@@ -92,7 +92,7 @@ def main(args, **kwargs) -> bool:
     return True
 
 
-def turn(args, **kwargs):
+def turn(args, **kwargs) -> bool:
     """Run attempt logic - returns True when player can escape."""
     return attempt(args, **kwargs)
 

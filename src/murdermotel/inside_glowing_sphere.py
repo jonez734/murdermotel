@@ -20,9 +20,26 @@ init = libtraproom.init
 access = libtraproom.access
 buildargs = libtraproom.buildargs
 main = libtraproom.main
-turn = libtraproom.turn
-attempt = libtraproom.attempt
-success = libtraproom.success
-solved = libtraproom.solved
-win = libtraproom.win
+
+
+def turn(args, **kwargs) -> bool:
+    return libtraproom.turn(args, **kwargs)
+
+
+def attempt(args, **kwargs) -> bool:
+    return libtraproom.attempt(args, **kwargs)
+
+
+def success(args, **kwargs) -> int:
+    return libtraproom.success(args, **kwargs)
+
+
+def solved(args, **kwargs) -> int:
+    return libtraproom.solved(args, **kwargs)
+
+
+def win(args, **kwargs) -> int:
+    return libtraproom.win(args, **kwargs)
+
+
 reset = libtraproom.reset
