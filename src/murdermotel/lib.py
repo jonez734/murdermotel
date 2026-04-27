@@ -45,19 +45,19 @@ BOT_MODE_FULL = "full"
 BOT_MODE_HYBRID = "hybrid"
 
 
-def _stub_turn(args: argparse.Namespace, /, **kwargs: dict) -> bool | None:
-    pass
+def _stub_turn(args, **kwargs) -> bool:
+    return True
 
 
-def _stub_escape(args: argparse.Namespace, /, **kwargs: dict) -> int | None:
-    pass
+def _stub_escape(args, **kwargs) -> int:
+    return 0
 
 
-def _stub_attempt(args: argparse.Namespace, /, **kwargs: dict) -> bool:
+def _stub_attempt(args, **kwargs) -> bool:
     return False
 
 
-def _stub_success(args: argparse.Namespace, /, **kwargs: dict) -> int:
+def _stub_success(args, **kwargs) -> int:
     return 0
 
 
@@ -80,21 +80,6 @@ def get_op(module_ref: str, op: str, args) -> callable | None:  # type: ignore[n
         io.echo(f"get_op: no stub for {op}")
         return None
 
-    # For trap operations, just check if function exists and is callable
-    # Skip strict signature validation since we alias functions from traproom
-    if op in ("attempt", "success", "solved", "win"):
-        if hasattr(m, op) and callable(getattr(m, op)):
-            io.echo(f"get_op: found {op}")
-            return getattr(m, op)
-        io.echo(f"get_op: {op} not found or not callable")
-        return None
-
-    has_func = bbsmodule.check_func(m, op, stub, silent=False)
-    io.echo(f"get_op: check_func({op})={has_func}")
-    if has_func:
-        return getattr(m, op)
-    io.echo(f"get_op: returning None for {op}")
-    return None
     has_func = bbsmodule.check_func(m, op, stub, silent=False)
     io.echo(f"get_op: check_func({op})={has_func}")
     if has_func:
