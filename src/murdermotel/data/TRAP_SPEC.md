@@ -32,7 +32,7 @@ room.Room (bbsengine6)
 2. play.py: _handle_trap() checks if room is a trap:
    - Reads room.TRAP_EXITS (None = all directions trigger trap)
    - If direction triggers trap:
-     a. Calls room.on_turn() (runs attempt())
+     a. Calls traproom.turn() directly (runs attempt())
      b. If attempt() returns False:
         - Shows room.TRAP_MESSAGE
         - Player stays trapped
@@ -41,6 +41,7 @@ room.Room (bbsengine6)
         - Moves player to returned room ID
 3. If direction doesn't trigger trap:
    - Move via normal exit
+4. Room.on_turn() is called separately for room display (runs "turn" operation)
 ```
 
 ## TrapRoom Class
@@ -242,4 +243,12 @@ Call `reset(moniker)` when player leaves the trap to clear their counter.
 
 ### Signature Validation
 
-The library uses bbsengine6's signature validation. For trap operations (attempt, success, solved, win), the library bypasses strict signature checking because trap rooms often alias functions from traproom.py which have different signatures than the expected stub.
+The library uses bbsengine6's signature validation. All stub functions and trap room implementations must have explicit return types:
+
+- `turn(args, **kwargs) -> bool`
+- `attempt(args, **kwargs) -> bool`
+- `success(args, **kwargs) -> int`
+- `solved(args, **kwargs) -> int`
+- `win(args, **kwargs) -> int`
+
+The validation checks parameter names and return types for compatibility.
