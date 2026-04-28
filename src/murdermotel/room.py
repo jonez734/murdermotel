@@ -260,3 +260,26 @@ def build(args, rec: dict, **kwargs) -> Room:
     for e in EXITS:
         r.exits[e] = rec[e]
     return r
+
+
+def is_valid(args, roomid, **kwargs) -> bool:
+    """Check if a room exists by ID or shortname."""
+    def _work(conn) -> bool:
+        with database.cursor(conn) as cur:
+            params = {"roomid": roomid}
+            q = database.query(
+                "SELECT 1 FROM $murdermotel.playground WHERE id = :roomid OR shortname = :roomid::text",
+                **params,
+            )
+            cur.execute(q, params)
+            return cur.rowcount > 0
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"mm.room.is_valid.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)

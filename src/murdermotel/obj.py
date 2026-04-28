@@ -142,6 +142,24 @@ class Obj(object):
         self.isdirty = False
         return True
 
+    def move(self, args, roomid: int, **kwargs) -> bool:
+        """Move object to specified room id.
+
+        Args:
+            args: command-line args
+            roomid: target room ID to move to
+
+        Returns:
+            True if move successful, False otherwise
+        """
+        from . import room as libroom
+
+        if not libroom.is_valid(args, roomid, **kwargs):
+            io.echo(f"Obj.move.100: invalid roomid {roomid}", level="debug")
+            return False
+        self.roomid = roomid
+        return True
+
 
 class Living(Obj):
     def __init__(self, args):
