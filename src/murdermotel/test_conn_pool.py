@@ -1,6 +1,5 @@
 """Tests for conn/pool handling in database functions."""
 
-import pytest
 
 from bbsengine6 import database
 

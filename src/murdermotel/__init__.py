@@ -1,5 +1,5 @@
 from bbsengine6 import io, util
-from . import lib
+from . import _version as _version, lib
 
 
 def init(args, **kw: dict) -> bool:

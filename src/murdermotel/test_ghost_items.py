@@ -1,6 +1,5 @@
 """Tests for ghost item detection - items in mm.item but not in any map table."""
 
-import pytest
 
 from bbsengine6 import database
 
