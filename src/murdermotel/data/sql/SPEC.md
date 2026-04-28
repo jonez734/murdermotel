@@ -4,6 +4,18 @@
 
 PostgreSQL schema for the Murder Motel game. Uses explicit joins instead of table inheritance for type modeling.
 
+## Module Specifications
+
+Detailed specifications for each game module:
+
+| File | Description |
+|------|-------------|
+| [SPEC_room.md](SPEC_room.md) | Room module (locations, exits) |
+| [SPEC_player.md](SPEC_player.md) | Player module (characters, inventory) |
+| [SPEC_item.md](SPEC_item.md) | Item module (weapons, components, traps) |
+| [SPEC_obj.md](SPEC_obj.md) | Base object classes and registry |
+| [SPEC_npc.md](SPEC_npc.md) | NPC modules (RabidWolf, Thief) |
+
 ## Tables
 
 ### Core Tables
