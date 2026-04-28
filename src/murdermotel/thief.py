@@ -113,7 +113,7 @@ class Thief(Living):
                         f"{SCHEMA}.map_item_thief",
                         m,
                         returnid=False,
-                        mogrify=True,
+                        mogrify=False,
                         conn=conn,
                     ):
                         io.echo("mm.Thief.save.110: insert failed", level="error")
@@ -220,7 +220,7 @@ def save(args, thief, **kwargs):
                     f"{libmm.SCHEMA}.map_item_thief",
                     m,
                     returnid=False,
-                    mogrify=True,
+                    mogrify=False,
                     conn=conn,
                 ):
                     io.echo("mm.thief.save.110: insert failed", level="error")
@@ -262,7 +262,7 @@ def create(args, **kwargs):
             rec,
             conflict_columns=["name"],
             update_columns=["bag", "roomid", "healthpoints"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.thief.create.115: upsert failed", level="error")

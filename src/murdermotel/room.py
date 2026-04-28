@@ -107,7 +107,7 @@ class Room(object):
                 f"{libmm.SCHEMA}.playground",
                 r,
                 conflict_columns=["id"],
-                mogrify=mogrify,
+                mogrify=False,
                 conn=conn,
             ):
                 io.echo("mm.room.save.105: room upsert failed", level="error")
@@ -130,7 +130,7 @@ class Room(object):
                         "murdermotel.map_item_room",
                         m,
                         conflict_columns=["itemname", "serial", "roomid"],
-                        mogrify=mogrify,
+                        mogrify=False,
                         conn=conn,
                     ):
                         io.echo("mm.room.save.110: item upsert failed", level="error")

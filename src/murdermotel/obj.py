@@ -105,7 +105,7 @@ class Obj(object):
                 self.name,  # type: ignore[arg-type]
                 p,
                 primarykey="moniker",
-                mogrify=True,
+                mogrify=False,
                 conn=conn,
             )
             if self.args.debug is True:
@@ -122,7 +122,7 @@ class Obj(object):
                     p,
                     primarykey="name",
                     returnid=False,
-                    mogrify=True,
+                    mogrify=False,
                     conn=conn,
                 ):
                     io.echo(f"{self.classname}.save.170: insert failed", level="error")

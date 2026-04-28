@@ -202,7 +202,7 @@ class Player(object):
                         f"{libmm.SCHEMA}.map_item_player",
                         m,
                         returnid=False,
-                        mogrify=True,
+                        mogrify=False,
                         conn=conn,
                     ):
                         io.echo("mm.player.save.130: insert failed", level="error")
@@ -549,7 +549,7 @@ def create(args, playermoniker, **kwargs):
                 "datelastplayed",
                 "datecreated",
             ],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.player.create.115: upsert failed", level="error")

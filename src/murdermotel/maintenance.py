@@ -122,7 +122,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         boobytrap_item,
         conflict_columns=["name", "serial"],
         update_columns=["kind", "modulepath", "title"],
-        mogrify=True,
+        mogrify=False,
         conn=conn,
     ):
         io.echo(
@@ -144,7 +144,7 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
                 args,
                 "murdermotel.map_item_room",
                 m,
-                mogrify=True,
+                mogrify=False,
                 returnid=False,
                 conn=conn,
             ):

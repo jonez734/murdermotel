@@ -13,6 +13,7 @@ from .obj import Living, registry
 WOLF_NAME = "rabidwolf"
 WOLF_HEALTH = 35
 WOLF_AUTO_ATTACK_CHANCE = 6
+WOLF_WANDER_CHANCE = 3
 SCHEMA = "murdermotel"
 
 
@@ -45,6 +46,44 @@ class RabidWolf(Living):
         rec["healthpoints"] = self.healthpoints
         return rec
 
+    def _move_randomly(self, args, **kwargs) -> bool:
+        """Pick random exit direction from current room."""
+        current_room = libroom.load(args, self.roomid, pool=self.pool)
+        if (
+            not current_room
+            or not hasattr(current_room, "exits")
+            or not current_room.exits
+        ):
+            return False
+        exits = current_room.exits
+        valid_exits = [
+            d for d, target in exits.items() if target is not None and target > 1
+        ]
+        if not valid_exits:
+            return False
+        direction = random.choice(valid_exits)
+        target_roomid = exits[direction]
+        if self.move(args, roomid=target_roomid, **kwargs):
+            io.echo(f"The wolf wanders {direction}.", level="debug")
+            return True
+        return False
+
+    def _is_player_adjacent(self, args, player, **kwargs) -> bool:
+        """Check if player is in a room adjacent to the wolf."""
+        if player is None or player.roomid == 0:
+            return False
+        current_room = libroom.load(args, self.roomid, pool=self.pool)
+        if (
+            not current_room
+            or not hasattr(current_room, "exits")
+            or not current_room.exits
+        ):
+            return False
+        for direction, target in current_room.exits.items():
+            if target is not None and target == player.roomid:
+                return True
+        return False
+
     def on_turn(self, args, room=None, **kwargs) -> bool:
         import random as randomlib
 
@@ -56,6 +95,14 @@ class RabidWolf(Living):
                 logger_name="murdermotel",
             )
             return False
+
+        if (
+            player.roomid != self.roomid
+            and util.diceroll(10, mode="single") < WOLF_WANDER_CHANCE
+        ):
+            if self._move_randomly(args, **kwargs):
+                if self._is_player_adjacent(args, player, **kwargs):
+                    io.echo("You hear howling nearby.")
 
         attacked = kwargs.get("attacked", False)
         ignored = kwargs.get("ignored", False)
@@ -201,7 +248,7 @@ def create(args: argparse.Namespace, **kwargs) -> RabidWolf | bool:
             rec,
             conflict_columns=["name"],
             update_columns=["roomid", "healthpoints"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.rabidwolf.create.115: upsert failed", level="error")
@@ -322,6 +369,14 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
             logger_name="murdermotel",
         )
         return False
+
+    if (
+        player.roomid != obj.roomid
+        and util.diceroll(10, mode="single") < WOLF_WANDER_CHANCE
+    ):
+        if obj._move_randomly(args, **kwargs):
+            if obj._is_player_adjacent(args, player, **kwargs):
+                io.echo("You hear howling nearby.")
 
     attacked = kwargs.get("attacked", False)
     ignored = kwargs.get("ignored", False)

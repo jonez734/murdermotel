@@ -176,7 +176,7 @@ class Bot(Living):
             return True
 
         if self.mode in (libmm.BOT_MODE_SIMPLE, libmm.BOT_MODE_HYBRID):
-            self._move_randomly(room)
+            self._move_randomly(args, room, **kwargs)
         if self.mode in (libmm.BOT_MODE_FULL, libmm.BOT_MODE_HYBRID):
             self._handle_items(room)
         if self.mode in (
@@ -199,7 +199,7 @@ class Bot(Living):
                 self.save(conn=conn) if conn else self.save()
         return True
 
-    def _move_randomly(self, room) -> bool:
+    def _move_randomly(self, args, room, **kwargs) -> bool:
         """Pick random exit direction."""
         if not room or not hasattr(room, "exits") or not room.exits:
             return False
@@ -208,8 +208,8 @@ class Bot(Living):
         if not valid_exits:
             return False
         direction = random.choice(valid_exits)
-        self.roomid = exits[direction]
-        return True
+        target_roomid = exits[direction]
+        return self.move(args, roomid=target_roomid, **kwargs)
 
     def _handle_items(self, room) -> bool:
         """Pick up items (30% chance) or drop items (20% chance)."""
@@ -268,7 +268,7 @@ class Bot(Living):
                 rec,
                 conflict_columns=["name"],
                 update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
-                mogrify=True,
+                mogrify=False,
                 conn=conn,
             ):
                 io.echo("mm.bot.save.110: upsert failed", level="error")
@@ -287,7 +287,7 @@ class Bot(Living):
                         f"{libmm.SCHEMA}.npc_player_items",
                         m,
                         returnid=False,
-                        mogrify=True,
+                        mogrify=False,
                         conn=conn,
                     ):
                         io.echo("mm.bot.save.120: insert failed", level="error")
@@ -375,7 +375,7 @@ def create(
             rec,
             conflict_columns=["name"],
             update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.bot.create.110: upsert failed", level="error")

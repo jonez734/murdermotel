@@ -4,6 +4,7 @@ from typing import Optional
 from bbsengine6 import database, io, util
 
 from . import lib as libmm
+from .obj import Obj
 
 
 BOOBYTRAP_NAME = "boobytrap"
@@ -29,11 +30,11 @@ def main(args, **kwargs):
     return True
 
 
-class Item:
+class Item(Obj):
     module: Optional[str] = None
 
     def __init__(self, args):
-        super().__init__()
+        super().__init__(args)
         self.roomid = None
 
     def on_turn(self, args, room=None, **kwargs) -> bool:
@@ -126,7 +127,7 @@ class BoobyTrap(Item):
                 item_rec,
                 conflict_columns=["name", "serial"],
                 update_columns=["kind", "modulepath", "title"],
-                mogrify=True,
+                mogrify=False,
                 conn=conn,
             ):
                 io.echo("mm.BoobyTrap.save.105: item upsert failed", level="error")
@@ -159,7 +160,7 @@ class BoobyTrap(Item):
                     f"{libmm.SCHEMA}.map_item_room",
                     m,
                     returnid=False,
-                    mogrify=True,
+                    mogrify=False,
                     conn=conn,
                 ):
                     io.echo("mm.BoobyTrap.save.110: insert failed", level="error")
@@ -252,7 +253,7 @@ def save(args, boobytrap, **kwargs):
             item_rec,
             conflict_columns=["name", "serial"],
             update_columns=["kind", "modulepath", "title"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.boobytrap.save.105: item upsert failed", level="error")
@@ -284,7 +285,7 @@ def save(args, boobytrap, **kwargs):
                 f"{libmm.SCHEMA}.map_item_room",
                 m,
                 returnid=False,
-                mogrify=True,
+                mogrify=False,
                 conn=conn,
             ):
                 io.echo("mm.boobytrap.save.110: insert failed", level="error")
@@ -328,7 +329,7 @@ def create(args, **kwargs):
             item_rec,
             conflict_columns=["name", "serial"],
             update_columns=["kind", "modulepath", "title"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.boobytrap.create.105: item upsert failed", level="error")
@@ -343,7 +344,7 @@ def create(args, **kwargs):
             rec,
             conflict_columns=["name"],
             update_columns=["running", "timer"],
-            mogrify=True,
+            mogrify=False,
             conn=conn,
         ):
             io.echo("mm.boobytrap.create.115: upsert failed", level="error")

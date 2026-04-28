@@ -70,7 +70,7 @@ class Item(object):
                 f"{libmm.SCHEMA}.item",
                 i,
                 conflict_columns=["name"],
-                mogrify=mogrify,
+                mogrify=False,
                 conn=conn,
             ):
                 io.echo("mm.item.save.105: item upsert failed", level="error")
