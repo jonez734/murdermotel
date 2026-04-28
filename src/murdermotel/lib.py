@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import argparse
-from typing import Any
+from typing import Any, Callable, Optional
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
 from bbsengine6.io import terminal
@@ -71,7 +69,7 @@ OP_TO_STUB = {
 }
 
 
-def get_op(module_ref: str, op: str, args) -> callable | None:  # type: ignore[no-untyped-def]
+def get_op(module_ref: str, op: str, args) -> Optional[Callable]:
     """Get an optional operation function from murdermotel's op map."""
     io.echo(f"get_op: looking for {op} in {module_ref}")
     m = bbsmodule.get(module_ref, args)
