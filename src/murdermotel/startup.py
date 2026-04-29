@@ -59,9 +59,9 @@ def main(args, **kwargs) -> bool:
         io.echo(f"{{var:labelcolor}}schema {{var:valuecolor}}{libmm.SCHEMA}: ", end="")
         if not database.schemaexists(args, libmm.SCHEMA, conn=conn):
             if not database.createschema(args, libmm.SCHEMA, conn=conn):
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 return False
-        io.echo(" ok ", level="ok")
+        io.echo("  ok  ", level="ok")
 
         # --- tables ---
         failcount = 0
@@ -75,12 +75,12 @@ def main(args, **kwargs) -> bool:
                 if not database.importsql(
                     args, sqlfile, conn=conn, package=_SQL_PACKAGE
                 ):
-                    io.echo("fail", level="error")
+                    io.echo(" fail ", level="error")
                     failcount += 1
                 else:
-                    io.echo(" ok ", level="ok")
+                    io.echo("  ok  ", level="ok")
             else:
-                io.echo("ok", level="ok")
+                io.echo("  ok  ", level="ok")
 
         if failcount > 0:
             io.echo("table setup failed", level="error")
@@ -111,7 +111,7 @@ def main(args, **kwargs) -> bool:
             conn.rollback()
             return False
 
-        io.echo(" ok ", level="ok")
+        io.echo("  ok  ", level="ok")
 
         # --- orphan items ---
         io.echo("{var:labelcolor}check {var:valuecolor}orphan items: ", end="")
@@ -122,18 +122,18 @@ def main(args, **kwargs) -> bool:
                 level="ok",
             )
         else:
-            io.echo(" ok ", level="ok")
+            io.echo("  ok  ", level="ok")
 
         # --- rooms ---
         io.echo("{var:labelcolor}populate {var:valuecolor}rooms: ", end="")
         if (libroom.getcount(args, conn=conn) or 0) == 0:
             if not _populate_rooms(args, conn=conn):
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 failcount += 1
             else:
-                io.echo(" ok ", level="ok")
+                io.echo("  ok  ", level="ok")
         else:
-            io.echo("skip", level="info")
+            io.echo(" skip ", level="info")
 
         # --- items ---
         io.echo("{var:labelcolor}populate {var:valuecolor}items: ", end="")
@@ -141,59 +141,59 @@ def main(args, **kwargs) -> bool:
             if not database.importsql(
                 args, "item_data.sql", conn=conn, package=_SQL_PACKAGE
             ):
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 conn.rollback()
                 failcount += 1
             else:
-                io.echo(" ok ", level="ok")
+                io.echo("  ok  ", level="ok")
         else:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
 
         # --- defenses ---
         io.echo("{var:labelcolor}populate {var:valuecolor}defenses: ", end="")
         if failcount > 0:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
         elif (libmm.getdefensecount(args, conn=conn) or 0) == 0:
             if not database.importsql(
                 args, "defense_data.sql", conn=conn, package=_SQL_PACKAGE
             ):
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 conn.rollback()
                 failcount += 1
             else:
-                io.echo(" ok ", level="ok")
+                io.echo("  ok  ", level="ok")
         else:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
 
         # --- distribute items ---
         io.echo("{var:labelcolor}distribute {var:valuecolor}items: ", end="")
         if failcount > 0:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
         elif (libmm.countdistributeditems(args, conn=conn) or 0) > 0:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
         else:
             if libmm.distributeitems(args, conn=conn):
-                io.echo(" ok ", level="ok")
+                io.echo("  ok  ", level="ok")
             else:
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 conn.rollback()
                 failcount += 1
 
         # --- NPCs ---
         io.echo("{var:labelcolor}populate {var:valuecolor}NPCs: ", end="")
         if failcount > 0:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
         elif (libmm.getnpccount(args, conn=conn) or 0) == 0:
             if not database.importsql(
                 args, "npcs.sql", conn=conn, package=_SQL_PACKAGE
             ):
-                io.echo("fail", level="error")
+                io.echo(" fail ", level="error")
                 conn.rollback()
                 failcount += 1
             else:
-                io.echo(" ok ", level="ok")
+                io.echo("  ok  ", level="ok")
         else:
-            io.echo("skip", level="ok")
+            io.echo(" skip ", level="ok")
 
         if failcount > 0:
             io.echo("startup failed", level="error")
@@ -308,7 +308,7 @@ def _check_orphan_items(args, conn) -> tuple[int, int]:
         q = database.query(
             """
             DELETE FROM $murdermotel.map_item_room
-            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i 
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i
                            WHERE i.name = map_item_room.itemname AND i.serial = map_item_room.serial)
         """
         )
@@ -318,7 +318,7 @@ def _check_orphan_items(args, conn) -> tuple[int, int]:
         q = database.query(
             """
             DELETE FROM $murdermotel.map_item_player
-            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i 
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.item i
                            WHERE i.name = map_item_player.itemname AND i.serial = map_item_player.serial)
         """
         )
@@ -328,9 +328,9 @@ def _check_orphan_items(args, conn) -> tuple[int, int]:
         q = database.query(
             """
             SELECT i.name, i.serial FROM $murdermotel.item i
-            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_room m 
+            WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_room m
                             WHERE m.itemname = i.name AND m.serial = i.serial)
-            AND NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_player m 
+            AND NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_player m
                           WHERE m.itemname = i.name AND m.serial = i.serial)
             AND i.kind IN ('component', 'defense')
         """
