@@ -1,4 +1,4 @@
-OUTDIR = /srv/repo/bbsengine6/
+OUTDIR = dist/
 PROJECT = murdermotel
 VERSION = $(shell date +%Y%m%d%H%M)
 

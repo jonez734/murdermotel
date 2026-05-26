@@ -4,8 +4,12 @@ import os
 import time
 from setuptools import setup
 
+r = 1
+v = os.environ.get("VERSION")
+if v is None:
+    v = time.strftime("%Y%m%d%H%M")
+
 projectname = "murdermotel"
-v = os.environ.get("VERSION", time.strftime("%Y%m%d%H%M"))
 
 setup(
     name=projectname,
@@ -14,9 +18,11 @@ setup(
     author="zoidtechnologies.com",
     author_email=f"{projectname}@projects.zoidtechnologies.com",
     requires=["bbsengine6"],
-    scripts=["../bin/murdermotel"],
+    scripts=["bin/murdermotel"],
     license="GPL-2.0-or-later",
     provides=[projectname],
+    packages=["murdermotel"],
     long_description="""murder motel -- turn based game involving assassination of other players""",
     include_package_data=True,
+    package_data={"murdermotel": ["data/*.txt", "data/sql/*.sql"]},
 )
