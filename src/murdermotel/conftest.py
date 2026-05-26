@@ -1,8 +1,42 @@
 import argparse
+import atexit
 import os
 import pytest
 
 from bbsengine6 import database
+
+
+_tracked_pools: list = []
+
+
+def _cleanup_pools() -> None:
+    import gc
+    import threading
+    import time
+
+    database.reset_pool_cache()
+
+    for pool in list(_tracked_pools):
+        try:
+            pool.close()
+        except Exception:
+            pass
+        _tracked_pools.remove(pool)
+
+    gc.collect()
+
+    for _ in range(20):
+        active_workers = sum(
+            1
+            for t in threading.enumerate()
+            if t.name.startswith("psycopg") or t.name.startswith("pool-")
+        )
+        if active_workers == 0:
+            break
+        time.sleep(0.05)
+
+
+atexit.register(_cleanup_pools)
 
 
 @pytest.fixture(scope="session")
@@ -25,8 +59,9 @@ def test_args():
 def test_pool(test_args):
     pool = database.getpool(test_args, dbname=test_args.databasename)
     test_args.pool = pool
+    _tracked_pools.append(pool)
     yield pool
-    pool.close()
+    _cleanup_pools()
 
 
 @pytest.fixture(scope="session")
@@ -111,7 +146,9 @@ def test_item_in_room(test_args, test_pool, test_room):
                 itemname=item_name,
                 serial=item_serial,
             )
-            cur.execute(q, {"roomid": test_room, "itemname": item_name, "serial": item_serial})
+            cur.execute(
+                q, {"roomid": test_room, "itemname": item_name, "serial": item_serial}
+            )
         conn.commit()
 
     yield {"roomid": test_room, "itemname": item_name, "serial": item_serial}
@@ -124,7 +161,9 @@ def test_item_in_room(test_args, test_pool, test_room):
                 itemname=item_name,
                 serial=item_serial,
             )
-            cur.execute(q, {"roomid": test_room, "itemname": item_name, "serial": item_serial})
+            cur.execute(
+                q, {"roomid": test_room, "itemname": item_name, "serial": item_serial}
+            )
         conn.commit()
 
 
@@ -147,7 +186,14 @@ def test_item_on_player(test_args, test_pool, test_player):
                 itemname=item_name,
                 serial=item_serial,
             )
-            cur.execute(q, {"playermoniker": test_player, "itemname": item_name, "serial": item_serial})
+            cur.execute(
+                q,
+                {
+                    "playermoniker": test_player,
+                    "itemname": item_name,
+                    "serial": item_serial,
+                },
+            )
         conn.commit()
 
     yield {"playermoniker": test_player, "itemname": item_name, "serial": item_serial}
@@ -160,5 +206,12 @@ def test_item_on_player(test_args, test_pool, test_player):
                 itemname=item_name,
                 serial=item_serial,
             )
-            cur.execute(q, {"playermoniker": test_player, "itemname": item_name, "serial": item_serial})
+            cur.execute(
+                q,
+                {
+                    "playermoniker": test_player,
+                    "itemname": item_name,
+                    "serial": item_serial,
+                },
+            )
         conn.commit()
