@@ -1,21 +1,22 @@
-from bbsengine6 import io, util
-from . import _version as _version, lib
+from bbsengine6 import database, module
 
 
-def init(args, **kw: dict) -> bool:
-    io.register_emojis({"robot": "\U0001f916"})
+def init(args, **kwargs) -> bool:
     return True
 
 
-def access(args, op: str, **kw: dict) -> bool:
+def access(args, op: str, **kwargs) -> bool:
     return True
 
 
-def buildargs(args, **kw: dict) -> bool:
-    return True
+def buildargs(args, **kwargs) -> None:
+    return None
 
 
-def main(args, **kw: dict):
-    util.heading("murder motel")
-    lib.runmodule(args, "run", "lobby")
-    return True
+def main(args, **kwargs):
+    pool = kwargs.get("pool")
+    if pool is None:
+        with database.getpool(args) as pool:
+            module.run(args, "murdermotel.lobby", pool=pool)
+    else:
+        module.run(args, "murdermotel.lobby", pool=pool)
