@@ -1,17 +1,20 @@
-import argparse
+from bbsengine6 import database
 
 from murdermotel import lib
+
 
 def main():
     parser = lib.buildargs()
     args = parser.parse_args()
 
     try:
-        lib.runmodule(args, "main", "lobby")
+        with database.getpool(args) as pool:
+            lib.runmodule(args, "main", "lobby", pool=pool)
     except KeyboardInterrupt:
         pass
     except EOFError:
         pass
+
 
 if __name__ == "__main__":
     main()
