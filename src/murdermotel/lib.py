@@ -5,11 +5,12 @@ from typing import Any, Callable, Optional
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
 from bbsengine6.io import terminal
-from . import room as libroom, boobytrap as libboobytrap, player as libplayer
+from . import room as libroom, player as libplayer
 from . import obj as libobj
 from . import item as libitem
 from . import rabidwolf as librabidwolf
 from . import thief as libthief
+from . import boobytrap as libboobytrap
 
 BoobyTrap = libboobytrap.BoobyTrap
 RabidWolf = librabidwolf.RabidWolf

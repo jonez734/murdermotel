@@ -1,7 +1,7 @@
 import random as randomlib
 from typing import Optional
 
-from bbsengine6 import database, io, util
+from bbsengine6 import database, io
 
 from . import lib as libmm
 from .obj import Obj
@@ -15,7 +15,7 @@ BOOBYTRAP_NAME = "boobytrap"
 
 
 def access(args, op, **kwargs) -> bool:
-    return op in ("init", "run", "turn")
+    return op in ("init", "run")
 
 
 def init(args, obj=None, room=None, **kwargs) -> bool:
@@ -54,7 +54,7 @@ class BoobyTrap(Item):
         self.timer = 0
         self.playerid = None
         self.kind = "boobytrap"
-        self.modulepath = "boobytrap"
+        self.modulepath = None
 
         self.conn = kwargs.get("conn", None)
         self.pool = kwargs.get("pool", None)
@@ -415,45 +415,3 @@ def build(args, rec, **kwargs):
     if roomid is not None:
         b.roomid = roomid
     return b
-
-
-def turn(args, **kwargs) -> bool:
-    obj = kwargs.get("obj")
-    if obj is None:
-        io.echo("The boobytrap does not exist!")
-        util.logentry(
-            "murdermotel.boobytrap.turn.100: boobytrap does not exist",
-            logger_name="murdermotel",
-        )
-        return False
-
-    player = kwargs.get("player", None)
-    in_same_room = player is not None and player.roomid == obj.roomid
-
-    if obj.running:
-        obj.timer -= 1
-        if obj.timer <= 0:
-            if in_same_room:
-                io.echo("The boobytrap is triggered! It goes SNAP!")
-                if player:
-                    player.moves -= 10
-                    player.save()
-            obj.running = False
-            obj.timer = 0
-    elif in_same_room:
-        io.echo("There's a boobytrap here. It looks inactive.")
-        if (
-            io.inputboolean(
-                "{var:promptcolor}Set the trap? [yN]: {var:inputcolor}", "N", **kwargs
-            )
-            is True
-        ):
-            obj.running = True
-            obj.timer = 3
-            io.echo("You set the boobytrap!")
-
-    pool = kwargs.get("pool", None)
-    if pool:
-        obj.save()
-
-    return True

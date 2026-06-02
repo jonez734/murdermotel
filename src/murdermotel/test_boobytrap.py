@@ -4,7 +4,6 @@ class TestBoobyTrap:
 
         assert libbt.access(test_args, "init") is True
         assert libbt.access(test_args, "run") is True
-        assert libbt.access(test_args, "turn") is True
         assert libbt.access(test_args, "other") is False
 
     def test_init(self, test_args):
@@ -82,9 +81,3 @@ class TestBoobyTrap:
 
         b = libbt.build(test_args, {"name": "boobytrap", "running": False, "timer": 0})
         assert b.short() == ":mousetrap: Booby-Trap"
-
-    def test_turn_no_obj(self, test_args):
-        from murdermotel import boobytrap as libbt
-
-        result = libbt.turn(test_args, obj=None)
-        assert result is False
