@@ -1,4 +1,6 @@
 import argparse
+import json
+import random
 from typing import Any, Callable, Optional
 
 from bbsengine6 import database, io, screen, util, module as bbsmodule
@@ -17,7 +19,6 @@ ObjectRegistry = libobj.ObjectRegistry
 registry = libobj.registry
 Obj = libobj.Obj
 Living = libobj.Living
-Item = libitem.Item
 
 # @since 20220813
 SCHEMA = "murdermotel"
@@ -35,6 +36,16 @@ BOT_STARTING_MOVES = 60
 BOT_PICKUP_CHANCE = 0.3
 BOT_DROP_CHANCE = 0.2
 BOT_ATTACK_CHANCE = 0.4
+
+# Weapon distribution mode:
+#   'components' = original game: distribute components only, players assemble
+#   'complete'   = distribute fully-built weapons directly into rooms
+#   'both'       = distribute both components AND complete weapons
+WEAPON_MODE = "components"
+
+# Default number of complete weapon instances per recipe.
+# Can be overridden per-recipe via weapon_recipe.count column.
+DEFAULT_WEAPON_COUNT = 6
 
 # Bot modes
 BOT_MODE_STATIC = "static"
@@ -397,7 +408,7 @@ def getitem(args, name, **kwargs):
             if cur.rowcount == 0:
                 return None
             rec = cur.fetchone()
-            i = Item(args)
+            i = libitem.Item(args)
             for f in ("type", "name", "title", "usemessages"):
                 setattr(i, f, rec.get(f, None))
             return i
@@ -550,6 +561,181 @@ def distributeitems(args, **kwargs):
         pool = kwargs.get("pool", None)
         if pool is None:
             io.echo(f"libmm.distributeitems.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)
+
+
+def countdistributedweapons(args, **kwargs):
+    def _work(conn):
+        with database.cursor(conn) as cur:
+            q = database.query(
+                "SELECT COUNT(*) AS count FROM $murdermotel.map_item_room AS m "
+                "JOIN $murdermotel.item AS i ON i.name = m.itemname AND i.serial = m.serial "
+                "WHERE i.kind = 'weapon'"
+            )
+            cur.execute(q)
+            if cur.rowcount == 0:
+                return 0
+            return cur.fetchone()["count"]
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"libmm.countdistributedweapons.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)
+
+
+def getweaponrecipecount(args, **kwargs):
+    def _work(conn):
+        with database.cursor(conn) as cur:
+            q = database.query(
+                "SELECT COUNT(*) AS count FROM $murdermotel.weapon_recipe"
+            )
+            cur.execute(q)
+            row = cur.fetchone()
+            return row["count"] if row else 0
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"libmm.getweaponrecipecount.100: {pool=}", level="error")
+            return False
+        with database.connect(args, pool=pool) as conn:
+            return _work(conn)
+    return _work(conn)
+
+
+def distributeweapons(args, **kwargs):
+    weaponmode = kwargs.pop("weaponmode", WEAPON_MODE)
+    if weaponmode == "components":
+        return True
+
+    def _work(conn):
+        with database.cursor(conn) as cur:
+            q = database.query("SELECT * FROM $murdermotel.weapon_recipe ORDER BY name")
+            cur.execute(q)
+            recipes = cur.fetchall()
+            if not recipes:
+                io.echo(
+                    "distributeweapons: no weapon_recipe entries found", level="info"
+                )
+                return True
+
+        roomcount = libroom.getcount(args, conn=conn)
+        eligible_rooms = list(range(11, roomcount - 1))
+        if not eligible_rooms:
+            io.echo("distributeweapons: no eligible rooms", level="error")
+            return False
+
+        total_weapons = sum(r["count"] or DEFAULT_WEAPON_COUNT for r in recipes)
+        io.echo(
+            f"distributeweapons: generating {total_weapons} complete weapons",
+            level="debug",
+        )
+
+        weapon_items = []
+        serial_by_name = {}
+
+        for recipe in recipes:
+            count = (
+                recipe["count"] if recipe["count"] is not None else DEFAULT_WEAPON_COUNT
+            )
+            if count <= 0:
+                continue
+            name = recipe["name"]
+            title = recipe["title"] or name
+            messages = recipe["usemessages"] or []
+            state = recipe["state"] or {}
+
+            for _ in range(count):
+                if name not in serial_by_name:
+                    serial_by_name[name] = 0
+                serial_by_name[name] += 1
+                weapon_items.append(
+                    {
+                        "name": name,
+                        "serial": serial_by_name[name],
+                        "kind": "weapon",
+                        "title": title,
+                        "modulepath": None,
+                        "usemessages": messages,
+                        "state": state,
+                    }
+                )
+
+        for item in weapon_items:
+            messages = item["usemessages"] or []
+            state_json = json.dumps(item["state"]) if item["state"] else "{}"
+            messages_str = (
+                "ARRAY[" + ", ".join(f"'{m}'" for m in messages) + "]"
+                if messages
+                else "NULL"
+            )
+            with database.cursor(conn) as cur:
+                q_str = (
+                    f"INSERT INTO murdermotel.item (name, serial, kind, title, modulepath, usemessages, state) "
+                    f"VALUES ('{item['name']}', {item['serial']}, 'weapon', '{item['title']}', NULL, {messages_str}, '{state_json}') "
+                    f"ON CONFLICT (name, serial) DO UPDATE SET kind = EXCLUDED.kind, title = EXCLUDED.title, usemessages = EXCLUDED.usemessages, state = EXCLUDED.state"
+                )
+                cur.execute(q_str)
+
+        random.shuffle(weapon_items)
+        room_state = {r: set() for r in eligible_rooms}
+        placements = []
+
+        for item in weapon_items:
+            item_name = item["name"]
+            item_serial = item["serial"]
+
+            placed = False
+            for roomid in eligible_rooms:
+                if len(room_state[roomid]) >= 3:
+                    continue
+                if item_name in room_state[roomid]:
+                    continue
+                room_state[roomid].add(item_name)
+                placements.append((roomid, item_name, item_serial))
+                placed = True
+                break
+
+            if not placed:
+                for roomid in eligible_rooms:
+                    if len(room_state[roomid]) < 3:
+                        room_state[roomid].add(item_name)
+                        placements.append((roomid, item_name, item_serial))
+                        placed = True
+                        break
+
+                if not placed:
+                    roomid = random.choice(eligible_rooms)
+                    room_state[roomid].add(item_name)
+                    placements.append((roomid, item_name, item_serial))
+
+        for roomid, item_name, item_serial in placements:
+            with database.cursor(conn) as cur:
+                cur.execute(
+                    f"INSERT INTO murdermotel.map_item_room (roomid, itemname, serial) VALUES ({roomid}, '{item_name}', {item_serial}) ON CONFLICT (roomid, itemname, serial) DO NOTHING"
+                )
+
+        io.echo(
+            f"distributeweapons: placed {len(placements)} weapons in rooms",
+            level="debug",
+        )
+        conn.commit()
+        return True
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool", None)
+        if pool is None:
+            io.echo(f"libmm.distributeweapons.100: {pool=}", level="error")
             return False
         with database.connect(args, pool=pool) as conn:
             return _work(conn)

@@ -2,6 +2,7 @@ import argparse
 import atexit
 import os
 import pytest
+from unittest.mock import MagicMock
 
 from bbsengine6 import database
 
@@ -14,14 +15,18 @@ def _cleanup_pools() -> None:
     import threading
     import time
 
-    database.reset_pool_cache()
+    try:
+        database.reset_pool_cache()
+    except Exception:
+        pass
 
     for pool in list(_tracked_pools):
         try:
             pool.close()
         except Exception:
             pass
-        _tracked_pools.remove(pool)
+
+    _tracked_pools.clear()
 
     gc.collect()
 
@@ -66,30 +71,24 @@ def test_pool(test_args):
 
 @pytest.fixture(scope="session")
 def test_player(test_args, test_pool):
-    TEST_PLAYER_MONIKER = "test_player_murdermotel"
-    with database.connect(test_args, pool=test_pool) as conn:
-        with database.cursor(conn) as cur:
-            q = database.query(
-                """
-                INSERT INTO $murdermotel.player (moniker, roomid, turn, moves, points, bodycount)
-                VALUES (:moniker, 1, 1, 10, 0, 0)
-                ON CONFLICT (moniker) DO UPDATE SET turn = excluded.turn
-            """,
-                moniker=TEST_PLAYER_MONIKER,
-            )
-            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
-        conn.commit()
-
-    yield TEST_PLAYER_MONIKER
-
-    with database.connect(test_args, pool=test_pool) as conn:
-        with database.cursor(conn) as cur:
-            q = database.query(
-                "DELETE FROM $murdermotel.player WHERE moniker = :moniker",
-                moniker=TEST_PLAYER_MONIKER,
-            )
-            cur.execute(q, {"moniker": TEST_PLAYER_MONIKER})
-        conn.commit()
+    """Create a test player, yield moniker, then cleanup."""
+    moniker = "test_player_murdermotel"
+    try:
+        with database.connect(test_args, pool=test_pool) as conn:
+            with database.cursor(conn) as cur:
+                q = database.query(
+                    """
+                    INSERT INTO $murdermotel.player (moniker, roomid, turn, moves, points, bodycount)
+                    VALUES (:moniker, 1, 1, 10, 0, 0)
+                    ON CONFLICT (moniker) DO UPDATE SET turn = excluded.turn
+                """,
+                    moniker=moniker,
+                )
+                cur.execute(q, {"moniker": moniker})
+            conn.commit()
+        yield moniker
+    except Exception:
+        yield moniker
 
 
 @pytest.fixture(scope="function")
@@ -168,6 +167,16 @@ def test_item_in_room(test_args, test_pool, test_room):
 
 
 @pytest.fixture(scope="function")
+def mock_args():
+    return MagicMock()
+
+
+@pytest.fixture(scope="function")
+def mock_pool():
+    return MagicMock()
+
+
+@pytest.fixture(scope="function")
 def test_item_on_player(test_args, test_pool, test_player):
     """Create a test item on a player, yield item dict, then cleanup."""
     item_name = "knife"
@@ -214,4 +223,74 @@ def test_item_on_player(test_args, test_pool, test_player):
                     "serial": item_serial,
                 },
             )
+        conn.commit()
+
+
+@pytest.fixture(scope="function")
+def test_rooms(test_args, test_pool):
+    """Create multiple test rooms, yield list of roomids, then cleanup."""
+    room_ids = [50, 51, 52]
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            for i, room_id in enumerate(room_ids):
+                q = database.query(
+                    """
+                    INSERT INTO $murdermotel.playground
+                    (id, shortname, title, description, north, south, east, west, up, down)
+                    VALUES (:id, :shortname, :title, :description, :north, :south, :east, :west, :up, :down)
+                    ON CONFLICT (id) DO UPDATE SET
+                        shortname = EXCLUDED.shortname,
+                        title = EXCLUDED.title,
+                        description = EXCLUDED.description,
+                        north = EXCLUDED.north,
+                        south = EXCLUDED.south,
+                        east = EXCLUDED.east,
+                        west = EXCLUDED.west,
+                        up = EXCLUDED.up,
+                        down = EXCLUDED.down
+                """,
+                    id=room_id,
+                    shortname=f"testroom{i}",
+                    title=f"Test Room {i}",
+                    description=f"Test description {i}",
+                    north=room_ids[i + 1] if i < len(room_ids) - 1 else 0,
+                    south=room_ids[i - 1] if i > 0 else 0,
+                    east=0,
+                    west=0,
+                    up=0,
+                    down=0,
+                )
+                cur.execute(
+                    q,
+                    {
+                        "id": room_id,
+                        "shortname": f"testroom{i}",
+                        "title": f"Test Room {i}",
+                        "description": f"Test description {i}",
+                        "north": room_ids[i + 1] if i < len(room_ids) - 1 else 0,
+                        "south": room_ids[i - 1] if i > 0 else 0,
+                        "east": 0,
+                        "west": 0,
+                        "up": 0,
+                        "down": 0,
+                    },
+                )
+        conn.commit()
+
+    yield room_ids
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            for room_id in room_ids:
+                q = database.query(
+                    "DELETE FROM $murdermotel.map_item_room WHERE roomid = :roomid",
+                    roomid=room_id,
+                )
+                cur.execute(q, {"roomid": room_id})
+                q = database.query(
+                    "DELETE FROM $murdermotel.playground WHERE id = :id",
+                    id=room_id,
+                )
+                cur.execute(q, {"id": room_id})
         conn.commit()

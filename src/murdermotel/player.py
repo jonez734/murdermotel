@@ -6,6 +6,20 @@ from bbsengine6 import member, database, io, util
 
 from . import item as libitem, lib as libmm
 
+
+def _get_weapon_recipes(args, conn):
+    """Load weapon recipes from database. Returns list of dicts with name, c1, c2."""
+    with database.cursor(conn) as cur:
+        q = database.query(
+            "SELECT name, component1, component2 FROM $murdermotel.weapon_recipe ORDER BY name"
+        )
+        cur.execute(q)
+        return [
+            {"name": r["name"], "c1": r["component1"], "c2": r["component2"]}
+            for r in cur.fetchall()
+        ]
+
+
 FIELDS = (
     "moniker",
     "roomid",
@@ -61,6 +75,7 @@ class Player(object):
     bodycount: int
     membermoniker: str | None
     pool: object
+    _weapon_recipes: list[dict[str, str]] | None
     conn: object
     exits: dict
     datecreated: datetime.datetime | None
@@ -125,33 +140,31 @@ class Player(object):
                     return x
             return None
 
-        components = [
-            ["axe", "axeblade", "axehandle"],
-            ["pistol", "pistol", "bullets"],
-            ["chlorine", "chlorinegas", "gassprayer"],
-            ["fire", "lighterfluid", "flamethrower"],
-            ["acid", "industrialacid", "acidsprayer"],
-        ]
+        if not hasattr(self, "_weapon_recipes") or self._weapon_recipes is None:
+            pool = getattr(self, "pool", None)
+            if pool:
+                with database.connect(self.args, pool=pool) as conn:
+                    self._weapon_recipes = _get_weapon_recipes(self.args, conn=conn)
+            else:
+                self._weapon_recipes = []
 
         w = []
-        for fortytwo in components:
-            name = fortytwo[0]
-            c1 = fortytwo[1]
-            c2 = fortytwo[2]
+        for recipe in self._weapon_recipes:
+            name = recipe["name"]
+            c1 = recipe["c1"]
+            c2 = recipe["c2"]
 
-            if find(c1) is not None and find(c2) is not None:
-                i1 = find(c1)
-                if i1 is not None:
-                    del items[i1]
+            idx1 = find(c1)
+            idx2 = find(c2)
+            if idx1 is not None and idx2 is not None:
+                if idx1 < idx2:
+                    del items[idx1]
+                    del items[idx2 - 1]
+                else:
+                    del items[idx2]
+                    del items[idx1 - 1]
 
-                i2 = find(c2)
-                if i2 is not None:
-                    del items[i2]
-
-                io.echo(
-                    f"complete weapon {name!r} found. i1={i1!r} i2={i2!r}",
-                    level="debug",
-                )
+                io.echo(f"complete weapon {name!r} found", level="debug")
                 w.append(name + " (weapon)")
         return w
 
@@ -235,45 +248,7 @@ class Player(object):
 
     def getitems(self):
         items = copy.deepcopy(self.items)
-
-        def findcomponent(shortname):
-            for x in range(0, len(items)):
-                if items[x].name == shortname:
-                    return x
-            return None
-
         return self.weapons(items) + items
-        w = []
-
-        components = [
-            ["axe", "axeblade", "axehandle"],
-            ["pistol", "pistol", "bullets"],
-            ["chlorine", "chlorine", "gassprayer"],
-            ["fire", "lighterfluid", "flamethrower"],
-            ["acid", "industrialacid", "acidsprayer"],
-        ]
-        for fortytwo in components:
-            name = fortytwo[0]
-
-            c1 = fortytwo[1]
-            c2 = fortytwo[2]
-
-            if findcomponent(c1) is not None and findcomponent(c2) is not None:
-                i1 = findcomponent(c1)
-                if i1 is not None:
-                    del items[i1]
-
-                i2 = findcomponent(c2)
-                if i2 is not None:
-                    del items[i2]
-
-                io.echo(
-                    f"complete weapon {name!r} found. i1={i1!r} i2={i2!r}",
-                    level="debug",
-                )
-                w.append(name + " (weapon)")
-
-        return w + items
 
 
 def load(args, moniker, **kwargs):
@@ -296,7 +271,7 @@ def load(args, moniker, **kwargs):
             p = build(args, rec, **kwargs)
             if p is None:
                 return None
-            p.items = getitems(args, moniker, **kwargs)
+            p.items = getitems(args, moniker, conn=conn)
             return p
 
     io.echo(f"mm.player.load.120: {kwargs=}", level="debug")
@@ -372,10 +347,10 @@ def getitems(args, playermoniker, **kwargs) -> list:
             cur.execute(q, {"playermoniker": playermoniker})
             if cur.rowcount == 0:
                 return items
-            res = cur.fetchmany()
+            res = cur.fetchall()
             for rec in res:
                 serial = rec.get("serial")
-                item = libitem.load(args, rec["itemname"], serial=serial)
+                item = libitem.load(args, rec["itemname"], serial=serial, conn=conn)
                 if item is None:
                     io.echo(f"mm.player.getitems: {item=}", level="error")
                     break

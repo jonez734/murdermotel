@@ -46,39 +46,79 @@ class Item:
 ## Database
 
 - **Table**: `murdermotel.item`
-- **Primary Key**: `name` (citext)
+- **Primary Key**: `(name, serial)`
 
 ### Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `kind` | text | Item type ('weapon', 'boobytrap', 'component', 'defense') |
+| `kind` | text | Item type ('weapon', 'boobytrap', 'component', 'defense', 'item') |
 | `modulepath` | text | Custom module path |
-| `name` | citext | Item name (PK) |
-| `serial` | int | Serial number |
+| `name` | citext | Item name (part of PK) |
+| `serial` | int | Serial number (part of PK, unique per name) |
 | `title` | text | Display title |
-| `state` | jsonb | Item state |
+| `state` | jsonb | Instance state (weapon stats, durability, etc.) |
 
 ## Item Kinds
 
 | Kind | Description |
 |------|-------------|
-| `weapon` | Complete weapons (axes, pistols, etc) |
+| `weapon` | Complete weapons (axes, pistols, etc.) — generated from `weapon_recipe` |
 | `boobytrap` | Active traps |
-| `component` | Weapon parts (blades, handles) |
+| `component` | Weapon parts (blades, handles) — assembled into weapons |
 | `defense` | Defensive items |
+| `item` | Generic items |
 
-## Weapon Components
+## Weapon System
 
-Items are combined to form complete weapons:
+### `murdermotel.weapon_recipe`
 
-| Weapon | Component 1 | Component 2 |
-|--------|--------------|-------------|
-| `axe` | `axeblade` | `axehandle` |
-| `pistol` | `pistol` | `bullets` |
-| `chlorine` | `chlorinegas` | `gassprayer` |
-| `fire` | `lighterfluid` | `flamethrower` |
-| `acid` | `industrialacid` | `acidsprayer` |
+Defines how weapons are built and distributed. Each recipe specifies the two required components, how many instances to generate (rarity control), shared messages, and default state.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `name` | citext PK | Weapon name — 'axe', 'pistol', etc. |
+| `title` | text | Display name for the weapon |
+| `component1` | citext | First required component |
+| `component2` | citext | Second required component |
+| `count` | int | Number of instances to generate (default 6). Lower = rarer. 0 = disabled. |
+| `usemessages` | text[] | Shared kill/attack messages for all instances |
+| `state` | jsonb | Default state copied into each item instance at generation time |
+
+### Recipe Defaults vs Instance State
+
+Recipe `state` is **default values** copied into each item at generation time. Instance `state` in `murdermotel.item` can be modified independently (e.g., ammo consumed, durability lost).
+
+```json
+// axe — high damage melee weapon
+{"damage_min": 15, "damage_max": 30, "type": "melee", "power": "high"}
+
+// pistol — ranged weapon with limited ammo (set count=3 for rarity)
+{"damage_min": 10, "damage_max": 20, "type": "ranged", "ammo": 6, "ammo_max": 6}
+
+// chlorine — area-effect chemical weapon
+{"damage_min": 5, "damage_max": 25, "type": "area", "radius": 1}
+
+// fire — flame weapon
+{"damage_min": 20, "damage_max": 40, "type": "burn", "area": false}
+
+// acid — corrosive weapon
+{"damage_min": 12, "damage_max": 35, "type": "corrosive", "uses": 3, "uses_max": 3}
+```
+
+### Weapon Mode
+
+The `WEAPON_MODE` config in `lib.py` controls distribution:
+
+| Mode | Behavior |
+|------|----------|
+| `components` | Distribute components only. Players assemble via `weapon_recipe` lookup in `Player.weapons()`. |
+| `complete` | Distribute pre-built `kind='weapon'` items directly into rooms. Players pick them up without assembly. |
+| `both` | Both: components distributed as normal, plus complete weapon instances placed in rooms. |
+
+### Weapon Assembly (components mode)
+
+When `WEAPON_MODE` is `'components'` or `'both'`, `Player.weapons()` queries `weapon_recipe` for the assembly list and checks if both required components are in the player's inventory. If so, the components are consumed and a virtual "weapon" is presented to the player (no `item` row created — it's an in-memory weapon constructed from components).
 
 ## Item Mapping
 

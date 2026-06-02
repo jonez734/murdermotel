@@ -30,14 +30,13 @@ Detailed specifications for each game module:
 ### Item Subtypes (via join)
 
 | Table | Parent | Additional Columns |
-|-------|--------|---------------------|
-| `murdermotel.weapon` | `item` | `component1`, `component2` |
+|-------|--------|-------------------|
 | `murdermotel.boobytrap` | `item` | `running`, `timer` |
 
 ### NPC Subtypes (via join)
 
 | Table | Parent | Additional Columns |
-|-------|--------|---------------------|
+|-------|--------|-------------------|
 | `murdermotel.rabidwolf` | `npc` | `roomid`, `healthpoints` |
 | `murdermotel.thief` | `npc` | `bag` (citext[]), `roomid`, `healthpoints` |
 
@@ -48,7 +47,12 @@ Detailed specifications for each game module:
 | `murdermotel.map_item_player` | Items held by players |
 | `murdermotel.map_item_room` | Items placed in rooms |
 | `murdermotel.map_item_thief` | Items stolen by the thief |
-| `murdermotel.component` | Weapon components |
+
+### Weapon System
+
+| Table | Purpose |
+|-------|---------|
+| `murdermotel.weapon_recipe` | Weapon definitions: name, components, count, defaults |
 
 ## Design Decisions
 
@@ -56,20 +60,22 @@ Detailed specifications for each game module:
 
 Each parent table uses a `kind` column with CHECK constraint to enforce valid subtypes:
 
-- `item.kind` ∈ {'weapon', 'boobytrap'}
+- `item.kind` ∈ {'weapon', 'boobytrap', 'component', 'defense', 'item'}
 - `npc.kind` ∈ {'wolf', 'thief'}
 
-### Foreign Key Pattern
+### Weapon Mode
 
-Child tables use their parent's primary key as both their PK and FK:
+The `WEAPON_MODE` config in `lib.py` controls weapon distribution:
 
-```sql
--- Example: weapon table
-name citext unique not null,
-constraint fk_weapon_item foreign key (name) references murdermotel.item(name) ...
-```
+| Mode | Behavior |
+|------|----------|
+| `components` | Distribute components only. Players assemble weapons via `weapon_recipe`. |
+| `complete` | Distribute pre-built `kind='weapon'` items directly into rooms. |
+| `both` | Both: components + complete weapons placed in rooms. |
 
-This enforces the "is-a" relationship at the database level and enables cascading deletes.
+### Instance State
+
+Each weapon instance in `murdermotel.item` has a `state` JSONB column that can diverge from the recipe defaults. The `weapon_recipe.state` column provides default values copied into each instance at generation time.
 
 ## Loading Order
 
@@ -78,11 +84,9 @@ schema.sql
   → player.sql
   → playground.sql
   → item.sql
-    → weapon.sql
+    → weapon_recipe.sql (weapon.sql)
     → boobytrap.sql
   → npc.sql
     → wolf.sql
     → thief.sql
 ```
-
-Note: Parent tables must be loaded before child tables due to FK constraints.

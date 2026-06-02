@@ -21,7 +21,7 @@ _TABLES = (
     (f"{libmm.SCHEMA}.item", "item.sql"),
     (f"{libmm.SCHEMA}.npc", "npc.sql"),
     (f"{libmm.SCHEMA}.defense", "defense.sql"),
-    (f"{libmm.SCHEMA}.weapon", "weapon.sql"),
+    (f"{libmm.SCHEMA}.weapon_recipe", "weapon.sql"),
     (f"{libmm.SCHEMA}.boobytrap", "boobytrap.sql"),
     (f"{libmm.SCHEMA}.thief", "thief.sql"),
     (f"{libmm.SCHEMA}.rabidwolf", "rabidwolf.sql"),
@@ -165,6 +165,22 @@ def main(args, **kwargs) -> bool:
         else:
             io.echo(" skip ", level="ok")
 
+        # --- weapon recipes ---
+        io.echo("{var:labelcolor}populate {var:valuecolor}weapon recipes: ", end="")
+        if failcount > 0:
+            io.echo(" skip ", level="ok")
+        elif (libmm.getweaponrecipecount(args, conn=conn) or 0) == 0:
+            if not database.importsql(
+                args, "weapon_data.sql", conn=conn, package=_SQL_PACKAGE
+            ):
+                io.echo(" fail ", level="error")
+                conn.rollback()
+                failcount += 1
+            else:
+                io.echo("  ok  ", level="ok")
+        else:
+            io.echo(" skip ", level="ok")
+
         # --- distribute items ---
         io.echo("{var:labelcolor}distribute {var:valuecolor}items: ", end="")
         if failcount > 0:
@@ -173,6 +189,20 @@ def main(args, **kwargs) -> bool:
             io.echo(" skip ", level="ok")
         else:
             if libmm.distributeitems(args, conn=conn):
+                io.echo("  ok  ", level="ok")
+            else:
+                io.echo(" fail ", level="error")
+                conn.rollback()
+                failcount += 1
+
+        # --- distribute complete weapons ---
+        io.echo("{var:labelcolor}distribute {var:valuecolor}weapons: ", end="")
+        if failcount > 0:
+            io.echo(" skip ", level="ok")
+        elif (libmm.countdistributedweapons(args, conn=conn) or 0) > 0:
+            io.echo(" skip ", level="ok")
+        else:
+            if libmm.distributeweapons(args, conn=conn):
                 io.echo("  ok  ", level="ok")
             else:
                 io.echo(" fail ", level="error")
@@ -345,7 +375,11 @@ def _check_orphan_items(args, conn) -> tuple[int, int]:
             if eligible_rooms:
                 random.shuffle(eligible_rooms)
                 placements = [
-                    (eligible_rooms[i % len(eligible_rooms)], ghost["name"], ghost["serial"])
+                    (
+                        eligible_rooms[i % len(eligible_rooms)],
+                        ghost["name"],
+                        ghost["serial"],
+                    )
                     for i, ghost in enumerate(ghosts)
                 ]
                 with database.cursor(conn) as insert_cur:

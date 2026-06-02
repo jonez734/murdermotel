@@ -1,6 +1,6 @@
 from bbsengine6 import database, io
 
-from . import room as libroom, item as libitem
+from . import room as libroom, item as libitem, lib as libmm
 
 
 def init(args=None, **kw):
@@ -155,6 +155,12 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
 
     screen.updateprogress(step, total)
     step += 1
+
+    if libmm.distributeweapons(args, conn=conn):
+        io.echo("complete weapons distributed", level="debug")
+    else:
+        io.echo("complete weapons distribution failed", level="error")
+        return False
 
     conn.commit()
     io.echo("OK.{f6}reticulation of splines completed")
