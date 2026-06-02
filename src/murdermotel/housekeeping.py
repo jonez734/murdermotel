@@ -32,7 +32,8 @@ def main(args: argparse.Namespace, **kw: dict) -> bool | None:
             level="debug",
         )
         io.echo()
-        lib.setarea(args, player, "housekeeping")
+        pool = kw.get("pool")
+        lib.setbottombar(args, "housekeeping", player=player, pool=pool)
         io.echo("{var:optioncolor}[S]{var:labelcolor}etup")
         io.echo("{var:optioncolor}[E]{var:labelcolor}dit")
         io.echo("{var:optioncolor}[W]{var:labelcolor}eapon list")

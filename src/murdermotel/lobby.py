@@ -48,7 +48,7 @@ def main(args, **kwargs):
     player = None
     done = False
     while not done:
-        libmm.setarea(args, player, "lobby", help=True, **kwargs)
+        libmm.setbottombar(args, "lobby", player=player, help=True, **kwargs)
 
         util.heading("murder motel lobby")
         io.echo(
@@ -75,11 +75,11 @@ def main(args, **kwargs):
         )
         if ch == "G":
             io.echo("Game Instructions")
-            libmm.setarea(args, player, "reading: 'game instructions'")
+            libmm.setbottombar(args, "reading: 'game instructions'", player=player)
             util.filedisplay(data.get("s.explain.txt"), more=False)
         elif ch == "C":
             io.echo("Credits")
-            libmm.setarea(args, player, "reading: 'credits'")
+            libmm.setbottombar(args, "reading: 'credits'", player=player)
             util.filedisplay(data.get("s.credits.txt"), more=False)
         elif ch == "Q":
             io.echo(":door: Quit")
@@ -94,8 +94,6 @@ def main(args, **kwargs):
         elif ch == "P":
             io.echo("Play!")
             io.screen.init()
-            res = libmm.runmodule(
-                args, "run", "play", **kwargs
-            )
+            res = libmm.runmodule(args, "run", "play", **kwargs)
         else:
             io.echo("{bell}", end="", flush=True)

@@ -24,3 +24,4 @@
 - [ ] when showing player items, condense complete weapons but internally keep track of each component (@since 20221008)
 - [ ] properly handle KEY_F1 (help) (@since 20221008)
 - [ ] during encounter w rabid wolf, output what direction the player ran in (@since 20221016)
+- [x] refactor `setarea()` → `setbottombar()` aligns with `zoidoffice` pattern, uses `screen.setbottombar` with `bottombar_fragments`, player passed via kwargs (@done 20260602)

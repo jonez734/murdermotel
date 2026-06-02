@@ -161,51 +161,47 @@ class completeItemName:
         return results[state]
 
 
-def setarea(args, player, left, **kwargs):
-    def right():
-        help = " | F1: Help" if "help" in kwargs and kwargs["help"] is True else ""
-        debug = " | debug" if args.debug is True else ""
-        room = ""
-        playername = ""
-        moves = ""
-        turn = ""
+def _mm_game_state_fragment(**kwargs) -> str:
+    player = kwargs.get("player")
+    args = kwargs.get("args")
+    room = kwargs.get("room")
+    help_flag = kwargs.get("help", False)
 
-        buf = "murder motel"
-        if player is not None:
-            if player.isdirty is True:
-                isdirty = "*"
-            else:
-                isdirty = ""
+    buf = "murder motel"
+    if player is not None:
+        isdirty = "*" if player.isdirty is True else ""
+        turn = " | %s" % util.pluralize(4 - player.turn, "turn", "turns")
+        moves = " | %s" % util.pluralize(player.moves, "move", "moves")
+        playername = f" | {isdirty}{player.moniker}"
+        buf += f"{playername}"
 
-            turn = " | %s" % (util.pluralize(4 - player.turn, "turn", "turns"))
+        if player.roomid is not None:
+            room_str = f" | room #{player.roomid}"
+            if room is not None and room.shortname:
+                room_str += " " + room.shortname
+            elif room is None:
+                conn = kwargs.get("conn")
+                pool = kwargs.get("pool")
+                if conn or pool:
+                    loaded = libroom.load(args, player.roomid, conn=conn, pool=pool)
+                    if loaded and loaded.shortname:
+                        room_str += " " + loaded.shortname
+            buf += room_str
 
-            if player.roomid is not None:
-                room = f" | room #{player.roomid}"
-                conn = kwargs.get("conn", None)
-                pool = kwargs.get("pool", None)
-                if conn is None and pool is None:
-                    io.echo(f"libmm.setarea.100: {pool=}", level="error")
-                    return False
-                currentroom = libroom.load(args, player.roomid, **kwargs)
-                if currentroom is False:
-                    io.echo(f"{player.roomid=} does not exist!", level="error")
-                    return False
+        buf += f"{turn}{moves}"
 
-                if currentroom and currentroom.shortname is not None:
-                    room += " " + currentroom.shortname
-            else:
-                room = ""
+    debug = " | debug" if (args and args.debug is True) else ""
+    help_str = " | F1: Help" if help_flag else ""
+    buf += f"{debug}{help_str}"
+    return buf
 
-            moves = " | %s" % (util.pluralize(player.moves, "move", "moves"))
 
-            playername = f" | {isdirty}{player.moniker}"
+def setbottombar(args: argparse.Namespace, left: str, /, right: Optional[Callable[..., str]] = None, **kwargs: Any) -> None:
+    fragment = right if right is not None else _mm_game_state_fragment
+    screen.setbottombar(left, right=fragment, args=args, **kwargs)
 
-        buf += f"{playername}{room}{turn}{moves}{debug}{help}"
 
-        return buf
-
-    screen.setbottombar(left, right)
-    return
+setarea = setbottombar
 
 
 def init(args=None):

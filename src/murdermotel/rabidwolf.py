@@ -336,8 +336,13 @@ def build(args: argparse.Namespace, rec: dict, **kwargs: Any) -> RabidWolf:
 
 
 def wolf_attack_player(
-    args: argparse.Namespace, player: Any, wolf: RabidWolf, **kwargs: Any
+    args: argparse.Namespace, wolf: RabidWolf, **kwargs: Any
 ) -> None:
+    player = kwargs.get("player")
+    if player is None:
+        io.echo("You do not exist! Go Away!")
+        return
+
     damage = randomlib.randint(1, 10) + 10
     io.echo(f"damage={damage}", level="debug")
     io.echo(
@@ -383,12 +388,12 @@ def turn(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     if attacked:
         if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
-            wolf_attack_player(args, player, obj, **kwargs)
+            wolf_attack_player(args, obj, **kwargs)
 
     if ignored:
         if util.diceroll(10, mode="single") < WOLF_AUTO_ATTACK_CHANCE:
             io.echo(f"The {obj.short()} attacks you!")
-            wolf_attack_player(args, player, obj, **kwargs)
+            wolf_attack_player(args, obj, **kwargs)
 
     pool = kwargs.get("pool", None)
     if pool:
@@ -503,9 +508,12 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         io.echo("The room you are in does not exist!")
         return False
 
+    pool = kwargs.get("pool")
     done = False
     while not done:
-        libmm.setarea(args, player, "playground: rabid wolf")
+        libmm.setbottombar(
+            args, "playground: rabid wolf", player=player, pool=pool, **kwargs
+        )
 
         io.echo(f"{{var:labelcolor}}There is a {wolf.short()} snarling at you.{{f6}}")
 

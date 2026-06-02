@@ -220,9 +220,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             "new player moniker: ",
             currentmembermoniker,
             verify=libplayer.verifyPlayerNameNotFound,  # type: ignore[arg-type]
-            multiple=False,  # type: ignore[arg-type]
             args=args,  # type: ignore[arg-type]
-            returnseq=False,  # type: ignore[arg-type]
             **kwargs,
         )
         if playermoniker == "":
@@ -338,12 +336,11 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         if conn is None and pool is None:
             io.echo(f"mm.play.playloop.100: {pool=}", level="error")
             return False
-        libmm.setarea(args, player, "playground", help=True, **kwargs)
         room: Any = libroom.load(args, player.roomid, **kwargs)
         if not room:
             io.echo("your room does not exist! go away!", level="error")
             return False
-
+        libmm.setbottombar(args, "playground", player=player, room=room, help=True, **kwargs)
         room.on_turn(args, room=room, player=player, **kwargs)
         if args.debug is True:
             io.echo(f"mm.play.220: {room.exits=}", level="debug")
