@@ -196,9 +196,11 @@ def _mm_game_state_fragment(**kwargs) -> str:
     return buf
 
 
-def setbottombar(args: argparse.Namespace, left: str, /, right: Optional[Callable[..., str]] = None, **kwargs: Any) -> None:
-    fragment = right if right is not None else _mm_game_state_fragment
-    screen.setbottombar(left, right=fragment, args=args, **kwargs)
+screen.register_bottombar_fragment(_mm_game_state_fragment)
+
+
+def setbottombar(args: argparse.Namespace, left: str, /, **kwargs: Any) -> None:
+    screen.setbottombar(left, args=args, **kwargs)
 
 
 setarea = setbottombar

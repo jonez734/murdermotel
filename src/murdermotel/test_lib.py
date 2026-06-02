@@ -4,7 +4,9 @@ from unittest.mock import patch, MagicMock
 
 class TestSetarea:
     @patch("murdermotel.lib.screen.setbottombar")
-    def test_setarea_calls_screen_setbottombar(self, mock_sb, test_args, test_pool):
+    def test_setbottombar_calls_screen_setbottombar(
+        self, mock_sb, test_args, test_pool
+    ):
         from murdermotel import lib as libmm
 
         player = MagicMock()
@@ -20,10 +22,9 @@ class TestSetarea:
         assert call_args.args[0] == "lobby"
         call_kwargs = call_args.kwargs
         assert call_kwargs["args"] is test_args
-        assert call_kwargs["right"] is libmm._mm_game_state_fragment
 
     @patch("murdermotel.lib.screen.setbottombar")
-    def test_setarea_passes_player_to_screen(self, mock_sb, test_args, test_pool):
+    def test_setbottombar_passes_player_to_screen(self, mock_sb, test_args, test_pool):
         from murdermotel import lib as libmm
 
         player = MagicMock()
@@ -37,17 +38,6 @@ class TestSetarea:
         mock_sb.assert_called_once()
         call_kwargs = mock_sb.call_args.kwargs
         assert call_kwargs["player"] is player
-
-    @patch("murdermotel.lib.screen.setbottombar")
-    def test_setarea_custom_right_is_used(self, mock_sb, test_args, test_pool):
-        from murdermotel import lib as libmm
-
-        def custom(**kw) -> str:
-            return "custom right"
-
-        libmm.setbottombar(test_args, "lobby", right=custom, pool=test_pool)
-        mock_sb.assert_called_once()
-        assert mock_sb.call_args.kwargs["right"] is custom
 
 
 class TestLibQueries:
