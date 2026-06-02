@@ -24,7 +24,7 @@ def lobbyhelp(**kwargs):
 
     io.echo("{var:optioncolor}[G]{var:labelcolor}ame instructions")
     io.echo("{var:optioncolor}[C]{var:labelcolor}redits")
-    if member.checkflag(args, "sysop", **kwargs) is True:
+    if member.issysop(args, **kwargs) is True:
         io.echo("{var:optioncolor}[M]{var:labelcolor}aintenance")
         io.echo("{var:optioncolor}[H]{var:labelcolor}ousekeeping")
     io.echo("{var:optioncolor}[P]{var:labelcolor}lay")
@@ -58,7 +58,7 @@ def main(args, **kwargs):
         io.echo()
 
         options = "GC"
-        if member.checkflag(args, "sysop", **kwargs) is True:
+        if member.issysop(args, **kwargs) is True:
             options += "MH"
 
         options += "P"

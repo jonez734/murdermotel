@@ -8,7 +8,7 @@ def init(args: argparse.Namespace | None = None, **kw: dict) -> bool:
 
 
 def access(args: argparse.Namespace, op: str, **kw: dict) -> bool | None:
-    return member.checkflag(args, "SYSOP")
+    return member.issysop(args)
 
 
 def buildargs(args: argparse.Namespace, **kw: dict) -> argparse.ArgumentParser | None:

@@ -597,7 +597,7 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
 
 
 def reload(args: argparse.Namespace, player: Any, **kwargs: Any) -> bool:
-    if not member.checkflag(args, "SYSOP"):
+    if not member.issysop(args):
         io.echo("Sysop access required.", level="error")
         return False
 
