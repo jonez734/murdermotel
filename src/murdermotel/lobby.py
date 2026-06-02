@@ -93,9 +93,9 @@ def main(args, **kwargs):
             res = libmm.runmodule(args, "run", "housekeeping", **kwargs)
         elif ch == "P":
             io.echo("Play!")
+            io.screen.init()
             res = libmm.runmodule(
                 args, "run", "play", **kwargs
-            )  # bbsengine.module.runsubmodule(args, "murdermotel.play", player=player)
-            io.echo(f"end play! {res=}")
+            )
         else:
             io.echo("{bell}", end="", flush=True)
