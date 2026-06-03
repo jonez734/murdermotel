@@ -41,7 +41,7 @@ class Item:
 |--------|-----------|-------------|
 | `short` | `() -> str` | Get short item description |
 | `buildrec` | `()` | Build database record |
-| `save` | `(mogrify=False, **kwargs)` | Save item to database |
+| `save` | `(mogrify=False, commit=True, **kwargs)` | Save item to database (commit=False defers to outer transaction) |
 
 ## Database
 

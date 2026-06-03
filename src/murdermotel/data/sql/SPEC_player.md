@@ -18,7 +18,7 @@ Player module for the Murder Motel game. Manages player characters, inventory, a
 | `count` | `(args, membermoniker: str, **kwargs) -> int` | Count players by member |
 | `getitems` | `(args, playermoniker, **kwargs) -> list` | Get player's items |
 | `build` | `(args, rec: dict, **kwargs) -> Player` | Build Player from record |
-| `inputmoniker` | `(prompt, oldvalue, args, **kwargs)` | Input player name with verification |
+| `inputmoniker` | `(prompt, oldvalue, args, verify=None, **kwargs)` | Input player name with verification |
 | `create` | `(args, playermoniker, **kwargs)` | Create new player |
 
 ## Player Class
@@ -55,7 +55,7 @@ class Player:
 | `buildrec` | `(kwargs)` | Build database record |
 | `weapons` | `(items=None)` | Find complete weapons from components |
 | `finditem` | `(shortname)` | Find item by name |
-| `save` | `(**kwargs)` | Save player to database |
+| `save` | `(commit=True, **kwargs)` | Save player to database (commit=False defers to outer transaction) |
 | `info` | `()` | Display player info |
 | `getitems` | `()` | Get player's items with weapons |
 

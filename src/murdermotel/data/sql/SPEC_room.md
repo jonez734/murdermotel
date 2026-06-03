@@ -48,7 +48,7 @@ class Room:
 | `short` | `() -> str` | Get short room description |
 | `buildrec` | `()` | Build database record |
 | `finditem` | `(shortname)` | Find item by name |
-| `save` | `(mogrify=False, **kwargs)` | Save room to database |
+| `save` | `(mogrify=False, commit=True, **kwargs)` | Save room to database (commit=False defers to outer transaction) |
 
 ## Database
 

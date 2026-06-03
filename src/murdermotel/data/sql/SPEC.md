@@ -77,6 +77,17 @@ The `WEAPON_MODE` config in `lib.py` controls weapon distribution:
 
 Each weapon instance in `murdermotel.item` has a `state` JSONB column that can diverge from the recipe defaults. The `weapon_recipe.state` column provides default values copied into each instance at generation time.
 
+## Save Pattern
+
+All `save()` methods follow a consistent pattern for transaction management:
+
+1. `_work(conn)` nested function performs DB operations (upserts, inserts, updates)
+2. If external `conn` provided: call `_work(conn)` and commit, return result
+3. If only `pool` provided: acquire connection, call `_work(conn)`, commit, close
+4. All save methods use `commit=False` on upsert calls to defer commit until outer scope
+
+This pattern ensures proper resource cleanup and transaction handling.
+
 ## Loading Order
 
 ```
