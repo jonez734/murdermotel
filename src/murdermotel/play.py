@@ -145,8 +145,8 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
 
     io.echo("Z - Maint Mode ", end="")
     ch: Optional[str] = io.inputchoice(
-        "{var:optioncolor}[G]{var:labelcolor}oto {var:optioncolor}[E]{var:labelcolor}dit room {var:optioncolor}[R]{var:labelcolor}eload {var:optioncolor}(Q){var:labelcolor}uit",
-        "GERQ",
+        "{var:optioncolor}[G]{var:labelcolor}oto {var:optioncolor}[E]{var:labelcolor}dit room {var:optioncolor}[R]{var:labelcolor}eload {var:optioncolor}[W]{var:labelcolor}eapon list {var:optioncolor}(Q){var:labelcolor}uit",
+        "GERWQ",
         "Q",
         **kwargs,
     )
@@ -158,6 +158,8 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
         return reload(args, player, **kwargs)
     elif ch == "E":
         return editroom()
+    elif ch == "W":
+        return libmm.runsubmodule(args, "weaponlist", player=player, **kwargs)
 
     return True
 
