@@ -155,7 +155,7 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
     elif ch == "G":
         return goto()
     elif ch == "R":
-        return reload(args, player=player, **kwargs)
+        return reload(args, player, **kwargs)
     elif ch == "E":
         return editroom()
 
@@ -340,7 +340,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
         if not room:
             io.echo("your room does not exist! go away!", level="error")
             return False
-        libmm.setbottombar(args, "playground", player=player, room=room, help=True, **kwargs)
+        libmm.setbottombar(
+            args, "murder motel", player=player, room=room, help=True, **kwargs
+        )
         room.on_turn(args, room=room, player=player, **kwargs)
         if args.debug is True:
             io.echo(f"mm.play.220: {room.exits=}", level="debug")
