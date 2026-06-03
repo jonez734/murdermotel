@@ -162,7 +162,6 @@ def _weapons_work(args, conn, items, kk, total, **kwargs):
         io.echo("complete weapons distribution failed", level="error")
         return False
 
-    conn.commit()
     io.echo("OK.{f6}reticulation of splines completed")
     io.echo("{var:promptcolor}press any key: ", end="", flush=True)
     io.getch()

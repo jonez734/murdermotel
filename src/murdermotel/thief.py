@@ -414,7 +414,6 @@ def turn(args, **kwargs) -> bool:
         with database.connect(args, pool=pool) as conn:
             obj.save(conn=conn)
             player.save(conn=conn)
-            conn.commit()
     else:
         if pool:
             obj.save(conn=conn) if conn else obj.save()
@@ -437,7 +436,6 @@ def steal_from_player(player, thief, **kwargs):
         with database.connect(args, pool=pool) as conn:
             player.save(conn=conn)
             thief.save(conn=conn)
-            conn.commit()
     else:
         if conn is not None:
             player.save(conn=conn)
