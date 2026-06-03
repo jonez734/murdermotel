@@ -161,42 +161,37 @@ class completeItemName:
         return results[state]
 
 
-def _mm_game_state_fragment(**kwargs) -> str:
+def _mm_player_status_fragment(**kwargs) -> str:
+    player = kwargs.get("player")
+    if player is None:
+        return ""
+    isdirty = "*" if player.isdirty is True else ""
+    turns = " | %s" % util.pluralize(4 - player.turn, "turn", "turns")
+    moves = " | %s" % util.pluralize(player.moves, "move", "moves")
+    return f"{isdirty}{player.moniker}{turns}{moves}"
+
+
+def _mm_room_fragment(**kwargs) -> str:
     player = kwargs.get("player")
     args = kwargs.get("args")
     room = kwargs.get("room")
-    help_flag = kwargs.get("help", False)
-
-    buf = "murder motel"
-    if player is not None:
-        isdirty = "*" if player.isdirty is True else ""
-        turn = " | %s" % util.pluralize(4 - player.turn, "turn", "turns")
-        moves = " | %s" % util.pluralize(player.moves, "move", "moves")
-        playername = f" | {isdirty}{player.moniker}"
-        buf += f"{playername}"
-
-        if player.roomid is not None:
-            room_str = f" | room #{player.roomid}"
-            if room is not None and room.shortname:
-                room_str += " " + room.shortname
-            elif room is None:
-                conn = kwargs.get("conn")
-                pool = kwargs.get("pool")
-                if conn or pool:
-                    loaded = libroom.load(args, player.roomid, conn=conn, pool=pool)
-                    if loaded and loaded.shortname:
-                        room_str += " " + loaded.shortname
-            buf += room_str
-
-        buf += f"{turn}{moves}"
-
-    debug = " | debug" if (args and args.debug is True) else ""
-    help_str = " | F1: Help" if help_flag else ""
-    buf += f"{debug}{help_str}"
-    return buf
+    if player is None or player.roomid is None:
+        return ""
+    room_str = f"room #{player.roomid}"
+    if room is not None and room.shortname:
+        room_str += " " + room.shortname
+    elif room is None:
+        conn = kwargs.get("conn")
+        pool = kwargs.get("pool")
+        if conn or pool:
+            loaded = libroom.load(args, player.roomid, conn=conn, pool=pool)
+            if loaded and loaded.shortname:
+                room_str += " " + loaded.shortname
+    return room_str
 
 
-screen.register_bottombar_fragment(_mm_game_state_fragment)
+screen.register_bottombar_fragment(_mm_player_status_fragment)
+screen.register_bottombar_fragment(_mm_room_fragment)
 
 
 def setbottombar(args: argparse.Namespace, left: str, /, **kwargs: Any) -> None:
