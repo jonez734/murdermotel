@@ -27,16 +27,16 @@ def main(args: argparse.Namespace, **kw: dict) -> bool | None:
     while not done:
         util.heading("weapon list")
         io.echo("{var:optioncolor}[C]{var:labelcolor}omponents")
-        io.echo("{var:optioncolor}[R]{var:labelcolor}ecipes")
+        io.echo("{var:optioncolor}[W]{var:labelcolor}eapon recipes")
         io.echo("{f6}{var:optioncolor}[Q]{var:labelcolor}uit{f6}")
         ch = io.inputchar(
-            "{var:promptcolor}weapon list {var:optioncolor}[CRQ]{var:promptcolor}: {var:inputcolor}",
-            "CRQ",
+            "{var:promptcolor}weapon list {var:optioncolor}[CWQ]{var:promptcolor}: {var:inputcolor}",
+            "CWQ",
             "",
         )
         if ch == "C":
             _list_components(args, pool)
-        elif ch == "R":
+        elif ch == "W":
             _list_recipes(args, pool)
         elif ch == "Q":
             done = True

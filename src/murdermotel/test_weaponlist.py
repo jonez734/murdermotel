@@ -46,7 +46,7 @@ class TestWeaponlist:
     def test_main_recipes_option(self, test_args, test_pool):
         from murdermotel import weaponlist as wl
 
-        with patch("murdermotel.weaponlist.io.inputchar", side_effect=["R", "Q"]):
+        with patch("murdermotel.weaponlist.io.inputchar", side_effect=["W", "Q"]):
             with patch("murdermotel.weaponlist.io.echo"):
                 result = wl.main(test_args, pool=test_pool)
                 assert result is True
