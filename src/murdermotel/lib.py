@@ -547,7 +547,6 @@ def distributeitems(args, **kwargs):
         with database.cursor(conn) as cur:
             cur.executemany(q.as_string(conn), placements)
 
-        conn.commit()
         return True
 
     conn = kwargs.get("conn", None)
@@ -722,7 +721,6 @@ def distributeweapons(args, **kwargs):
             f"distributeweapons: placed {len(placements)} weapons in rooms",
             level="debug",
         )
-        conn.commit()
         return True
 
     conn = kwargs.get("conn", None)
