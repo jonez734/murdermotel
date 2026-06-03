@@ -159,7 +159,7 @@ def maintmode(args: argparse.Namespace, **kwargs: Any) -> bool:
     elif ch == "E":
         return editroom()
     elif ch == "W":
-        return libmm.runsubmodule(args, "weaponlist", player=player, **kwargs)
+        return libmm.runsubmodule(args, "weaponlist", **kwargs)
 
     return True
 
