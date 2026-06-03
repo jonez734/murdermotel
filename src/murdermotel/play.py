@@ -3,7 +3,7 @@ import copy
 import random
 from typing import Any, Optional
 
-from bbsengine6 import io, util, member, module as bbsmodule
+from bbsengine6 import database, io, util, member, module as bbsmodule
 
 from . import (
     lib as libmm,
@@ -538,11 +538,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             conn = kwargs.get("conn", None)
             pool = kwargs.get("pool", None)
             if conn is None and pool is not None:
-                conn = pool.getconn()
-                player.save(conn=conn)
-                room.save(conn=conn)
-                conn.commit()
-                pool.putconn(conn)
+                with database.connect(args, pool=pool) as conn:
+                    player.save(conn=conn)
+                    room.save(conn=conn)
             else:
                 player.save(conn=conn) if conn else player.save()
                 room.save(conn=conn) if conn else room.save()
@@ -566,11 +564,9 @@ def main(args: argparse.Namespace, **kwargs: Any) -> bool:
             conn = kwargs.get("conn", None)
             pool = kwargs.get("pool", None)
             if conn is None and pool is not None:
-                conn = pool.getconn()
-                player.save(conn=conn)
-                room.save(conn=conn)
-                conn.commit()
-                pool.putconn(conn)
+                with database.connect(args, pool=pool) as conn:
+                    player.save(conn=conn)
+                    room.save(conn=conn)
             else:
                 player.save(conn=conn) if conn else player.save()
                 room.save(conn=conn) if conn else room.save()
