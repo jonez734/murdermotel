@@ -16,6 +16,17 @@ Detailed specifications for each game module:
 | [SPEC_obj.md](SPEC_obj.md) | Base object classes and registry |
 | [SPEC_npc.md](SPEC_npc.md) | NPC modules (RabidWolf, Thief) |
 
+### Maintenance Modules (sysop-only)
+
+| Module | Description |
+|--------|-------------|
+| `housekeeping` | Maintenance menu with Setup, Edit, Weapon List, Quit |
+| `weaponlist` | Sysop-only tool showing components and recipe info |
+
+The `weaponlist` module provides two options:
+- **C** - Components: Lists all components with their room locations
+- **R** - Recipes: Shows each weapon recipe with its two components and room numbers (or "unplaced" if not in any room)
+
 ## Tables
 
 ### Core Tables

@@ -31,3 +31,5 @@
 - [x] save() refactor: use `commit=False` pattern for transaction management (@done 20260602)
 - [x] replace `copy.deepcopy(self.items)` with `list(self.items)` in player.py (@done 20260602)
 - [x] refactor Makefile: simplified build, version generation, virtual env support (@done 20260602)
+- [x] weaponlist module: sysop-only menu with C (components) and R (recipes) options (@done 20260603)
+  - R option shows each recipe's components and room numbers where available
