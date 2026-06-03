@@ -48,7 +48,35 @@ class Room:
 | `short` | `() -> str` | Get short room description |
 | `buildrec` | `()` | Build database record |
 | `finditem` | `(shortname)` | Find item by name |
-| `save` | `(mogrify=False, commit=True, **kwargs)` | Save room to database (commit=False defers to outer transaction) |
+| `save` | `(mogrify=False, **kwargs)` | Save room to database (uses CONN_POOL_PATTERN: context manager handles commit) |
+
+## CONN_POOL_PATTERN
+
+All database save/load methods use the standard bbsengine6 CONN_POOL_PATTERN:
+
+```python
+def save(self, mogrify=False, **kwargs):
+    def _work(conn):
+        # Database operations with conn, commit=False
+    
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool") or self.pool
+        if pool is None:
+            io.echo(f"mm.room.save.180: {pool=}", level="error")
+            return False
+        with database.connect(self.args, pool=pool) as conn:
+            return _work(conn)
+    else:
+        return _work(conn)
+```
+
+**Key principles:**
+- Always use `with database.connect()` context manager
+- Pass `commit=False` to database operations to defer commit to context manager
+- Let context manager handle commit on successful exit
+- Let context manager handle connection return to pool
+- Explicit `conn.commit()` before pool return causes "rolling back returned connection" warning
 
 ## Database
 

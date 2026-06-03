@@ -21,6 +21,33 @@ Player module for the Murder Motel game. Manages player characters, inventory, a
 | `inputmoniker` | `(prompt, oldvalue, args, verify=None, **kwargs)` | Input player name with verification |
 | `create` | `(args, playermoniker, **kwargs)` | Create new player |
 
+## CONN_POOL_PATTERN
+
+All database save/load methods use the standard bbsengine6 CONN_POOL_PATTERN:
+
+```python
+def save(self, **kwargs):
+    def _work(conn):
+        # Database operations with conn, commit=False
+    
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        if self.pool is None:
+            io.echo(f"mm.player.save.120: {self.pool=}", level="error")
+            return False
+        with database.connect(self.args, pool=self.pool) as conn:
+            return _work(conn)
+    else:
+        return _work(conn)
+```
+
+**Key principles:**
+- Always use `with database.connect()` context manager
+- Pass `commit=False` to database operations to defer commit to context manager
+- Let context manager handle commit on successful exit
+- Let context manager handle connection return to pool
+- Explicit `conn.commit()` before pool return causes "rolling back returned connection" warning
+
 ## Player Class
 
 ```python
@@ -55,7 +82,7 @@ class Player:
 | `buildrec` | `(kwargs)` | Build database record |
 | `weapons` | `(items=None)` | Find complete weapons from components |
 | `finditem` | `(shortname)` | Find item by name |
-| `save` | `(commit=True, **kwargs)` | Save player to database (commit=False defers to outer transaction) |
+| `save` | `(**kwargs)` | Save player to database (uses CONN_POOL_PATTERN: context manager handles commit) |
 | `info` | `()` | Display player info |
 | `getitems` | `()` | Get player's items with weapons |
 

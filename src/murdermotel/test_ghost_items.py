@@ -39,6 +39,7 @@ class TestGhostItems:
                     FROM $murdermotel.item i
                     WHERE NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_room m WHERE m.itemname = i.name AND m.serial = m.serial)
                     AND NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_player m WHERE m.itemname = i.name AND m.serial = m.serial)
+                    AND NOT EXISTS (SELECT 1 FROM $murdermotel.map_item_thief m WHERE m.itemname = i.name AND m.serial = m.serial)
                     ORDER BY i.name, i.serial
                 """
                 )

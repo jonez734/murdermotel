@@ -10,23 +10,28 @@ import pytest
 from bbsengine6 import database
 
 
-_tracked_pools = []
+_tracked_pools: list = []
 
 
-def _cleanup_pools():
+def pytest_sessionfinish(session, exitstatus):
     import gc
     import threading
     import time
 
-    database.reset_pool_cache()
     for pool in list(_tracked_pools):
         try:
             pool.close()
         except Exception:
             pass
-        _tracked_pools.remove(pool)
+    _tracked_pools.clear()
+
+    try:
+        database.reset_pool_cache()
+    except Exception:
+        pass
 
     gc.collect()
+
     for _ in range(20):
         active_workers = sum(
             1
@@ -62,7 +67,6 @@ def test_pool(test_args):
     test_args.pool = pool
     _tracked_pools.append(pool)
     yield pool
-    _cleanup_pools()
 
 
 @pytest.fixture(scope="session")
@@ -98,6 +102,19 @@ def test_player(test_args, test_pool):
                 moniker=moniker,
             )
             cur.execute(q, {"moniker": moniker})
+        conn.commit()
+
+    with database.connect(test_args, pool=test_pool) as conn:
+        with database.cursor(conn) as cur:
+            for name, serial in [
+                ("test_item_teardown", 999),
+            ]:
+                q = database.query(
+                    "DELETE FROM $murdermotel.item WHERE name = :name AND serial = :serial",
+                    name=name,
+                    serial=serial,
+                )
+                cur.execute(q, {"name": name, "serial": serial})
         conn.commit()
 
 

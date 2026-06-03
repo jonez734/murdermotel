@@ -1,5 +1,4 @@
 import argparse
-import atexit
 import os
 import pytest
 from unittest.mock import MagicMock
@@ -8,40 +7,6 @@ from bbsengine6 import database
 
 
 _tracked_pools: list = []
-
-
-def _cleanup_pools() -> None:
-    import gc
-    import threading
-    import time
-
-    try:
-        database.reset_pool_cache()
-    except Exception:
-        pass
-
-    for pool in list(_tracked_pools):
-        try:
-            pool.close()
-        except Exception:
-            pass
-
-    _tracked_pools.clear()
-
-    gc.collect()
-
-    for _ in range(20):
-        active_workers = sum(
-            1
-            for t in threading.enumerate()
-            if t.name.startswith("psycopg") or t.name.startswith("pool-")
-        )
-        if active_workers == 0:
-            break
-        time.sleep(0.05)
-
-
-atexit.register(_cleanup_pools)
 
 
 @pytest.fixture(scope="session")
@@ -66,7 +31,6 @@ def test_pool(test_args):
     test_args.pool = pool
     _tracked_pools.append(pool)
     yield pool
-    _cleanup_pools()
 
 
 @pytest.fixture(scope="session")

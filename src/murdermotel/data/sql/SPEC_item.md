@@ -41,7 +41,34 @@ class Item:
 |--------|-----------|-------------|
 | `short` | `() -> str` | Get short item description |
 | `buildrec` | `()` | Build database record |
-| `save` | `(mogrify=False, commit=True, **kwargs)` | Save item to database (commit=False defers to outer transaction) |
+| `save` | `(mogrify=False, **kwargs)` | Save item to database (uses CONN_POOL_PATTERN: context manager handles commit) |
+
+## CONN_POOL_PATTERN
+
+All database save/load methods use the standard bbsengine6 CONN_POOL_PATTERN:
+
+```python
+def save(self, mogrify=False, **kwargs):
+    def _work(conn):
+        # Database operations with conn, commit=False
+    
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        if self.pool is None:
+            io.echo(f"mm.item.save.180: {self.pool=}", level="error")
+            return False
+        with database.connect(self.args, pool=self.pool) as conn:
+            return _work(conn)
+    else:
+        return _work(conn)
+```
+
+**Key principles:**
+- Always use `with database.connect()` context manager
+- Pass `commit=False` to database operations to defer commit to context manager
+- Let context manager handle commit on successful exit
+- Let context manager handle connection return to pool
+- Explicit `conn.commit()` before pool return causes "rolling back returned connection" warning
 
 ## Database
 
