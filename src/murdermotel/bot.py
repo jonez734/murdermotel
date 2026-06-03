@@ -193,7 +193,6 @@ class Bot(Living):
             with database.connect(self.args, pool=pool) as conn:
                 room.save(conn=conn)
                 self.save(conn=conn)
-                conn.commit()
         else:
             if self.pool:
                 self.save(conn=conn) if conn else self.save()
@@ -270,6 +269,7 @@ class Bot(Living):
                 update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
                 mogrify=False,
                 conn=conn,
+                commit=False,
             ):
                 io.echo("mm.bot.save.110: upsert failed", level="error")
                 return False
@@ -289,6 +289,7 @@ class Bot(Living):
                         returnid=False,
                         mogrify=False,
                         conn=conn,
+                        commit=False,
                     ):
                         io.echo("mm.bot.save.120: insert failed", level="error")
                         return False
@@ -300,10 +301,9 @@ class Bot(Living):
                 io.echo(f"mm.bot.save.100: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                _work(conn)
+                return _work(conn)
         else:
-            _work(conn)
-        return True
+            return _work(conn)
 
 
 def access(args: argparse.Namespace, op: str, **kwargs: Any) -> bool:

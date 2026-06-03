@@ -72,6 +72,7 @@ class Item(object):
                 conflict_columns=["name"],
                 mogrify=False,
                 conn=conn,
+                commit=False,
             ):
                 io.echo("mm.item.save.105: item upsert failed", level="error")
                 return False
@@ -83,9 +84,7 @@ class Item(object):
                 io.echo(f"mm.item.save.180: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                result = _work(conn)
-                conn.commit()
-                return result
+                return _work(conn)
         else:
             return _work(conn)
 

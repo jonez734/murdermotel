@@ -129,6 +129,7 @@ class BoobyTrap(Item):
                 update_columns=["kind", "modulepath", "title"],
                 mogrify=False,
                 conn=conn,
+                commit=False,
             ):
                 io.echo("mm.BoobyTrap.save.105: item upsert failed", level="error")
                 return False
@@ -141,6 +142,7 @@ class BoobyTrap(Item):
                 rec,
                 primarykey="name",
                 conn=conn,
+                commit=False,
             )
 
             with database.cursor(conn) as cur:
@@ -162,6 +164,7 @@ class BoobyTrap(Item):
                     returnid=False,
                     mogrify=False,
                     conn=conn,
+                    commit=False,
                 ):
                     io.echo("mm.BoobyTrap.save.110: insert failed", level="error")
                     return False
@@ -173,10 +176,9 @@ class BoobyTrap(Item):
                 io.echo(f"mm.BoobyTrap.save.100: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                _work(conn)
+                return _work(conn)
         else:
-            _work(conn)
-        return True
+            return _work(conn)
 
 
 def load(args, **kwargs):

@@ -31,7 +31,8 @@ class Thief(Living):
                 self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
         else:
             self.roomid = random.randint(10, libroom.getcount(args, **kwargs) - 10)
-        self.items = []
+        if not hasattr(self, "items") or self.items is None:
+            self.items = []
         self.modulepath = None
         registry.register(self)
 
@@ -77,7 +78,6 @@ class Thief(Living):
             with database.connect(self.args, pool=pool) as conn:
                 self.save(conn=conn)
                 player.save(conn=conn)
-                conn.commit()
         else:
             if self.pool:
                 self.save(conn=conn) if conn else self.save()
@@ -94,6 +94,7 @@ class Thief(Living):
                 rec,
                 primarykey="name",
                 conn=conn,
+                commit=False,
             )
 
             with database.cursor(conn) as cur:
@@ -115,20 +116,19 @@ class Thief(Living):
                         returnid=False,
                         mogrify=False,
                         conn=conn,
+                        commit=False,
                     ):
                         io.echo("mm.Thief.save.110: insert failed", level="error")
                         return False
             return True
 
-        conn = kwargs.get("conn", None) or self.conn
+        conn = kwargs.get("conn", None)
         if conn is None:
             if self.pool is None:
                 io.echo(f"mm.Thief.save.100: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                result = _work(conn)
-                conn.commit()
-                return result
+                return _work(conn)
         else:
             return _work(conn)
 
@@ -178,7 +178,7 @@ def load(args, **kwargs):
 
             rec = cur.fetchone()
             t = build(args, rec, **kwargs)
-            t.items = getitems(args, **kwargs)
+            t.items = getitems(args, conn=conn)
             return t
 
     conn = kwargs.get("conn", None)
@@ -214,6 +214,7 @@ def save(args, thief, **kwargs):
             for i in thief.items:
                 m = {}
                 m["itemname"] = i.name
+                m["serial"] = i.serial
                 m["thiefname"] = THIEF_NAME
                 if not database.insert(
                     args,
@@ -323,11 +324,12 @@ def getitems(args, **kwargs):
             cur.execute(q)
             if cur.rowcount == 0:
                 return items
-            res = cur.fetchmany()
-            for rec in res:
+            for rec in cur.fetchall():
                 from . import item as libitem
 
-                item = libitem.load(args, rec["itemname"], serial=rec.get("serial"))
+                item = libitem.load(
+                    args, rec["itemname"], serial=rec.get("serial"), conn=conn
+                )
                 if item is None:
                     io.echo(f"mm.thief.getitems: {item=}", level="error")
                     break
@@ -437,8 +439,11 @@ def steal_from_player(player, thief, **kwargs):
             thief.save(conn=conn)
             conn.commit()
     else:
-        if pool and args:
-            player.save(conn=conn) if conn else player.save()
-            thief.save(conn=conn) if conn else thief.save()
+        if conn is not None:
+            player.save(conn=conn)
+            thief.save(conn=conn)
+        else:
+            player.save()
+            thief.save()
 
     return item

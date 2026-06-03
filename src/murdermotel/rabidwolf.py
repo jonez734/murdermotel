@@ -150,6 +150,7 @@ class RabidWolf(Living):
                 rec,
                 primarykey="name",
                 conn=conn,
+                commit=False,
             )
             return True
 
@@ -159,10 +160,9 @@ class RabidWolf(Living):
                 io.echo(f"mm.RabidWolf.save.100: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                _work(conn)
+                return _work(conn)
         else:
-            _work(conn)
-        return True
+            return _work(conn)
 
 
 def access(

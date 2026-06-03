@@ -109,6 +109,7 @@ class Room(object):
                 conflict_columns=["id"],
                 mogrify=False,
                 conn=conn,
+                commit=False,
             ):
                 io.echo("mm.room.save.105: room upsert failed", level="error")
                 return False
@@ -132,6 +133,7 @@ class Room(object):
                         conflict_columns=["itemname", "serial", "roomid"],
                         mogrify=False,
                         conn=conn,
+                        commit=False,
                     ):
                         io.echo("mm.room.save.110: item upsert failed", level="error")
                         return False
@@ -144,9 +146,7 @@ class Room(object):
                 io.echo(f"mm.room.save.180: {pool=}", level="error")
                 return False
             with database.connect(self.args, pool=pool) as conn:
-                result = _work(conn)
-                conn.commit()
-                return result
+                return _work(conn)
         else:
             return _work(conn)
 
