@@ -1,22 +1,24 @@
+from typing import Any
+
 import argparse
 
 from bbsengine6 import database, io, member
 
 
-def init(args: argparse.Namespace | None = None, **kw: dict) -> bool:
+def init(args: argparse.Namespace | None = None, **kwargs: Any) -> bool:
     return True
 
 
-def access(args: argparse.Namespace, op: str, **kw: dict) -> bool | None:
-    return member.issysop(args, **kw)
+def access(args: argparse.Namespace, op: str, **kwargs: Any) -> bool | None:
+    return member.issysop(args, **kwargs)
 
 
-def buildargs(args: argparse.Namespace, **kw: dict) -> argparse.ArgumentParser | None:
+def buildargs(args: argparse.Namespace, **kwargs: Any) -> argparse.ArgumentParser | None:
     return None
 
 
-def main(args: argparse.Namespace, **kw: dict) -> bool | None:
-    pool = kw.get("pool", None)
+def main(args: argparse.Namespace, **kwargs: Any) -> bool | None:
+    pool = kwargs.get("pool", None)
     if pool is None:
         io.echo(f"mm.weaponlist.main.100: {pool=}", level="error")
         return False
