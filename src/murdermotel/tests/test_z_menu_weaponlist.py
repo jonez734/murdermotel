@@ -80,3 +80,92 @@ class TestZMenuWeaponList:
             assert "pistol:" in output
             assert "chlorine:" in output
             assert "+" in output
+
+
+class TestZMenuGotoOption:
+    def test_g_option_prompts_for_destination(self, test_args, test_pool, test_player, test_room):
+        from murdermotel import play as libplay
+
+        with patch("murdermotel.play.io.inputchoice", side_effect=["G", "Q"]):
+            with patch("murdermotel.play.io.echo"):
+                with patch("murdermotel.play.io.inputstring") as mock_input:
+                    mock_input.return_value = None
+
+                    room = type("Room", (), {"id": test_room})()
+                    player = type("Player", (), {"moniker": test_player, "roomid": test_room})()
+
+                    libplay.maintmode(
+                        test_args, player=player, room=room, pool=test_pool
+                    )
+
+                    mock_input.assert_called()
+
+    def test_g_option_accepts_room_number(self, test_args, test_pool, test_player, test_room):
+        from murdermotel import play as libplay
+
+        with patch("murdermotel.play.io.inputchoice", side_effect=["G", "Q"]):
+            with patch("murdermotel.play.io.echo"):
+                with patch("murdermotel.play.io.inputstring") as mock_input:
+                    mock_input.return_value = "50"
+
+                    room = type("Room", (), {"id": test_room})()
+                    player = type("Player", (), {"moniker": test_player, "roomid": test_room})()
+
+                    result = libplay.maintmode(
+                        test_args, player=player, room=room, pool=test_pool
+                    )
+
+                    assert result is True
+
+    def test_g_option_aborts_on_empty_input(self, test_args, test_pool, test_player, test_room):
+        from murdermotel import play as libplay
+
+        with patch("murdermotel.play.io.inputchoice", side_effect=["G", "Q"]):
+            with patch("murdermotel.play.io.echo"):
+                with patch("murdermotel.play.io.inputstring") as mock_input:
+                    mock_input.return_value = ""
+
+                    room = type("Room", (), {"id": test_room})()
+                    player = type("Player", (), {"moniker": test_player, "roomid": test_room})()
+
+                    result = libplay.maintmode(
+                        test_args, player=player, room=room, pool=test_pool
+                    )
+
+                    assert result is True
+
+
+class TestZMenuEditRoomOption:
+    def test_e_option_prompts_for_shortname(self, test_args, test_pool, test_player, test_room):
+        from murdermotel import play as libplay
+
+        with patch("murdermotel.play.io.inputchoice", side_effect=["E", "Q"]):
+            with patch("murdermotel.play.io.echo"):
+                with patch("murdermotel.play.io.inputstring") as mock_input:
+                    mock_input.return_value = None
+
+                    room = type("Room", (), {"id": test_room, "shortname": "test"})()
+                    player = type("Player", (), {"moniker": test_player})()
+
+                    libplay.maintmode(
+                        test_args, player=player, room=room, pool=test_pool
+                    )
+
+                    mock_input.assert_called()
+
+
+class TestZMenuReloadOption:
+    def test_r_option_calls_reload(self, test_args, test_pool, test_player, test_room):
+        from murdermotel import play as libplay
+
+        with patch("murdermotel.play.io.inputchoice", return_value="R"):
+            with patch("murdermotel.play.io.echo"):
+                with patch("murdermotel.play.io.inputchoice", return_value="Q"):
+                    room = type("Room", (), {"id": test_room})()
+                    player = type("Player", (), {"moniker": test_player, "modulepath": None})()
+
+                    result = libplay.maintmode(
+                        test_args, player=player, room=room, pool=test_pool
+                    )
+
+                    assert result is True
