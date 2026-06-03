@@ -1,5 +1,4 @@
 import argparse
-import copy
 import datetime
 
 from bbsengine6 import member, database, io, util
@@ -132,7 +131,7 @@ class Player(object):
 
     def weapons(self, items=None):
         if items is None:
-            items = copy.deepcopy(self.items)
+            items = list(self.items)
 
         def find(shortname):
             for x in range(0, len(items)):
@@ -193,6 +192,7 @@ class Player(object):
                 rec,
                 primarykey="moniker",
                 conn=conn,
+                commit=False,
             )
 
             with database.cursor(conn) as cur:
@@ -217,6 +217,7 @@ class Player(object):
                         returnid=False,
                         mogrify=False,
                         conn=conn,
+                        commit=False,
                     ):
                         io.echo("mm.player.save.130: insert failed", level="error")
                         return False
@@ -228,9 +229,7 @@ class Player(object):
                 io.echo(f"mm.player.save.120: {self.pool=}", level="error")
                 return False
             with database.connect(self.args, pool=self.pool) as conn:
-                result = _work(conn)
-                conn.commit()
-                return result
+                return _work(conn)
         else:
             return _work(conn)
 
@@ -241,14 +240,16 @@ class Player(object):
         if self.datelastplayed is not None:
             date = util.datestamp(self.datelastplayed)
             io.echo(f"{{var:labelcolor}}Date:  {{var:valuecolor}}{date}")
-        items = copy.deepcopy(self.items)
-        items = self.weapons(items) + items
-        util.oxfordcomma(items)
-        io.echo(f"{{var:labelcolor}}Items: {{var:valuecolor}}{items}")
+        item_list = list(self.items)
+        item_list = self.weapons(item_list) + item_list
+        item_names = [i.name for i in item_list]
+        item_str = util.oxfordcomma(item_names)
+        io.echo(f"{{var:labelcolor}}Items: {{var:valuecolor}}{item_str}")
 
     def getitems(self):
-        items = copy.deepcopy(self.items)
-        return self.weapons(items) + items
+        item_list = list(self.items)
+        item_list = self.weapons(item_list) + item_list
+        return item_list
 
 
 def load(args, moniker, **kwargs):
@@ -466,6 +467,7 @@ def inputmoniker(
     prompt: str = "player moniker: ",
     oldvalue: str = "",
     args: argparse.Namespace | None = None,
+    verify=None,
     **kwargs: dict,
 ):
     if args is None:
@@ -476,13 +478,24 @@ def inputmoniker(
             args = argparse.Namespace()
     elif not isinstance(args, argparse.Namespace):
         args = argparse.Namespace()
-    verify = kwargs.pop("verify", verifyPlayerNameFound)
+
+    if verify is None:
+        verify = verifyPlayerNameFound
+
+    def _verify_wrapper(buffer: str, **kwargs) -> bool:
+        conn = kwargs.get("conn", None)
+        pool = kwargs.get("pool", None)
+        return verify(args, buffer, conn=conn, pool=pool)
+
+    verify_kwargs = {"conn": kwargs.get("conn"), "pool": kwargs.get("pool")}
+
     moniker = io.inputstring(
         prompt,
         oldvalue,
-        verify=verify,
-        completer=completePlayerName(args, **kwargs),
+        verify=_verify_wrapper,
+        completer=completePlayerName(args, pool=kwargs.get("pool")),
         completerdelims="",
+        verify_kwargs=verify_kwargs,
         **kwargs,
     )
     io.echo(f"libplayer.inputmoniker.160: {moniker=}", level="debug")
