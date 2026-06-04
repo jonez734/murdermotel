@@ -143,6 +143,31 @@ def count(moniker, args, **kwargs):
 
 The `bbsengine6.notify.count()` function uses `autocommit=True` to eliminate INTRANS warnings from the notify subsystem.
 
+## Fatal DB Errors in Module main()
+
+All module `main()` functions are decorated with `@fatal_on_db_error` from `bbsengine6.io`.
+This makes DB/connection errors fatal (exit 1) rather than silently failing:
+
+```python
+from bbsengine6.io import fatal_on_db_error
+
+@fatal_on_db_error
+def main(args, **kwargs):
+    with database.connect(args, pool=pool) as conn:
+        _work(conn)
+```
+
+The decorator catches:
+- `psycopg.OperationalError` - connection refused, pool exhausted, server down
+- `psycopg.InterfaceError` - connection closed unexpectedly
+
+On fatal error: traceback is printed via `echo_traceback()` and `sys.exit(1)` is called.
+
+Other exceptions (ValueError, KeyError, KeyboardInterrupt) propagate normally.
+
+**Applied to**: bot, player, maintenance, thief, rabidwolf, boobytrap, item, room,
+weaponlist, housekeeping, traproom, startup, play, lobby.
+
 ## Loading Order
 
 ```
