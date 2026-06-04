@@ -230,7 +230,6 @@ def main(args, **kwargs) -> bool:
             conn.rollback()
             return False
 
-        conn.commit()
         return True
 
     conn = kwargs.get("conn", None)
@@ -313,7 +312,6 @@ def _populate_rooms(args, **kwargs) -> bool:
         with database.cursor(conn) as cur:
             cur.executemany(query.as_string(conn), params_list)
 
-        conn.commit()
         return True
 
     conn = kwargs.get("conn", None)
@@ -388,5 +386,4 @@ def _check_orphan_items(args, conn) -> tuple[int, int]:
                         placements,
                     )
 
-    conn.commit()
     return orphan_count, ghost_count
