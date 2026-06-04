@@ -1,4 +1,5 @@
 from bbsengine6 import io, member, util
+from bbsengine6.io import fatal_on_db_error
 
 from . import lib as libmm
 from . import data
@@ -31,6 +32,7 @@ def lobbyhelp(**kwargs):
     io.echo("{f6}{var:optioncolor}[Q]{var:labelcolor}uit")
 
 
+@fatal_on_db_error
 def main(args, **kwargs):
     io.echo(f"{kwargs=}", level="debug")
     name = member.getcurrentmoniker(args, **kwargs)

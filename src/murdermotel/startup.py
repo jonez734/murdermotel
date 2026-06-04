@@ -4,6 +4,7 @@
 import re
 
 from bbsengine6 import database, io
+from bbsengine6.io import fatal_on_db_error
 from psycopg import sql as pgsql
 
 from . import lib as libmm, room as libroom
@@ -51,6 +52,7 @@ def buildargs(args, **kwargs):
     return None
 
 
+@fatal_on_db_error
 def main(args, **kwargs) -> bool:
     def _work(conn):
         io.echo("running startup...")

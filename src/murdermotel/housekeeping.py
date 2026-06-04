@@ -1,6 +1,7 @@
 import argparse
 
 from bbsengine6 import io, util, member
+from bbsengine6.io import fatal_on_db_error
 
 from . import lib
 
@@ -17,6 +18,7 @@ def buildargs(args: argparse.Namespace, **kw: dict) -> argparse.ArgumentParser |
     return None
 
 
+@fatal_on_db_error
 def main(args: argparse.Namespace, **kw: dict) -> bool | None:
     if args is not None and "debug" in args and args.debug is True:
         io.echo("hotelsetup.main.100: args=%r" % (args))

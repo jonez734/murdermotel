@@ -3,6 +3,7 @@ from typing import Any
 import argparse
 
 from bbsengine6 import database, io, member
+from bbsengine6.io import fatal_on_db_error
 
 
 def init(args: argparse.Namespace | None = None, **kwargs: Any) -> bool:
@@ -17,6 +18,7 @@ def buildargs(args: argparse.Namespace, **kwargs: Any) -> argparse.ArgumentParse
     return None
 
 
+@fatal_on_db_error
 def main(args: argparse.Namespace, **kwargs: Any) -> bool | None:
     pool = kwargs.get("pool", None)
     if pool is None:

@@ -2,6 +2,7 @@ import random
 import random as randomlib
 
 from bbsengine6 import database, io, util
+from bbsengine6.io import fatal_on_db_error
 
 from . import lib as libmm
 from . import room as libroom
@@ -145,6 +146,7 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
+@fatal_on_db_error
 def main(args, **kwargs) -> bool:
     return True
 

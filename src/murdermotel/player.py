@@ -2,6 +2,7 @@ import argparse
 import datetime
 
 from bbsengine6 import member, database, io, util
+from bbsengine6.io import fatal_on_db_error
 
 from . import item as libitem, lib as libmm
 
@@ -48,6 +49,7 @@ def buildargs(args, obj=None, room=None, **kwargs):
     return None
 
 
+@fatal_on_db_error
 def main(args, **kwargs) -> bool:
     return True
 

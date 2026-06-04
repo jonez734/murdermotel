@@ -182,3 +182,46 @@ pool, conn, we_created_conn = _resolve_conn(
     args, kwargs.get("pool"), kwargs.get("conn"), autocommit=True
 )
 ```
+
+## Fatal Errors in Module main() Functions
+
+DB/connection errors in module main() functions should cause the program to exit.
+Use the `@fatal_on_db_error` decorator from `bbsengine6.io`:
+
+```python
+from bbsengine6.io import fatal_on_db_error
+
+@fatal_on_db_error
+def main(args, **kwargs):
+    with database.connect(args, pool=pool) as conn:
+        _work(conn)
+```
+
+The decorator catches:
+- `psycopg.OperationalError` - connection refused, pool exhausted, server down
+- `psycopg.InterfaceError` - connection closed unexpectedly
+
+Other exceptions (ValueError, KeyError, KeyboardInterrupt, etc.) propagate normally
+to allow caller to handle them.
+
+On fatal DB error:
+1. Traceback is printed via `echo_traceback()`
+2. `sys.exit(1)` is called
+
+This is applied to all murdermotel module main() functions:
+- `lobby.py:36` - main
+- `play.py:208` - main, maintmode
+- `startup.py:55` - main
+- `bot.py:321` - main
+- `player.py:51` - main
+- `thief.py:148` - main
+- `rabidwolf.py:496` - main
+- `boobytrap.py:29` - main
+- `item.py:20` - main
+- `room.py:23` - main
+- `weaponlist.py:20` - main
+- `housekeeping.py:20` - main
+- `maintenance.py:175` - main
+- `traproom.py:91` - main
+
+If a module's main() should NOT exit on DB error (rare), simply don't decorate it.

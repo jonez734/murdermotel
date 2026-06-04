@@ -4,6 +4,7 @@ import random
 from typing import Any, Optional
 
 from bbsengine6 import database, io, util, member, module as bbsmodule
+from bbsengine6.io import fatal_on_db_error
 
 from . import (
     lib as libmm,
@@ -204,6 +205,7 @@ def playgroundhelp(**kwargs: Any) -> bool:
     return True
 
 
+@fatal_on_db_error
 def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     from datetime import datetime
     import dateutil.tz

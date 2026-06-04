@@ -1,4 +1,5 @@
 from bbsengine6 import database, io
+from bbsengine6.io import fatal_on_db_error
 
 from . import room as libroom, item as libitem, lib as libmm
 
@@ -172,6 +173,7 @@ def playground(args, **kwargs):
     return False
 
 
+@fatal_on_db_error
 def main(args, **kwargs):
     if args is not None and "debug" in args and args.debug is True:
         io.echo(f"mm.maint.main.100: {args=}", level="debug")

@@ -4,6 +4,7 @@ import random
 from typing import Any, Optional
 
 from bbsengine6 import database, io, util
+from bbsengine6.io import fatal_on_db_error
 
 from . import lib as libmm
 from . import room as libroom
@@ -493,6 +494,7 @@ def flee(args: argparse.Namespace, player: Any, exits: dict) -> None:
     return
 
 
+@fatal_on_db_error
 def main(args: argparse.Namespace, **kwargs: Any) -> bool:
     player = kwargs["player"] if "player" in kwargs else None
     if player is None:
