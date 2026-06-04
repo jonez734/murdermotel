@@ -46,7 +46,7 @@ def save(self, **kwargs):
 - Pass `commit=False` to database operations to defer commit to context manager
 - Let context manager handle commit on successful exit
 - Let context manager handle connection return to pool
-- Explicit `conn.commit()` before pool return causes "rolling back returned connection" warning
+- **Never** call `conn.commit()` explicitly - causes INTRANS rollback warning
 
 ## Player Class
 

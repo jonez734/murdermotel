@@ -11,6 +11,7 @@ def save(self, mogrify=False, **kwargs):
     def _work(conn):
         # Database operations here
         # Use conn=conn for all database.* calls
+        # Use commit=False on upsert/insert/update calls
         return True
 
     conn = kwargs.get("conn", None)
@@ -20,9 +21,7 @@ def save(self, mogrify=False, **kwargs):
             io.echo(f"{self.classname}.save.100: pool is None", level="error")
             return False
         with database.connect(self.args, pool=pool) as conn:
-            result = _work(conn)
-            conn.commit()
-            return result
+            return _work(conn)
     else:
         return _work(conn)
 ```
@@ -35,13 +34,14 @@ Standalone functions (not methods) must follow this pattern:
 def some_function(args, some_id, **kwargs):
     def _work(conn):
         # Database operations here
+        # Use commit=False on database.* calls
         return result
 
     conn = kwargs.get("conn", None)
     if conn is None:
         pool = kwargs.get("pool", None)
         if pool is None:
-            io.echo(f"module.function.100: pool is None", level="error")
+            io.echo(f"module.function.100: {pool=}", level="error")
             return default_value  # False, [], None, etc.
         with database.connect(args, pool=pool) as conn:
             return _work(conn)
@@ -56,9 +56,38 @@ def some_function(args, some_id, **kwargs):
 4. **pool is None is fatal**: never call `database.getpool(args)` as fallback - callers must pass pool
 5. **Use nested `_work(conn)`**: keeps connection handling clean
 6. **Pass `conn=conn`**: to all database.* function calls
-7. **Commit in context**: after _work() completes
+7. **Use commit=False**: on database.upsert/insert/update calls to defer commit
+8. **No explicit conn.commit()**: context manager handles commit automatically
 
-## Refinements (2026-04-22)
+## Context Manager Handles Commit
+
+The `database.connect()` context manager automatically:
+- Sets `conn.autocommit = False` on connection acquisition
+- Commits on successful exit (when auto_commit=True, the default)
+- Returns connection to pool
+- Rolls back on exception
+
+## Why No Explicit conn.commit()?
+
+Explicit `conn.commit()` after using the context manager causes problems:
+
+1. Context manager already committed via `conn.commit()` in its finally block
+2. Calling `conn.commit()` again means commit happens AFTER context manager already returned the connection to pool
+3. Pool sees INTRANS state (transaction still active) and logs "rolling back returned connection"
+
+The fix: remove all explicit `conn.commit()` calls. Let the context manager handle it.
+
+## Refinements (2026-06-03)
+
+### Explicit conn.commit() Causes INTRANS Rollback
+
+After the context manager yields and the `finally` block runs:
+1. `if auto_commit: conn.commit()` executes
+2. `pool.putconn(conn)` returns connection to pool
+3. Any subsequent `conn.commit()` happens AFTER connection is back in pool
+4. Pool sees INTRANS status and rolls back, logging warning
+
+**Fix**: Never call `conn.commit()` after using `with database.connect(...)`.
 
 ### For .save() Methods - Prefer kwargs.pool over self.pool
 
@@ -88,6 +117,7 @@ database.upsert(
     {"id": self.id, "name": self.name},
     conflict_columns=["id"],  # unique constraint columns
     conn=conn,
+    commit=False,
 )
 ```
 
@@ -98,8 +128,6 @@ database.upsert(
 - `thief.py` - Thief.save()
 - `rabidwolf.py` - RabidWolf.save()
 - `bot.py` - Bot.save()
-
-## Files Fixed To Follow This Pattern
-
-- `room.py` - Room.save() [fixed 2026-04-20]
-- `item.py` - Item.save() [fixed 2026-04-20]
+- `room.py` - Room.save()
+- `item.py` - Item.save()
+- `startup.py` - main(), _populate_rooms(), _check_orphan_items()

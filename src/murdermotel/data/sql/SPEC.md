@@ -88,16 +88,34 @@ The `WEAPON_MODE` config in `lib.py` controls weapon distribution:
 
 Each weapon instance in `murdermotel.item` has a `state` JSONB column that can diverge from the recipe defaults. The `weapon_recipe.state` column provides default values copied into each instance at generation time.
 
-## Save Pattern
+## Save Pattern (CONN_POOL_PATTERN)
 
 All `save()` methods follow a consistent pattern for transaction management:
 
-1. `_work(conn)` nested function performs DB operations (upserts, inserts, updates)
-2. If external `conn` provided: call `_work(conn)` and commit, return result
-3. If only `pool` provided: acquire connection, call `_work(conn)`, commit, close
-4. All save methods use `commit=False` on upsert calls to defer commit until outer scope
+1. `_work(conn)` nested function performs DB operations
+2. All database.* calls use `commit=False` to defer commit
+3. Context manager handles commit on successful exit
+4. No explicit `conn.commit()` - context manager handles it
 
-This pattern ensures proper resource cleanup and transaction handling.
+```python
+def save(self, **kwargs):
+    def _work(conn):
+        # DB operations with commit=False
+        return True
+
+    conn = kwargs.get("conn", None)
+    if conn is None:
+        pool = kwargs.get("pool") or self.pool
+        if pool is None:
+            io.echo(f"mm.{self.classname}.save.100: {pool=}", level="error")
+            return False
+        with database.connect(self.args, pool=pool) as conn:
+            return _work(conn)
+    else:
+        return _work(conn)
+```
+
+**Critical**: Explicit `conn.commit()` after context manager causes INTRANS rollback. Never call `conn.commit()` when using `with database.connect()`.
 
 ## Loading Order
 
