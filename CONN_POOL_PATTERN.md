@@ -131,3 +131,54 @@ database.upsert(
 - `room.py` - Room.save()
 - `item.py` - Item.save()
 - `startup.py` - main(), _populate_rooms(), _check_orphan_items()
+
+## Read-Only Queries and Autocommit
+
+For read-only queries (SELECT COUNT, SELECT ... LIMIT, etc.), consider using `autocommit=True`
+to avoid INTRANS warnings from psycopg_pool when the connection is returned in an uncommitted
+transaction state.
+
+### The Problem
+
+When a connection is used for read-only queries with `autocommit=False`:
+1. Connection gets from pool with `autocommit = False`
+2. Query executes (no commit needed for read-only)
+3. Connection returned to pool
+4. Pool sees INTRANS state and rolls back, logging: "rolling back returned connection: <psycopg.Connection [INTRANS]>"
+
+### The Solution
+
+For read-only queries in utility functions (like `notify.count()`), use `autocommit=True`:
+
+```python
+# In _resolve_conn(), add autocommit parameter
+def _resolve_conn(args, pool, conn, autocommit=False):
+    if conn is not None:
+        return pool, conn, False
+    if pool is not None:
+        conn = pool.getconn()
+        conn.autocommit = autocommit  # True for read-only, False for writes
+        return pool, conn, True
+    # ...
+
+# Use for read-only query
+pool, conn, we_created = _resolve_conn(args, pool, conn, autocommit=True)
+```
+
+### When to Use Autocommit
+
+- **Use `autocommit=True`**: Read-only queries (SELECT COUNT, SELECT ... LIMIT)
+- **Use `autocommit=False`**: Write operations (INSERT, UPDATE, DELETE) that need transaction
+
+### Notify Module Fix
+
+The `bbsengine6.notify.count()` function was fixed to use `autocommit=True` since it's a
+read-only query. This eliminates INTRANS warnings without needing to disable the notify
+subsystem entirely.
+
+```python
+# notify/lib.py - count() now uses autocommit for read-only query
+pool, conn, we_created_conn = _resolve_conn(
+    args, kwargs.get("pool"), kwargs.get("conn"), autocommit=True
+)
+```

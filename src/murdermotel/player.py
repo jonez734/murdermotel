@@ -183,6 +183,7 @@ class Player(object):
 
     def save(self, **kwargs):
         def _work(conn):
+            io.echo(f"Player.save._work: entering, status={conn.pgconn.transaction_status}", level="debug")
             rec = self.buildrec()
             io.echo(f"mm.player.save.300: {rec=}", level="debug")
             database.update(
@@ -194,6 +195,7 @@ class Player(object):
                 conn=conn,
                 commit=False,
             )
+            io.echo(f"Player.save._work: after update, status={conn.pgconn.transaction_status}", level="debug")
 
             with database.cursor(conn) as cur:
                 q = database.query(
@@ -221,6 +223,7 @@ class Player(object):
                     ):
                         io.echo("mm.player.save.130: insert failed", level="error")
                         return False
+            io.echo(f"Player.save._work: after all ops, status={conn.pgconn.transaction_status}", level="debug")
             return True
 
         conn = kwargs.get("conn", None)

@@ -117,6 +117,32 @@ def save(self, **kwargs):
 
 **Critical**: Explicit `conn.commit()` after context manager causes INTRANS rollback. Never call `conn.commit()` when using `with database.connect()`.
 
+### Read-Only Queries and Autocommit
+
+For read-only queries (SELECT COUNT, SELECT ... LIMIT, etc.), use `autocommit=True` to avoid INTRANS warnings:
+
+```python
+def count(moniker, args, **kwargs):
+    pool, conn, we_created = _resolve_conn(
+        args, kwargs.get("pool"), kwargs.get("conn"), autocommit=True
+    )
+    if conn is None:
+        return None
+    try:
+        with database.cursor(conn) as cur:
+            cur.execute("SELECT COUNT(*) FROM ...")
+            return cur.fetchone()
+    finally:
+        if we_created and pool is not None:
+            pool.putconn(conn)
+```
+
+**When to use autocommit**:
+- `autocommit=True`: Read-only queries (SELECT COUNT, SELECT ... LIMIT)
+- `autocommit=False`: Write operations (INSERT, UPDATE, DELETE) needing transaction control
+
+The `bbsengine6.notify.count()` function uses `autocommit=True` to eliminate INTRANS warnings from the notify subsystem.
+
 ## Loading Order
 
 ```

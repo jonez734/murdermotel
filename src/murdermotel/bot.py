@@ -377,6 +377,7 @@ def create(
             update_columns=["roomid", "target", "targetedby", "is_alive", "state"],
             mogrify=False,
             conn=conn,
+            commit=False,
         ):
             io.echo("mm.bot.create.110: upsert failed", level="error")
             return None
