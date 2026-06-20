@@ -7,7 +7,7 @@ PYTHON = python3
 .PHONY: build version
 .PHONY: clean build rename-sdist sign release all
 
-build:
+build: version
 	VERSION=$(VERSION) $(PYTHON) -m build --outdir $(OUTDIR)
 
 rename-sdist:
@@ -38,7 +38,8 @@ sdist:
 	$(PYTHON) -m setup sdist --dist-dir /srv/repo/$(PROJECT)/
 
 version:
-	@echo 'githash = "'`git log -1 --format='%H' | cut -c 1-16`'"' > $(PROJECT)/_version.py
+	@echo '__version__ = "0.0.0.dev$(VERSION)"' > $(PROJECT)/_version.py
+	@echo 'githash = "'`git log -1 --format='%H' | cut -c 1-16`'"' >> $(PROJECT)/_version.py
 	@echo 'datestamp = "$(VERSION)"' >> $(PROJECT)/_version.py
 
 push: tag

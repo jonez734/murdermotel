@@ -1,2 +1,0 @@
-include murdermotel/data/*.txt
-include murdermotel/data/sql/*.sql
