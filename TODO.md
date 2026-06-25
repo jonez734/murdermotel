@@ -1,5 +1,9 @@
 # Murdermotel WebSocket API - TODO
 
+## BED bearer token
+
+- [ ] See `bed/TODO.md` "Bearer token" — adopt `bed.api.auth.AuthService` for BED-mode authentication and reconnect. Replaces per-game `auth` implementations. Murdermotel benefits strongly: long-lived investigation/investment sessions can reconnect mid-night without re-login.
+
 ## Overview
 
 Create a WebSocket API for murdermotel using bbsengine6.services.session.
